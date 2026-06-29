@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const dawnTheme = require('../../packages/ui/tailwind-theme.cjs');
+
 module.exports = {
   darkMode: 'class',
   content: [
@@ -8,7 +10,7 @@ module.exports = {
   ],
   presets: [require('nativewind/preset')],
   theme: {
-    extend: {},
+    extend: dawnTheme,
   },
   plugins: [],
 };

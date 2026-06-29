@@ -1,21 +1,22 @@
-export const colors = {
+import { semantic } from './semantic';
+
+/** Brand / action colors */
+const brand = {
   primary: '#6B4EFF',
   primaryLight: '#8B74FF',
   primaryDark: '#4A32CC',
+  secondary: '#2E2648',
   accent: '#FFB84D',
   accentLight: '#FFD080',
-  background: '#0F0B1E',
-  backgroundElevated: '#1A1530',
-  surface: '#231D3A',
-  surfaceLight: '#2E2648',
-  border: '#3D3560',
-  text: '#F5F0FF',
-  textSecondary: '#A89EC8',
-  textMuted: '#6B6088',
+  danger: '#F87171',
   success: '#4ADE80',
   warning: '#FBBF24',
-  error: '#F87171',
   info: '#60A5FA',
+} as const;
+
+export const colors = {
+  ...brand,
+  ...semantic,
   rarity: {
     common: '#9CA3AF',
     uncommon: '#34D399',
@@ -27,9 +28,14 @@ export const colors = {
   healthBg: '#3B1515',
   mana: '#3B82F6',
   manaBg: '#152040',
-  overlay: 'rgba(15, 11, 30, 0.85)',
   gradientStart: '#1A1035',
   gradientEnd: '#0F0B1E',
+  // Deprecated aliases — keep for backward compatibility during migration
+  background: semantic.surface,
+  backgroundElevated: semantic.surfaceElevated,
+  surfaceLight: semantic.surfacePressed,
+  text: semantic.textPrimary,
+  error: brand.danger,
 } as const;
 
 export type Colors = typeof colors;

@@ -1,21 +1,24 @@
-export * from './Button';
-export * from './Panel';
-export * from './Card';
-export * from './Window';
-export * from './Dialog';
-export * from './Modal';
-export * from './Avatar';
-export * from './ProgressBar';
-export * from './AnimatedNumber';
-export * from './Notification';
-export * from './Toast';
-export * from './Tooltip';
-export * from './InventorySlot';
-export * from './ItemCard';
-export * from './SkillCard';
-export * from './CharacterCard';
-export * from './FloatingActionButton';
-export * from './Tabs';
+// Foundation UI components
+export * from './ui/Button';
+export * from './ui/Card';
+export * from './ui/Panel';
+export * from './ui/Modal';
+export * from './ui/Dialog';
+export * from './ui/TopBar';
+export * from './ui/BottomNav';
+export * from './ui/Avatar';
+export * from './ui/ProgressBar';
+export * from './ui/Toast';
+export * from './ui/Window';
+export * from './ui/Icon';
+
+// Game-specific components
+export * from './game';
+
+// Legacy / supplementary components
 export * from './LoadingOverlay';
-export * from './TopBar';
-export * from './BottomNavigation';
+export * from './Tabs';
+export * from './Tooltip';
+export * from './Notification';
+export * from './AnimatedNumber';
+export * from './FloatingActionButton';

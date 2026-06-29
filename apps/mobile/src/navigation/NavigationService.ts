@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
+import { toast } from '@dawn/ui';
 import { FeatureFlags } from '@/constants/FeatureFlags';
 import { ROUTES } from '@/navigation/routes';
-import { useNotificationStore } from '@/stores/notificationStore';
 import { Logger } from '@/services/logger/Logger';
 
 const ROUTE_FLAGS: Partial<Record<string, keyof typeof FeatureFlags>> = {
@@ -29,7 +29,7 @@ export const NavigationService = {
 
   navigate(route: string): void {
     if (!NavigationService.canEnterRoute(route)) {
-      useNotificationStore.getState().showToast('This feature is not available yet.');
+      toast.info('This feature is not available yet.');
       Logger.debug('Navigation blocked', { route });
       return;
     }
@@ -38,7 +38,7 @@ export const NavigationService = {
 
   replace(route: string): void {
     if (!NavigationService.canEnterRoute(route)) {
-      useNotificationStore.getState().showToast('This feature is not available yet.');
+      toast.info('This feature is not available yet.');
       return;
     }
     router.replace(route as never);

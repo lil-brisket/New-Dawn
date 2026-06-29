@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { Button, useTheme } from '@dawn/ui';
+import { Button, useTheme, useToast } from '@dawn/ui';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { GradientPanel } from '@/components/GradientPanel';
 import { NavigationService } from '@/navigation/NavigationService';
 import { ROUTES } from '@/navigation/routes';
 import { useAuthStore } from '@/stores/authStore';
-import { useNotificationStore } from '@/stores/notificationStore';
 import { authRepository } from '@/services/api/auth';
 import { AppConstants } from '@/constants/AppConstants';
 
@@ -15,7 +14,7 @@ export function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((s) => s.login);
-  const showToast = useNotificationStore((s) => s.showToast);
+  const toast = useToast();
 
   const handleLogin = async () => {
     const { token } = await authRepository.login(
@@ -27,7 +26,7 @@ export function LoginScreen() {
   };
 
   const handleCreateAccount = () => {
-    showToast('Account creation coming soon.');
+    toast.info('Account creation coming soon.');
   };
 
   return (

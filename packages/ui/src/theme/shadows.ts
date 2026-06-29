@@ -20,6 +20,13 @@ export const shadows = {
     shadowRadius: 16,
     elevation: 8,
   },
+  glow: {
+    shadowColor: '#6B4EFF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
 } as const;
 
 export type Shadows = typeof shadows;
