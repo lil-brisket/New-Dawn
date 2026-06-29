@@ -14,6 +14,7 @@ export const ROUTES = {
   SETTINGS: '/(main)/settings',
   DEVELOPER: '/(main)/developer',
   DEVELOPER_UI_SHOWCASE: '/(main)/developer/ui-showcase',
+  DEVELOPER_COMPONENT_PLAYGROUND: '/(main)/developer/component-playground',
   DEVELOPER_THEME_PREVIEW: '/(main)/developer/theme-preview',
 } as const;
 

@@ -58,7 +58,13 @@ export function DeveloperScreen() {
         </View>
 
         <Button
-          title="UI Showcase"
+          title="Component Playground"
+          onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_COMPONENT_PLAYGROUND)}
+          accessibilityLabel="Open component playground"
+        />
+        <Button
+          title="UI Showcase (legacy)"
+          variant="secondary"
           onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_UI_SHOWCASE)}
           accessibilityLabel="Open UI showcase"
         />
