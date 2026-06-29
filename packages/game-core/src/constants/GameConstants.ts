@@ -1,0 +1,5 @@
+export const GAME_CONSTANTS = {
+  MAX_PARTY_SIZE: 4,
+  MAX_INVENTORY_SLOTS: 200,
+  PORTRAIT_ASPECT: 3 / 4,
+} as const;

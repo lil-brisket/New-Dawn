@@ -1,0 +1,10 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "home": {
+    "welcome": "Welcome, Adventurer"
+  }
+}

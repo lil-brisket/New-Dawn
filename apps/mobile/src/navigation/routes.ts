@@ -1,0 +1,15 @@
+export const ROUTES = {
+  SPLASH: '/',
+  LOGIN: '/(auth)/login',
+  HOME: '/(main)/home',
+  WORLD: '/(main)/world',
+  BATTLE: '/battle',
+  INVENTORY: '/(main)/inventory',
+  CHARACTERS: '/(main)/characters',
+  GUILD: '/(main)/guild',
+  SHOP: '/(main)/shop',
+  SUMMON: '/(main)/summon',
+  QUESTS: '/(main)/quests',
+  PROFILE: '/(main)/profile',
+  SETTINGS: '/(main)/settings',
+} as const;

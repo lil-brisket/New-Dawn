@@ -1,0 +1,16 @@
+{
+  "extends": "@dawn/config/typescript/react-native",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@dawn/ui": ["../../packages/ui/src"],
+      "@dawn/game-core": ["../../packages/game-core/src"],
+      "@dawn/game-data": ["../../packages/game-data/src"],
+      "@dawn/types": ["../../packages/types/src"],
+      "@dawn/utils": ["../../packages/utils/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+}

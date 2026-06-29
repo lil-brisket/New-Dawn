@@ -1,0 +1,1 @@
+export { scoreHeal } from './AttackScore';
