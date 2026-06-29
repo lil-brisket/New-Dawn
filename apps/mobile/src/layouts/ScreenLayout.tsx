@@ -1,25 +1,31 @@
 import type { ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@dawn/ui';
+import { ScreenBackground } from '@/components/ScreenBackground';
 
-export function ScreenLayout({ children }: { children: ReactNode }) {
+export function ScreenLayout({
+  children,
+  gradient = false,
+}: {
+  children: ReactNode;
+  gradient?: boolean;
+}) {
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-        },
-      ]}
-    >
-      {children}
-    </View>
+    <ScreenBackground gradient={gradient}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          },
+        ]}
+      >
+        {children}
+      </View>
+    </ScreenBackground>
   );
 }
 

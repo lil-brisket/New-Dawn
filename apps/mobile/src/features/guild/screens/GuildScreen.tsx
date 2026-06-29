@@ -1,17 +1,38 @@
+import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
-import { Card, useTheme } from '@dawn/ui';
-import { MainLayout } from '@/layouts/MainLayout';
+import { useTheme } from '@dawn/ui';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { guildRepository } from '@/services/api/guild';
 
 export function GuildScreen() {
-  const { colors } = useTheme();
+  const { colors, spacing, typography } = useTheme();
+  const [summary, setSummary] = useState<string | null>(null);
+
+  useEffect(() => {
+    guildRepository.getGuild().then((guild) => {
+      if (guild) {
+        setSummary(`${guild.name} — Level ${guild.level} — ${guild.members} members`);
+      }
+    });
+  }, []);
 
   return (
-    <MainLayout title="Guild">
-      <Card title="No Guild" subtitle="Join or create a guild">
-        <Text style={{ color: colors.textMuted, marginTop: 8 }}>
-          Guild wars, raids, and shared rewards — coming soon.
+    <PlaceholderScreen
+      title="Guild"
+      icon="guild"
+      description="Join a fellowship, participate in guild wars, and earn rewards."
+    >
+      {summary ? (
+        <Text
+          style={{
+            color: colors.textMuted,
+            fontSize: typography.fontSize.sm,
+            marginTop: spacing.xs,
+          }}
+        >
+          {summary}
         </Text>
-      </Card>
-    </MainLayout>
+      ) : null}
+    </PlaceholderScreen>
   );
 }

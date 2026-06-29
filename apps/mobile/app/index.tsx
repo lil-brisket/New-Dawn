@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { SplashScreen } from '@/features/auth/screens/SplashScreen';
 import { useAuthStore } from '@/stores/authStore';
+import { AppConstants } from '@/constants/AppConstants';
+import { ROUTES } from '@/navigation/routes';
 
 export default function Index() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -9,11 +11,11 @@ export default function Index() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (isAuthenticated) {
-        router.replace('/(main)/home');
+        router.replace(ROUTES.HOME);
       } else {
-        router.replace('/(auth)/login');
+        router.replace(ROUTES.LOGIN);
       }
-    }, 1500);
+    }, AppConstants.SPLASH_DURATION_MS);
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
 

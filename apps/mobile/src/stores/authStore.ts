@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { mmkvStorage } from '@/services/storage/mmkv';
+import { appStorage } from '@/services/storage';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => appStorage),
       partialize: (state) => ({ token: state.token, isAuthenticated: state.isAuthenticated }),
     },
   ),

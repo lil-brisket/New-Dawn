@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { mmkvStorage } from '@/services/storage/mmkv';
+import { appStorage } from '@/services/storage';
 
 interface SettingsState {
   musicVolume: number;
@@ -23,7 +23,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'settings-store',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => appStorage),
     },
   ),
 );

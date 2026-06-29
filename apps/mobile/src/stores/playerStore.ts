@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { PlayerCharacter } from '@dawn/types';
-import { mmkvStorage } from '@/services/storage/mmkv';
+import { appStorage } from '@/services/storage';
 
 interface PlayerState {
   displayName: string;
@@ -20,7 +20,7 @@ export const usePlayerStore = create<PlayerState>()(
     }),
     {
       name: 'player-store',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => appStorage),
     },
   ),
 );

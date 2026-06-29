@@ -5,6 +5,7 @@ import { radius } from './radius';
 import { typography } from './typography';
 import { shadows } from './shadows';
 import { animations } from './animations';
+import { motion } from './motion';
 import { sizes } from './sizes';
 import { icons } from './icons';
 import { safeArea } from './safeArea';
@@ -16,6 +17,7 @@ export const theme = {
   typography,
   shadows,
   animations,
+  motion,
   sizes,
   icons,
   safeArea,
@@ -33,4 +35,4 @@ export function useTheme(): Theme {
   return useContext(ThemeContext);
 }
 
-export { colors, spacing, radius, typography, shadows, animations, sizes, icons, safeArea };
+export { colors, spacing, radius, typography, shadows, animations, motion, sizes, icons, safeArea };
