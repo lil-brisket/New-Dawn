@@ -12,4 +12,11 @@ export const ROUTES = {
   QUESTS: '/(main)/quests',
   PROFILE: '/(main)/profile',
   SETTINGS: '/(main)/settings',
+  DEVELOPER: '/(main)/developer',
+  DEVELOPER_UI_SHOWCASE: '/(main)/developer/ui-showcase',
+  DEVELOPER_THEME_PREVIEW: '/(main)/developer/theme-preview',
 } as const;
+
+export const RouteNames = ROUTES;
+
+export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

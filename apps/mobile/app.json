@@ -31,7 +31,8 @@
     },
     "plugins": ["expo-router", "expo-font", "expo-screen-orientation"],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "autolinkingModuleResolution": true
     }
   }
 }

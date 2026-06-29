@@ -16,6 +16,19 @@ pnpm --filter @dawn/mobile dev
 
 Scan the QR code with Expo Go on your iPhone. Ensure your Expo Go app is the SDK 54 version from the App Store.
 
+## Developer Menu
+
+Available only in development builds (`__DEV__`). Hidden from the tab bar.
+
+**Open the developer menu**
+
+1. **Home screen**
+   - **Mobile** — long-press **Welcome, Adventurer** at the top of the Home tab.
+   - **Web** — click **Welcome, Adventurer** (long-press is not supported in the browser).
+2. **Settings** — Profile tab → **Settings** → **Developer Menu** at the bottom.
+
+From the developer menu you can open **UI Showcase**, **Theme Preview**, clear storage, mock login, and inspect feature flags.
+
 ## Environment
 
 Optional `EXPO_PUBLIC_API_URL` — validated via Zod in `src/config/env.ts`.

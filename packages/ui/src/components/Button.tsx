@@ -1,22 +1,25 @@
 import React, { memo } from 'react';
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   StyleSheet,
   ActivityIndicator,
-  type TouchableOpacityProps,
+  type PressableProps,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import { useTheme } from '../theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends TouchableOpacityProps {
+export interface ButtonProps extends Omit<PressableProps, 'style'> {
   title: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
   testID?: string;
+  style?: StyleProp<ViewStyle>;
 }
 
 function ButtonComponent({
@@ -32,29 +35,35 @@ function ButtonComponent({
   const { colors, sizes, radius, typography } = useTheme();
 
   const variantStyles = {
-    primary: { bg: colors.primary, text: colors.text },
-    secondary: { bg: colors.surface, text: colors.text },
-    ghost: { bg: 'transparent', text: colors.primaryLight },
-    danger: { bg: colors.error, text: colors.text },
+    primary: { bg: colors.primary, text: colors.text, border: colors.primary, borderWidth: 0 },
+    secondary: {
+      bg: colors.surfaceLight,
+      text: colors.text,
+      border: colors.border,
+      borderWidth: 1,
+    },
+    ghost: { bg: 'transparent', text: colors.primaryLight, border: 'transparent', borderWidth: 0 },
+    danger: { bg: colors.error, text: colors.text, border: colors.error, borderWidth: 0 },
   }[variant];
 
   const height = sizes.button[size];
 
   return (
-    <TouchableOpacity
+    <Pressable
       testID={testID}
       disabled={disabled || loading}
-      style={[
+      style={({ pressed }) => [
         styles.base,
         {
           backgroundColor: variantStyles.bg,
           height,
           borderRadius: radius.md,
-          opacity: disabled ? 0.5 : 1,
+          borderColor: variantStyles.border,
+          borderWidth: variantStyles.borderWidth,
+          opacity: disabled ? 0.5 : pressed ? 0.8 : 1,
         },
         style,
       ]}
-      activeOpacity={0.8}
       {...props}
     >
       {loading ? (
@@ -70,7 +79,7 @@ function ButtonComponent({
           {title}
         </Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

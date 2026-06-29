@@ -1,15 +1,11 @@
-import { Text } from 'react-native';
-import { Card, useTheme } from '@dawn/ui';
-import { MainLayout } from '@/layouts/MainLayout';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 
 export function QuestsScreen() {
-  const { colors } = useTheme();
-
   return (
-    <MainLayout title="Quests">
-      <Card title="Main Story" subtitle="Chapter 1 — The Awakening">
-        <Text style={{ color: colors.textMuted, marginTop: 8 }}>Story quests — coming soon.</Text>
-      </Card>
-    </MainLayout>
+    <PlaceholderScreen
+      title="Quests"
+      icon="quests"
+      description="Story missions, daily tasks, and achievement rewards."
+    />
   );
 }

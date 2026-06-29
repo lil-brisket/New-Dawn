@@ -1,13 +1,16 @@
+import { motion } from './motion';
+
+/** @deprecated Use `motion` from theme instead */
 export const animations = {
   duration: {
-    fast: 150,
-    normal: 300,
-    slow: 500,
+    fast: motion.durations.fast,
+    normal: motion.durations.medium,
+    slow: motion.durations.slow,
   },
   easing: {
-    easeOut: 'ease-out',
-    easeIn: 'ease-in',
-    spring: 'spring',
+    easeOut: motion.easing.easeOut,
+    easeIn: motion.easing.easeIn,
+    spring: motion.easing.spring,
   },
 } as const;
 

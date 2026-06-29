@@ -1,23 +1,35 @@
-import { View } from 'react-native';
-import { InventorySlot, ItemCard, useTheme } from '@dawn/ui';
-import { defaultRegistry } from '@dawn/game-data';
-import { MainLayout } from '@/layouts/MainLayout';
+import { useEffect, useState } from 'react';
+import { Text } from 'react-native';
+import { useTheme } from '@dawn/ui';
+import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { inventoryRepository } from '@/services/api/inventory';
 
 export function InventoryScreen() {
-  const { spacing } = useTheme();
-  const potion = defaultRegistry.getItem('item_health_potion');
+  const { colors, spacing, typography } = useTheme();
+  const [items, setItems] = useState<{ id: string; name: string; quantity: number }[]>([]);
+
+  useEffect(() => {
+    inventoryRepository.getInventory().then(({ items: data }) => setItems(data));
+  }, []);
 
   return (
-    <MainLayout title="Inventory">
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <InventorySlot key={i} empty={i > 0}>
-            {i === 0 && potion ? (
-              <ItemCard name={potion.name} rarity={potion.rarity} quantity={5} />
-            ) : null}
-          </InventorySlot>
-        ))}
-      </View>
-    </MainLayout>
+    <PlaceholderScreen
+      title="Bag"
+      icon="inventory"
+      description="Manage items, equipment, and consumables."
+    >
+      {items.map((item) => (
+        <Text
+          key={item.id}
+          style={{
+            color: colors.textMuted,
+            fontSize: typography.fontSize.sm,
+            marginTop: spacing.xs,
+          }}
+        >
+          {item.name} x{item.quantity}
+        </Text>
+      ))}
+    </PlaceholderScreen>
   );
 }

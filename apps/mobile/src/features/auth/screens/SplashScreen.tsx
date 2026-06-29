@@ -1,20 +1,53 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme, Panel } from '@dawn/ui';
+import { useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useTheme } from '@dawn/ui';
 import { ScreenLayout } from '@/layouts/ScreenLayout';
 
 export function SplashScreen() {
-  const { colors, spacing } = useTheme();
+  const { colors, spacing, typography, motion } = useTheme();
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: motion.durations.medium });
+  }, [opacity, motion.durations.medium]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
-    <ScreenLayout>
+    <ScreenLayout gradient>
       <View style={styles.container}>
-        <Text style={[styles.title, { color: colors.accent }]}>DAWN</Text>
-        <Text style={{ color: colors.textSecondary, marginTop: spacing.sm }}>
-          Tactical Fantasy RPG
-        </Text>
-        <Panel style={{ marginTop: spacing['3xl'], opacity: 0.6 }}>
-          <Text style={{ color: colors.textMuted, textAlign: 'center' }}>Loading...</Text>
-        </Panel>
+        <Animated.View style={[styles.logoBlock, animatedStyle]}>
+          <Text
+            style={{
+              color: colors.accent,
+              fontSize: typography.fontSize['3xl'],
+              fontWeight: typography.fontWeight.bold,
+              letterSpacing: 8,
+            }}
+            accessibilityRole="header"
+          >
+            DAWN
+          </Text>
+          <Text
+            style={{
+              color: colors.textSecondary,
+              fontSize: typography.fontSize.md,
+              marginTop: spacing.sm,
+            }}
+            maxFontSizeMultiplier={1.5}
+          >
+            Tactical Fantasy RPG
+          </Text>
+        </Animated.View>
+        <ActivityIndicator
+          size="large"
+          color={colors.accent}
+          style={{ marginTop: spacing['3xl'] }}
+          accessibilityLabel="Loading application"
+        />
       </View>
     </ScreenLayout>
   );
@@ -22,5 +55,5 @@ export function SplashScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 48, fontWeight: '800', letterSpacing: 8 },
+  logoBlock: { alignItems: 'center' },
 });
