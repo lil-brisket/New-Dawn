@@ -45,7 +45,8 @@ function RadioGroup<T extends string>({
   value: T;
   onChange: (v: T) => void;
 }) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   return (
     <View style={{ gap: spacing.sm }}>
       <Text style={{ color: colors.textSecondary, fontSize: typography.fontSize.sm }}>{label}</Text>
@@ -76,7 +77,8 @@ function ToggleRow({
   value: boolean;
   onChange: (v: boolean) => void;
 }) {
-  const { colors, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography } = theme;
   return (
     <View style={styles.toggleRow}>
       <Text style={{ color: colors.textPrimary, fontSize: typography.fontSize.sm }}>{label}</Text>
@@ -86,7 +88,8 @@ function ToggleRow({
 }
 
 export function ComponentPlaygroundScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const toast = useToast();
 
   const [buttonVariant, setButtonVariant] = useState<ButtonVariant>('primary');

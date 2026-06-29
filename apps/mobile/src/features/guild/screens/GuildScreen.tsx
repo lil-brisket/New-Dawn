@@ -5,7 +5,8 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { guildRepository } from '@/services/api/guild';
 
 export function GuildScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {

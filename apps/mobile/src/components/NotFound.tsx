@@ -5,7 +5,8 @@ import { ROUTES } from '@/navigation/routes';
 import { ScreenBackground } from './ScreenBackground';
 
 export function NotFound() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <ScreenBackground>

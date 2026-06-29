@@ -2,7 +2,8 @@ import { View, StyleSheet } from 'react-native';
 import { Button, useTheme } from '@dawn/ui';
 
 export function BattleCommandBar() {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <View style={[styles.row, { gap: spacing.sm }]}>

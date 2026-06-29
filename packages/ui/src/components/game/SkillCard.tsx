@@ -11,7 +11,8 @@ export interface SkillCardProps {
 }
 
 function SkillCardComponent({ name, mpCost, cooldown, selected, testID }: SkillCardProps) {
-  const { colors, radius, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, typography, border } = theme;
 
   return (
     <View
@@ -22,15 +23,14 @@ function SkillCardComponent({ name, mpCost, cooldown, selected, testID }: SkillC
           backgroundColor: selected ? colors.primaryDark : colors.surfacePressed,
           borderRadius: radius.md,
           padding: spacing.md,
-          borderColor: selected ? colors.accent : colors.border,
-          borderWidth: 1,
+          borderColor: selected ? colors.gold : colors.border,
+          borderWidth: border.thin,
+          minWidth: 100,
         },
       ]}
     >
-      <Text style={{ color: colors.textPrimary, fontWeight: typography.fontWeight.semibold }}>
-        {name}
-      </Text>
-      <Text style={{ color: colors.mana, fontSize: typography.fontSize.xs, marginTop: spacing[4] }}>
+      <Text style={{ color: colors.text, fontWeight: typography.fontWeight.semibold }}>{name}</Text>
+      <Text style={{ color: colors.mana, fontSize: typography.fontSize.xs, marginTop: spacing.xs }}>
         MP {mpCost}
       </Text>
       {cooldown > 0 ? (
@@ -43,7 +43,7 @@ function SkillCardComponent({ name, mpCost, cooldown, selected, testID }: SkillC
 }
 
 const styles = StyleSheet.create({
-  base: { minWidth: 100 },
+  base: {},
 });
 
 export const SkillCard = memo(SkillCardComponent);

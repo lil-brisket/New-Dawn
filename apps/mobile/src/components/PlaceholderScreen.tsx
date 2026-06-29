@@ -13,7 +13,8 @@ export interface PlaceholderScreenProps {
 }
 
 export function PlaceholderScreen({ title, icon, description, children }: PlaceholderScreenProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <MainLayout title={title}>

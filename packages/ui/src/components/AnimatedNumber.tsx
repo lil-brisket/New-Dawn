@@ -17,7 +17,8 @@ function AnimatedNumberComponent({
   testID,
   ...props
 }: AnimatedNumberProps) {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const { colors } = theme;
   const [display, setDisplay] = useState(value);
 
   useEffect(() => {

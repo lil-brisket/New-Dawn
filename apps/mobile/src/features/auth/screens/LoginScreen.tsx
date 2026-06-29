@@ -10,7 +10,8 @@ import { authRepository } from '@/services/api/auth';
 import { AppConstants } from '@/constants/AppConstants';
 
 export function LoginScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography, radius, border } = theme;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((s) => s.login);
@@ -35,10 +36,10 @@ export function LoginScreen() {
         <View style={styles.logoBlock}>
           <Text
             style={{
-              color: colors.accent,
+              color: colors.gold,
               fontSize: typography.fontSize['3xl'],
               fontWeight: typography.fontWeight.bold,
-              letterSpacing: 6,
+              letterSpacing: typography.letterSpacing.widest,
               textAlign: 'center',
             }}
             accessibilityRole="header"
@@ -46,7 +47,7 @@ export function LoginScreen() {
             {AppConstants.APP_NAME.toUpperCase()}
           </Text>
           <Text
-            style={{ color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm }}
+            style={{ color: colors.textMuted, textAlign: 'center', marginTop: spacing.sm }}
             maxFontSizeMultiplier={1.5}
           >
             Enter the realm
@@ -67,9 +68,10 @@ export function LoginScreen() {
                 {
                   color: colors.text,
                   borderColor: colors.border,
-                  backgroundColor: colors.backgroundElevated,
+                  backgroundColor: colors.surfaceElevated,
                   padding: spacing.md,
-                  borderRadius: 8,
+                  borderRadius: radius.sm,
+                  borderWidth: border.thin,
                 },
               ]}
             />
@@ -85,9 +87,10 @@ export function LoginScreen() {
                 {
                   color: colors.text,
                   borderColor: colors.border,
-                  backgroundColor: colors.backgroundElevated,
+                  backgroundColor: colors.surfaceElevated,
                   padding: spacing.md,
-                  borderRadius: 8,
+                  borderRadius: radius.sm,
+                  borderWidth: border.thin,
                 },
               ]}
             />
@@ -107,5 +110,5 @@ export function LoginScreen() {
 
 const styles = StyleSheet.create({
   logoBlock: { alignItems: 'center' },
-  input: { borderWidth: 1 },
+  input: {},
 });

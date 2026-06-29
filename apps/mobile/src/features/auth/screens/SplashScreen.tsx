@@ -5,12 +5,13 @@ import { useTheme } from '@dawn/ui';
 import { ScreenLayout } from '@/layouts/ScreenLayout';
 
 export function SplashScreen() {
-  const { colors, spacing, typography, motion } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography, animation } = theme;
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    opacity.value = withTiming(1, { duration: motion.durations.medium });
-  }, [opacity, motion.durations.medium]);
+    opacity.value = withTiming(1, { duration: animation.duration.normal });
+  }, [opacity, animation.duration.normal]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -22,10 +23,10 @@ export function SplashScreen() {
         <Animated.View style={[styles.logoBlock, animatedStyle]}>
           <Text
             style={{
-              color: colors.accent,
+              color: colors.gold,
               fontSize: typography.fontSize['3xl'],
               fontWeight: typography.fontWeight.bold,
-              letterSpacing: 8,
+              letterSpacing: typography.letterSpacing.brand,
             }}
             accessibilityRole="header"
           >
@@ -44,7 +45,7 @@ export function SplashScreen() {
         </Animated.View>
         <ActivityIndicator
           size="large"
-          color={colors.accent}
+          color={colors.gold}
           style={{ marginTop: spacing['3xl'] }}
           accessibilityLabel="Loading application"
         />

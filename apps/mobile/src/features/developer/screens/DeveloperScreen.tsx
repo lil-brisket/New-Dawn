@@ -12,7 +12,8 @@ import { authRepository } from '@/services/api/auth';
 import { Redirect } from 'expo-router';
 
 export function DeveloperScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const login = useAuthStore((s) => s.login);
   const logout = useAuthStore((s) => s.logout);
 

@@ -7,7 +7,8 @@ export interface ErrorScreenProps {
 }
 
 export function ErrorScreen({ onRetry }: ErrorScreenProps) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <ScreenBackground gradient>

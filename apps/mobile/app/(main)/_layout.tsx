@@ -12,17 +12,18 @@ function TabBarIcon(name: Parameters<typeof AppIcon>[0]['name']) {
 }
 
 export default function MainTabLayout() {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const { colors } = theme;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.backgroundElevated,
+          backgroundColor: colors.surfaceElevated,
           borderTopColor: colors.border,
         },
-        tabBarActiveTintColor: colors.accent,
+        tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.textMuted,
       }}
     >

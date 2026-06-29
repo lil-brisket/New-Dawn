@@ -82,14 +82,23 @@ function ToastViewportInternal({
   onDismiss: (id: string) => void;
   testID?: string;
 }) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing, zIndex } = theme;
 
   if (toasts.length === 0) return null;
 
   return (
     <View
       testID={testID}
-      style={[styles.viewport, { top: spacing['3xl'], left: spacing.xl, right: spacing.xl }]}
+      style={[
+        styles.viewport,
+        {
+          top: spacing['3xl'],
+          left: spacing.xl,
+          right: spacing.xl,
+          zIndex: zIndex.toast,
+        },
+      ]}
       pointerEvents="box-none"
     >
       {toasts.map((item) => (
@@ -125,6 +134,5 @@ export function Toast({ message, visible }: { message: string; visible: boolean 
 const styles = StyleSheet.create({
   viewport: {
     position: 'absolute',
-    zIndex: 9999,
   },
 });

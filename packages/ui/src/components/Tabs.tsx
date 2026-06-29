@@ -15,14 +15,15 @@ export interface TabsProps {
 }
 
 function TabsComponent({ tabs, activeKey, onTabPress, testID }: TabsProps) {
-  const { colors, spacing, radius } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, radius, typography } = theme;
 
   return (
     <ScrollView
       testID={testID}
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.row}
+      contentContainerStyle={[styles.row, { gap: spacing.sm }]}
     >
       {tabs.map((tab) => {
         const active = tab.key === activeKey;
@@ -33,14 +34,19 @@ function TabsComponent({ tabs, activeKey, onTabPress, testID }: TabsProps) {
             style={[
               styles.tab,
               {
-                backgroundColor: active ? colors.primary : 'transparent',
+                backgroundColor: active ? colors.primary : colors.transparent,
                 borderRadius: radius.md,
                 paddingHorizontal: spacing.lg,
                 paddingVertical: spacing.sm,
               },
             ]}
           >
-            <Text style={{ color: active ? colors.text : colors.textSecondary, fontWeight: '600' }}>
+            <Text
+              style={{
+                color: active ? colors.text : colors.textMuted,
+                fontWeight: typography.fontWeight.semibold,
+              }}
+            >
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -51,7 +57,7 @@ function TabsComponent({ tabs, activeKey, onTabPress, testID }: TabsProps) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8 },
+  row: { flexDirection: 'row' },
   tab: {},
 });
 

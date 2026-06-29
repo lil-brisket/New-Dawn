@@ -28,7 +28,8 @@ function PressableScaleComponent({
   testID,
   ...props
 }: PressableScaleProps) {
-  const { sizes } = useTheme();
+  const { theme } = useTheme();
+  const { sizes } = theme;
   const {
     animatedStyle,
     onPressIn: handlePressIn,

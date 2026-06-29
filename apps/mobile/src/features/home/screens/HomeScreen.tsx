@@ -62,7 +62,8 @@ const HUB_FEATURES = [
 ];
 
 export function HomeScreen() {
-  const { colors, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing } = theme;
 
   const openDeveloper = () => {
     if (FeatureFlags.developerTools) {

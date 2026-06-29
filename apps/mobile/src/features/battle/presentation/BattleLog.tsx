@@ -3,7 +3,8 @@ import { Panel, useTheme } from '@dawn/ui';
 import { mockBattle } from '@/mocks/battle';
 
 export function BattleLog() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <Panel variant="outlined" style={{ maxHeight: 120 }}>

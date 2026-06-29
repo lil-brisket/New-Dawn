@@ -4,9 +4,10 @@ import { useTheme } from '../../../theme';
 import type { IconProps } from './Icon.types';
 
 function IconComponent({ name, size = 'md', color, children, testID }: IconProps) {
-  const { sizes, colors } = useTheme();
-  const dim = sizes.icon[size];
-  const tint = color ?? colors.textPrimary;
+  const { theme } = useTheme();
+  const { icons, colors } = theme;
+  const dim = icons[size];
+  const tint = color ?? colors.text;
 
   if (children) {
     return (

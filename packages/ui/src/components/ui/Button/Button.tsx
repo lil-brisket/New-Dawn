@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
 import { Text, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { useTheme } from '../../../theme';
+import { getButtonVariants, buttonSizeStyles } from './Button.styles';
 import { PressableScale } from '../../_internal/PressableScale';
-import { buttonVariants, buttonSizeStyles } from './Button.styles';
 import type { ButtonProps } from './Button.types';
 
 function ButtonComponent({
@@ -20,8 +20,10 @@ function ButtonComponent({
   accessibilityRole = 'button',
   ...props
 }: ButtonProps) {
-  const { components, sizes, radius, typography } = useTheme();
-  const variantStyle = buttonVariants[variant] ?? components.button.primary;
+  const { theme } = useTheme();
+  const { colors, sizes, radius, typography, spacing } = theme;
+  const variants = getButtonVariants(colors);
+  const variantStyle = variants[variant];
   const sizeStyle = buttonSizeStyles[size];
   const height = sizes.button[size];
   const isDisabled = disabled || loading;
@@ -54,7 +56,7 @@ function ButtonComponent({
       {loading ? (
         <ActivityIndicator color={variantStyle.text} />
       ) : (
-        <View style={styles.content}>
+        <View style={[styles.content, { gap: spacing.sm }]}>
           {leading ? <View style={styles.iconSlot}>{leading}</View> : null}
           <Text
             style={{
@@ -79,7 +81,6 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   iconSlot: {
     alignItems: 'center',

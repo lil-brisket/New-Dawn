@@ -2,7 +2,6 @@ import React, { memo, createContext, useContext, useEffect } from 'react';
 import { Modal as RNModal, View, Text, Pressable, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useTheme } from '../../../theme';
-import { springs } from '../../../theme/motion/springs';
 import { useControllableState } from '../../_internal/useControllableState';
 import { GlassSurface } from '../../_internal/GlassSurface';
 import type {
@@ -28,6 +27,8 @@ function ModalRoot({
   dismissible = true,
   testID,
 }: ModalProps) {
+  const { theme } = useTheme();
+  const spring = theme.animation.spring.gentle;
   const [open, setOpen] = useControllableState({
     value: visible,
     defaultValue: defaultVisible,
@@ -39,13 +40,13 @@ function ModalRoot({
 
   useEffect(() => {
     if (open) {
-      opacity.value = withSpring(1, springs.modalOpen);
-      scale.value = withSpring(1, springs.modalOpen);
+      opacity.value = withSpring(1, spring);
+      scale.value = withSpring(1, spring);
     } else {
-      opacity.value = withSpring(0, springs.modalOpen);
-      scale.value = withSpring(0.92, springs.modalOpen);
+      opacity.value = withSpring(0, spring);
+      scale.value = withSpring(0.92, spring);
     }
-  }, [open, opacity, scale]);
+  }, [open, opacity, scale, spring]);
 
   const backdropStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
   const contentStyle = useAnimatedStyle(() => ({
@@ -57,6 +58,8 @@ function ModalRoot({
     if (dismissible) setOpen(false);
   };
 
+  const { colors, layout } = theme;
+
   return (
     <ModalContext.Provider value={{ dismiss }}>
       <RNModal
@@ -66,9 +69,18 @@ function ModalRoot({
         testID={testID}
         onRequestClose={dismiss}
       >
-        <Animated.View style={[styles.overlay, backdropStyle]}>
+        <Animated.View
+          style={[
+            styles.overlay,
+            { backgroundColor: colors.backdrop, padding: layout.screenPadding },
+            backdropStyle,
+          ]}
+        >
           <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} accessibilityRole="button" />
-          <Animated.View style={[styles.center, contentStyle]} pointerEvents="box-none">
+          <Animated.View
+            style={[styles.center, { maxWidth: layout.maxContentWidth }, contentStyle]}
+            pointerEvents="box-none"
+          >
             {children}
           </Animated.View>
         </Animated.View>
@@ -79,7 +91,8 @@ function ModalRoot({
 
 function ModalBackdrop({ children, onPress, testID }: ModalBackdropProps) {
   const { dismiss } = useContext(ModalContext);
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const { colors } = theme;
 
   return (
     <Pressable
@@ -93,8 +106,8 @@ function ModalBackdrop({ children, onPress, testID }: ModalBackdropProps) {
 }
 
 function ModalContent({ children, testID }: ModalContentProps) {
-  const { components, radius, spacing } = useTheme();
-  const tokens = components.modal.content;
+  const { theme } = useTheme();
+  const { colors, radius, spacing, shadow, border } = theme;
 
   return (
     <GlassSurface
@@ -102,13 +115,13 @@ function ModalContent({ children, testID }: ModalContentProps) {
       style={[
         styles.content,
         {
-          backgroundColor: tokens.bg,
-          borderColor: tokens.border,
-          borderWidth: tokens.borderWidth,
+          backgroundColor: colors.surfaceElevated,
+          borderColor: colors.border,
+          borderWidth: border.thin,
           borderRadius: radius.xl,
           padding: spacing.xl,
         },
-        tokens.shadow,
+        shadow.lg,
       ]}
     >
       {children}
@@ -117,14 +130,15 @@ function ModalContent({ children, testID }: ModalContentProps) {
 }
 
 function ModalHeader({ children, title, testID }: ModalHeaderProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography, spacing } = theme;
 
   return (
     <View testID={testID} style={{ marginBottom: spacing.md }}>
       {title ? (
         <Text
           style={{
-            color: colors.textPrimary,
+            color: colors.text,
             fontSize: typography.fontSize.xl,
             fontWeight: typography.fontWeight.bold,
           }}
@@ -139,12 +153,13 @@ function ModalHeader({ children, title, testID }: ModalHeaderProps) {
 }
 
 function ModalBody({ children, testID }: ModalBodyProps) {
-  const { colors, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography } = theme;
 
   return (
     <View testID={testID}>
       {typeof children === 'string' ? (
-        <Text style={{ color: colors.textSecondary, fontSize: typography.fontSize.md }}>
+        <Text style={{ color: colors.textMuted, fontSize: typography.fontSize.md }}>
           {children}
         </Text>
       ) : (
@@ -155,7 +170,8 @@ function ModalBody({ children, testID }: ModalBodyProps) {
 }
 
 function ModalFooter({ children, testID }: ModalFooterProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <View testID={testID} style={[styles.footer, { marginTop: spacing.lg, gap: spacing.sm }]}>
@@ -167,12 +183,10 @@ function ModalFooter({ children, testID }: ModalFooterProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 11, 30, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
   },
-  center: { width: '100%', maxWidth: 400 },
+  center: { width: '100%' },
   content: { width: '100%' },
   footer: { flexDirection: 'row', justifyContent: 'flex-end' },
 });

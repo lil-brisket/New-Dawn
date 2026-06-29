@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../../theme';
+import { createPanelVariants } from '../../../theme/components/button';
 import { GlassSurface } from '../../_internal/GlassSurface';
 import type { PanelProps, PanelHeaderProps, PanelBodyProps, PanelFooterProps } from './Panel.types';
 
@@ -12,8 +13,13 @@ function PanelRoot({
   testID,
   ...props
 }: PanelProps) {
-  const { components, radius, shadows } = useTheme();
-  const tokens = components.panel[variant];
+  const { theme } = useTheme();
+  const { colors, radius, shadow } = theme;
+  const panelVariants = useMemo(
+    () => createPanelVariants(colors, { glow: shadow.glow, md: shadow.md }),
+    [colors, shadow],
+  );
+  const tokens = panelVariants[variant];
 
   return (
     <GlassSurface
@@ -26,7 +32,7 @@ function PanelRoot({
           borderRadius: radius.lg,
         },
         tokens.shadow,
-        borderStyle === 'ornate' ? shadows.glow : undefined,
+        borderStyle === 'ornate' ? shadow.glow : undefined,
         style,
       ]}
       {...props}
@@ -37,7 +43,8 @@ function PanelRoot({
 }
 
 function PanelHeader({ title, subtitle, icon, children, testID }: PanelHeaderProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography, spacing } = theme;
 
   if (children) {
     return <View testID={testID}>{children}</View>;
@@ -45,12 +52,12 @@ function PanelHeader({ title, subtitle, icon, children, testID }: PanelHeaderPro
 
   return (
     <View testID={testID} style={[styles.header, { marginBottom: spacing.md }]}>
-      {icon ? <View style={styles.icon}>{icon}</View> : null}
+      {icon ? <View style={{ marginRight: spacing.sm }}>{icon}</View> : null}
       <View style={styles.headerText}>
         {title ? (
           <Text
             style={{
-              color: colors.textPrimary,
+              color: colors.text,
               fontSize: typography.fontSize.lg,
               fontWeight: typography.fontWeight.bold,
             }}
@@ -61,7 +68,7 @@ function PanelHeader({ title, subtitle, icon, children, testID }: PanelHeaderPro
         {subtitle ? (
           <Text
             style={{
-              color: colors.textSecondary,
+              color: colors.textMuted,
               fontSize: typography.fontSize.sm,
               marginTop: spacing[2],
             }}
@@ -79,12 +86,21 @@ function PanelBody({ children, testID }: PanelBodyProps) {
 }
 
 function PanelFooter({ children, testID }: PanelFooterProps) {
-  const { spacing, colors } = useTheme();
+  const { theme } = useTheme();
+  const { spacing, colors, border } = theme;
 
   return (
     <View
       testID={testID}
-      style={[styles.footer, { marginTop: spacing.md, borderTopColor: colors.border }]}
+      style={[
+        styles.footer,
+        {
+          marginTop: spacing.md,
+          borderTopColor: colors.border,
+          borderTopWidth: border.thin,
+          paddingTop: spacing.md,
+        },
+      ]}
     >
       {children}
     </View>
@@ -93,9 +109,8 @@ function PanelFooter({ children, testID }: PanelFooterProps) {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center' },
-  icon: { marginRight: 8 },
   headerText: { flex: 1 },
-  footer: { borderTopWidth: 1, paddingTop: 12 },
+  footer: {},
 });
 
 export const Panel = Object.assign(memo(PanelRoot), {

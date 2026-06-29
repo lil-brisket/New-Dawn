@@ -14,7 +14,8 @@ function FloatingActionButtonComponent({
   onPress,
   testID,
 }: FloatingActionButtonProps) {
-  const { colors, radius, shadows } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, shadow, sizes, layout, typography } = theme;
 
   return (
     <TouchableOpacity
@@ -23,26 +24,33 @@ function FloatingActionButtonComponent({
       style={[
         styles.base,
         {
-          backgroundColor: colors.accent,
-          borderRadius: radius.full,
+          backgroundColor: colors.gold,
+          borderRadius: radius.pill,
+          width: sizes.fabSize,
+          height: sizes.fabSize,
+          bottom: layout.screenPadding,
+          right: layout.screenPadding,
         },
-        shadows.lg,
+        shadow.lg,
       ]}
     >
-      <Text style={{ color: colors.background, fontSize: 24, fontWeight: '700' }}>{label}</Text>
+      <Text
+        style={[
+          typography.textStyles.heading,
+          { color: colors.textInverse, fontSize: typography.fontSize.xl },
+        ]}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   base: {
-    width: 56,
-    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 24,
-    right: 24,
   },
 });
 

@@ -1,7 +1,2 @@
-export const safeArea = {
-  topOffset: 0,
-  bottomOffset: 0,
-  horizontalPadding: 16,
-} as const;
-
-export type SafeArea = typeof safeArea;
+/** @deprecated Remove after Phase 7 — import from `./tokens/layout` */
+export { layout as safeArea, type Layout as SafeArea } from './tokens/layout';

@@ -9,7 +9,8 @@ import { BattleCommandBar } from '../presentation/BattleCommandBar';
 import { BattleLog } from '../presentation/BattleLog';
 
 export function BattleScreen() {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <ScreenLayout>

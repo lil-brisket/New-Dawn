@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { View } from 'react-native';
+import { useTheme } from '../../../theme';
 import { Modal } from '../Modal';
 import { Button } from '../Button';
 import type { DialogProps } from './Dialog.types';
@@ -17,6 +18,8 @@ function DialogComponent({
   testID,
   dismissible = true,
 }: DialogProps) {
+  const { theme } = useTheme();
+  const { spacing } = theme;
   const [open, setOpen] = useState(defaultVisible ?? false);
   const isControlled = visible !== undefined;
   const isOpen = isControlled ? visible : open;
@@ -38,7 +41,7 @@ function DialogComponent({
         <Modal.Header title={title} />
         {message ? <Modal.Body>{message}</Modal.Body> : null}
         <Modal.Footer>
-          <View style={{ flexDirection: 'row', gap: 12, flex: 1 }}>
+          <View style={{ flexDirection: 'row', gap: spacing.md, flex: 1 }}>
             {onCancel ? (
               <Button
                 title={cancelLabel}

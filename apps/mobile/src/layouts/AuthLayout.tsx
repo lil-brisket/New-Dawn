@@ -4,7 +4,8 @@ import { useTheme } from '@dawn/ui';
 import { ScreenLayout } from './ScreenLayout';
 
 export function AuthLayout({ children }: { children: ReactNode }) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <ScreenLayout gradient>

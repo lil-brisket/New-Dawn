@@ -50,7 +50,8 @@ export interface AppIconProps {
 }
 
 export function AppIcon({ name, size = 'md', color, accessibilityLabel }: AppIconProps) {
-  const { icons, colors } = useTheme();
+  const { theme } = useTheme();
+  const { icons, colors } = theme;
   const iconSize = icons[size];
   const iconColor = color ?? colors.text;
 

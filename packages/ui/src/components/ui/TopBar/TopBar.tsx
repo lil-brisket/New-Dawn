@@ -13,7 +13,8 @@ function TopBarComponent({
   rightAction,
   testID,
 }: TopBarProps) {
-  const { colors, sizes, typography, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, sizes, typography, spacing, border } = theme;
 
   const resolvedLeft =
     leftAction ??
@@ -23,9 +24,9 @@ function TopBarComponent({
         style={styles.actionSlot}
         accessibilityRole="button"
         accessibilityLabel="Go back"
-        hitSlop={8}
+        hitSlop={spacing.sm}
       >
-        <Text style={{ color: colors.accent, fontSize: typography.fontSize.lg }}>{'‹'}</Text>
+        <Text style={{ color: colors.gold, fontSize: typography.fontSize.lg }}>{'‹'}</Text>
       </Pressable>
     ) : (
       <View style={styles.actionSlot} />
@@ -42,16 +43,17 @@ function TopBarComponent({
           height: sizes.topBar,
           backgroundColor: colors.surfaceElevated,
           borderBottomColor: colors.border,
+          borderBottomWidth: border.thin,
           paddingHorizontal: spacing.sm,
         },
       ]}
     >
       <View style={styles.actionSlot}>{resolvedLeft}</View>
       <View style={styles.center}>
-        {icon ? <View style={styles.icon}>{icon}</View> : null}
+        {icon ? <View style={{ marginBottom: spacing[2] }}>{icon}</View> : null}
         <Text
           style={{
-            color: colors.textPrimary,
+            color: colors.text,
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.bold,
           }}
@@ -62,7 +64,7 @@ function TopBarComponent({
         {subtitle ? (
           <Text
             style={{
-              color: colors.textSecondary,
+              color: colors.textMuted,
               fontSize: typography.fontSize.xs,
             }}
             numberOfLines={1}
@@ -87,10 +89,8 @@ const styles = StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
   },
   center: { flex: 1, alignItems: 'center' },
-  icon: { marginBottom: 2 },
   actionSlot: {
     minWidth: 44,
     minHeight: 44,

@@ -7,7 +7,8 @@ import { NavigationService } from '@/navigation/NavigationService';
 import { ROUTES } from '@/navigation/routes';
 
 export function ProfileScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const displayName = usePlayerStore((s) => s.displayName);
 
   return (

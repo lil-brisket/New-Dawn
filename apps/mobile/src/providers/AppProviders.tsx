@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { ThemeProvider, ToastProvider } from '@dawn/ui';
+import { ToastProvider } from '@dawn/ui';
+import { PersistedThemeProvider } from '@/providers/PersistedThemeProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { LoadingOverlayHost } from '@/providers/OverlayHosts';
 import { Logger } from '@/services/logger/Logger';
@@ -10,12 +11,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryProvider>
-      <ThemeProvider>
+      <PersistedThemeProvider>
         <ToastProvider>
           {children}
           <LoadingOverlayHost />
         </ToastProvider>
-      </ThemeProvider>
+      </PersistedThemeProvider>
     </QueryProvider>
   );
 }

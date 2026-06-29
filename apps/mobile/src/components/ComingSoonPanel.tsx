@@ -10,7 +10,8 @@ export interface ComingSoonPanelProps {
 }
 
 export function ComingSoonPanel({ title, description, icon = 'world' }: ComingSoonPanelProps) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <GradientPanel>

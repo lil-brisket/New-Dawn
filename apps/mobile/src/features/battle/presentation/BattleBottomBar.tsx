@@ -3,7 +3,8 @@ import { HealthBar, ManaBar, useTheme } from '@dawn/ui';
 import { mockBattle } from '@/mocks/battle';
 
 export function BattleBottomBar() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <View style={{ gap: spacing.sm }}>

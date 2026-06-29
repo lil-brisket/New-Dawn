@@ -15,7 +15,8 @@ export interface CharacterCardProps {
 }
 
 function CharacterCardComponent({ name, level, hp, maxHp, rarity, testID }: CharacterCardProps) {
-  const { colors, radius, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, typography, border, game } = theme;
 
   return (
     <View
@@ -27,29 +28,29 @@ function CharacterCardComponent({ name, level, hp, maxHp, rarity, testID }: Char
           borderRadius: radius.lg,
           padding: spacing.md,
           borderColor: colors.rarity[rarity],
-          borderWidth: 1,
+          borderWidth: border.thin,
         },
       ]}
     >
-      <View style={styles.row}>
+      <View style={[styles.row, { gap: spacing.md }]}>
         <Avatar initials={name} size="lg" rarity={rarity} />
         <View style={styles.info}>
           <Text
             style={{
-              color: colors.textPrimary,
+              color: colors.text,
               fontWeight: typography.fontWeight.bold,
               fontSize: typography.fontSize.lg,
             }}
           >
             {name}
           </Text>
-          <Text style={{ color: colors.textSecondary, fontSize: typography.fontSize.sm }}>
+          <Text style={{ color: colors.textMuted, fontSize: typography.fontSize.sm }}>
             Lv. {level}
           </Text>
         </View>
       </View>
       <View style={{ marginTop: spacing.sm }}>
-        <HealthBar value={hp} max={maxHp} height={6} />
+        <HealthBar value={hp} max={maxHp} height={game.battle.healthBarHeight} />
       </View>
     </View>
   );
@@ -57,7 +58,7 @@ function CharacterCardComponent({ name, level, hp, maxHp, rarity, testID }: Char
 
 const styles = StyleSheet.create({
   base: {},
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  row: { flexDirection: 'row', alignItems: 'center' },
   info: { flex: 1 },
 });
 

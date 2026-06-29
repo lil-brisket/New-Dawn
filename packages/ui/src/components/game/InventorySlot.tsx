@@ -17,7 +17,8 @@ function InventorySlotComponent({
   children,
   testID,
 }: InventorySlotProps) {
-  const { colors, sizes, radius } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, border, game } = theme;
 
   return (
     <TouchableOpacity
@@ -26,12 +27,12 @@ function InventorySlotComponent({
       style={[
         styles.base,
         {
-          width: sizes.inventorySlot,
-          height: sizes.inventorySlot,
+          width: game.inventory.slotSize,
+          height: game.inventory.slotSize,
           borderRadius: radius.md,
           backgroundColor: empty ? colors.surfaceElevated : colors.surfacePressed,
-          borderColor: selected ? colors.accent : colors.border,
-          borderWidth: selected ? 2 : 1,
+          borderColor: selected ? colors.gold : colors.border,
+          borderWidth: selected ? border.normal : border.thin,
         },
       ]}
     >

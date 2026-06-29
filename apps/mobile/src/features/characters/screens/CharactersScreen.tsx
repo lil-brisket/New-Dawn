@@ -5,7 +5,8 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { playerRepository } from '@/services/api/player';
 
 export function CharactersScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const [names, setNames] = useState<string[]>([]);
 
   useEffect(() => {

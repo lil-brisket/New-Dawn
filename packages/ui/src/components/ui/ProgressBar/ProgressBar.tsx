@@ -16,21 +16,22 @@ function ProgressBarComponent({
   testID,
   accessibilityLabel,
 }: ProgressBarProps) {
-  const { components, radius, sizes, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, sizes, typography, spacing } = theme;
   const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   const barHeight = height ?? sizes.progressBar.md;
   const fillStyle = useAnimatedProgress(pct, animated);
-  const trackColor = backgroundColor ?? components.progressBar.track;
-  const fillColor = color ?? components.progressBar.fill;
+  const trackColor = backgroundColor ?? colors.surfacePressed;
+  const fillColor = color ?? colors.primary;
 
   return (
     <View testID={testID} accessibilityLabel={accessibilityLabel ?? label}>
       {label ? (
         <Text
           style={{
-            color: components.progressBar.label,
+            color: colors.textMuted,
             fontSize: typography.fontSize.sm,
-            marginBottom: 4,
+            marginBottom: spacing.xs,
           }}
         >
           {label}

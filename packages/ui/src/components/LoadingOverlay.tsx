@@ -8,13 +8,17 @@ export interface LoadingOverlayProps {
 }
 
 function LoadingOverlayComponent({ visible, testID }: LoadingOverlayProps) {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const { colors, zIndex } = theme;
 
   if (!visible) return null;
 
   return (
-    <View testID={testID} style={[styles.base, { backgroundColor: colors.overlay }]}>
-      <ActivityIndicator size="large" color={colors.accent} />
+    <View
+      testID={testID}
+      style={[styles.base, { backgroundColor: colors.overlay, zIndex: zIndex.overlay }]}
+    >
+      <ActivityIndicator size="large" color={colors.gold} />
     </View>
   );
 }
@@ -24,7 +28,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 999,
   },
 });
 

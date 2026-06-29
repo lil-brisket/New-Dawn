@@ -8,7 +8,8 @@ export interface EmptyStateProps {
 }
 
 export function EmptyState({ title, message }: EmptyStateProps) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <View style={[styles.container, { padding: spacing.xl, gap: spacing.md }]}>

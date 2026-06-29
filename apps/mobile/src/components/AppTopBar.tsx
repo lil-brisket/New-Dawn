@@ -10,7 +10,8 @@ export interface AppTopBarProps {
 }
 
 export function AppTopBar({ title, onBack, rightAction }: AppTopBarProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <View style={styles.wrapper}>

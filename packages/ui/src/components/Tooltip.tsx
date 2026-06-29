@@ -9,7 +9,8 @@ export interface TooltipProps {
 }
 
 function TooltipComponent({ text, visible, testID }: TooltipProps) {
-  const { colors, radius, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, border, typography, zIndex } = theme;
 
   if (!visible) return null;
 
@@ -19,21 +20,22 @@ function TooltipComponent({ text, visible, testID }: TooltipProps) {
       style={[
         styles.base,
         {
-          backgroundColor: colors.backgroundElevated,
+          backgroundColor: colors.surfaceElevated,
           borderRadius: radius.sm,
           padding: spacing.sm,
           borderColor: colors.border,
-          borderWidth: 1,
+          borderWidth: border.thin,
+          zIndex: zIndex.tooltip,
         },
       ]}
     >
-      <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{text}</Text>
+      <Text style={typography.textStyles.caption}>{text}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  base: { position: 'absolute', zIndex: 100 },
+  base: { position: 'absolute' },
 });
 
 export const Tooltip = memo(TooltipComponent);

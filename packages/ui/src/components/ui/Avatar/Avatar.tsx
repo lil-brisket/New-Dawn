@@ -14,11 +14,11 @@ function AvatarComponent({
   testID,
   accessibilityLabel,
 }: AvatarProps) {
-  const { colors, sizes, radius, components, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, sizes, radius, typography, border, spacing } = theme;
   const dim = sizes.avatar[size];
   const resolvedInitials = (initials ?? label ?? '?').charAt(0).toUpperCase();
-  const borderColor = rarity ? colors.rarity[rarity] : colors.accent;
-  const tokens = components.avatar;
+  const borderColor = rarity ? colors.rarity[rarity] : colors.gold;
 
   const imageSource = typeof image === 'string' ? { uri: image } : image;
 
@@ -35,21 +35,25 @@ function AvatarComponent({
             width: dim,
             height: dim,
             borderRadius: radius.circle,
-            backgroundColor: tokens.bg,
+            backgroundColor: colors.primaryDark,
             borderColor,
-            borderWidth: rarity ? 3 : 2,
+            borderWidth: rarity ? border.normal : border.thin,
           },
         ]}
       >
         {imageSource ? (
           <Image
             source={imageSource}
-            style={{ width: dim - 4, height: dim - 4, borderRadius: radius.circle }}
+            style={{
+              width: dim - spacing.xs,
+              height: dim - spacing.xs,
+              borderRadius: radius.circle,
+            }}
           />
         ) : (
           <Text
             style={{
-              color: tokens.text,
+              color: colors.text,
               fontSize: dim * 0.35,
               fontWeight: typography.fontWeight.bold,
             }}
@@ -63,16 +67,19 @@ function AvatarComponent({
           style={[
             styles.online,
             {
-              backgroundColor: online ? tokens.online : tokens.offline,
+              backgroundColor: online ? colors.success : colors.textMuted,
               borderColor: colors.surface,
               width: dim * 0.28,
               height: dim * 0.28,
               borderRadius: radius.circle,
+              borderWidth: border.thin,
             },
           ]}
         />
       ) : null}
-      {statusBadge ? <View style={styles.badge}>{statusBadge}</View> : null}
+      {statusBadge ? (
+        <View style={[styles.badge, { top: -spacing.xs, right: -spacing.xs }]}>{statusBadge}</View>
+      ) : null}
     </View>
   );
 }
@@ -84,9 +91,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    borderWidth: 2,
   },
-  badge: { position: 'absolute', top: -4, right: -4 },
+  badge: { position: 'absolute' },
 });
 
 export const Avatar = memo(AvatarComponent);

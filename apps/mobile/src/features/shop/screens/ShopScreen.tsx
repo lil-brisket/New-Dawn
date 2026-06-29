@@ -5,7 +5,8 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { shopRepository } from '@/services/api/shop';
 
 export function ShopScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const [items, setItems] = useState<
     { id: string; name: string; price: number; currency: string }[]
   >([]);

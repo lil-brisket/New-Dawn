@@ -72,5 +72,6 @@ vi.mock('react-native', () => {
       flatten: (style: unknown) => style,
     },
     Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default },
+    useColorScheme: () => 'dark',
   };
 });

@@ -1,8 +1,2 @@
-export const icons = {
-  sm: 16,
-  md: 24,
-  lg: 32,
-  xl: 48,
-} as const;
-
-export type Icons = typeof icons;
+/** @deprecated Remove after Phase 7 — import from `./tokens/icons` */
+export { icons, type Icons } from './tokens/icons';

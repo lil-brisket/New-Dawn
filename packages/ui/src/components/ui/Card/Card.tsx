@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../../../theme';
+import { createCardVariants } from '../../../theme/components/button';
 import type {
   CardProps,
   CardHeaderProps,
@@ -10,8 +11,13 @@ import type {
 } from './Card.types';
 
 function CardRoot({ variant = 'default', title, children, style, testID, ...props }: CardProps) {
-  const { components, radius, spacing } = useTheme();
-  const tokens = components.card[variant];
+  const { theme } = useTheme();
+  const { colors, radius, spacing, shadow } = theme;
+  const cardVariants = useMemo(
+    () => createCardVariants(colors, { sm: shadow.sm, md: shadow.md }),
+    [colors, shadow],
+  );
+  const tokens = cardVariants[variant];
 
   return (
     <View
@@ -37,15 +43,16 @@ function CardRoot({ variant = 'default', title, children, style, testID, ...prop
 }
 
 function CardHeader({ children, icon, testID }: CardHeaderProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography, spacing } = theme;
 
   return (
-    <View testID={testID} style={[styles.header, { marginBottom: spacing.sm }]}>
-      {icon ? <View style={styles.headerIcon}>{icon}</View> : null}
+    <View testID={testID} style={[styles.header, { marginBottom: spacing.sm, gap: spacing.sm }]}>
+      {icon ? <View style={{ marginRight: spacing.xs }}>{icon}</View> : null}
       {typeof children === 'string' ? (
         <Text
           style={{
-            color: colors.textPrimary,
+            color: colors.text,
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.semibold,
           }}
@@ -60,14 +67,18 @@ function CardHeader({ children, icon, testID }: CardHeaderProps) {
 }
 
 function CardBody({ children, image, testID }: CardBodyProps) {
-  const { spacing, radius } = useTheme();
+  const { theme } = useTheme();
+  const { spacing, radius, sizes } = theme;
 
   return (
     <View testID={testID}>
       {image ? (
         <Image
           source={image}
-          style={[styles.image, { borderRadius: radius.md, marginBottom: spacing.md }]}
+          style={[
+            styles.image,
+            { borderRadius: radius.md, marginBottom: spacing.md, height: sizes.cardMinHeight },
+          ]}
           resizeMode="cover"
         />
       ) : null}
@@ -77,10 +88,11 @@ function CardBody({ children, image, testID }: CardBodyProps) {
 }
 
 function CardFooter({ children, testID }: CardFooterProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
-    <View testID={testID} style={[styles.footer, { marginTop: spacing.md }]}>
+    <View testID={testID} style={[styles.footer, { marginTop: spacing.md, gap: spacing.sm }]}>
       {children}
     </View>
   );
@@ -88,10 +100,9 @@ function CardFooter({ children, testID }: CardFooterProps) {
 
 const styles = StyleSheet.create({
   base: { overflow: 'hidden' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerIcon: { marginRight: 4 },
-  image: { width: '100%', height: 120 },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  header: { flexDirection: 'row', alignItems: 'center' },
+  image: { width: '100%' },
+  footer: { flexDirection: 'row', alignItems: 'center' },
 });
 
 export const Card = Object.assign(memo(CardRoot), {

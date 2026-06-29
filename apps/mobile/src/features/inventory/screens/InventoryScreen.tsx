@@ -5,7 +5,8 @@ import { PlaceholderScreen } from '@/components/PlaceholderScreen';
 import { inventoryRepository } from '@/services/api/inventory';
 
 export function InventoryScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
   const [items, setItems] = useState<{ id: string; name: string; quantity: number }[]>([]);
 
   useEffect(() => {

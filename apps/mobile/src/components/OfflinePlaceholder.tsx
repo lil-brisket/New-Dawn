@@ -3,7 +3,8 @@ import { useTheme } from '@dawn/ui';
 import { GradientPanel } from './GradientPanel';
 
 export function OfflinePlaceholder() {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <View style={[styles.container, { padding: spacing.xl }]}>

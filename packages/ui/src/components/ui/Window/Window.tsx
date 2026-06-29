@@ -43,13 +43,22 @@ function WindowRoot({ children, title, icon, testID, style }: WindowProps) {
 }
 
 function WindowHeader({ title, icon, children, testID }: WindowHeaderProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, typography, spacing, border } = theme;
 
   if (children) {
     return (
       <View
         testID={testID}
-        style={[styles.header, { borderBottomColor: colors.border, paddingBottom: spacing.md }]}
+        style={[
+          styles.header,
+          {
+            borderBottomColor: colors.border,
+            borderBottomWidth: border.thin,
+            paddingBottom: spacing.md,
+            gap: spacing.sm,
+          },
+        ]}
       >
         {children}
       </View>
@@ -59,13 +68,21 @@ function WindowHeader({ title, icon, children, testID }: WindowHeaderProps) {
   return (
     <View
       testID={testID}
-      style={[styles.header, { borderBottomColor: colors.border, paddingBottom: spacing.md }]}
+      style={[
+        styles.header,
+        {
+          borderBottomColor: colors.border,
+          borderBottomWidth: border.thin,
+          paddingBottom: spacing.md,
+          gap: spacing.sm,
+        },
+      ]}
     >
-      {icon ? <View style={styles.icon}>{icon}</View> : null}
+      {icon ? <View style={{ marginRight: spacing.xs }}>{icon}</View> : null}
       {title ? (
         <Text
           style={{
-            color: colors.accent,
+            color: colors.gold,
             fontSize: typography.fontSize.xl,
             fontWeight: typography.fontWeight.bold,
           }}
@@ -78,7 +95,8 @@ function WindowHeader({ title, icon, children, testID }: WindowHeaderProps) {
 }
 
 function WindowBody({ children, scrollable = false, testID, ...scrollProps }: WindowBodyProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   if (scrollable) {
     return (
@@ -101,14 +119,20 @@ function WindowBody({ children, scrollable = false, testID, ...scrollProps }: Wi
 }
 
 function WindowFooter({ children, testID }: WindowFooterProps) {
-  const { spacing, colors } = useTheme();
+  const { theme } = useTheme();
+  const { spacing, colors, border } = theme;
 
   return (
     <View
       testID={testID}
       style={[
         styles.footer,
-        { marginTop: spacing.md, borderTopColor: colors.border, paddingTop: spacing.md },
+        {
+          marginTop: spacing.md,
+          borderTopColor: colors.border,
+          borderTopWidth: border.thin,
+          paddingTop: spacing.md,
+        },
       ]}
     >
       {children}
@@ -121,11 +145,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    gap: 8,
   },
-  icon: { marginRight: 4 },
-  footer: { borderTopWidth: 1 },
+  footer: {},
 });
 
 export const Window = Object.assign(memo(WindowRoot), {

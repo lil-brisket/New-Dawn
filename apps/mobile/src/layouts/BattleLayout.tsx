@@ -10,7 +10,8 @@ export interface BattleLayoutProps {
 }
 
 export function BattleLayout({ header, viewport, bottomBar }: BattleLayoutProps) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <ScreenLayout>

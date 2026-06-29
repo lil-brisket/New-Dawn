@@ -9,7 +9,8 @@ export interface GlassSurfaceProps extends ViewProps {
 }
 
 function GlassSurfaceComponent({ children, style, testID, ...props }: GlassSurfaceProps) {
-  const { colors, radius, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, border } = theme;
 
   return (
     <View
@@ -21,6 +22,7 @@ function GlassSurfaceComponent({ children, style, testID, ...props }: GlassSurfa
           borderColor: colors.border,
           borderRadius: radius.lg,
           padding: spacing.lg,
+          borderWidth: border.thin,
         },
         style,
       ]}
@@ -33,7 +35,6 @@ function GlassSurfaceComponent({ children, style, testID, ...props }: GlassSurfa
 
 const styles = StyleSheet.create({
   base: {
-    borderWidth: 1,
     overflow: 'hidden',
   },
 });

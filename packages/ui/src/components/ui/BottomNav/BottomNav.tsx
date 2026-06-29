@@ -5,7 +5,8 @@ import { PressableScale } from '../../_internal/PressableScale';
 import type { BottomNavProps } from './BottomNav.types';
 
 function BottomNavComponent({ items, testID }: BottomNavProps) {
-  const { colors, sizes, components, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, sizes, typography, border, opacity } = theme;
 
   return (
     <View
@@ -16,13 +17,12 @@ function BottomNavComponent({ items, testID }: BottomNavProps) {
           height: sizes.bottomNav,
           backgroundColor: colors.surfaceElevated,
           borderTopColor: colors.border,
+          borderTopWidth: border.thin,
         },
       ]}
     >
       {items.map((item, index) => {
-        const stateTokens = item.active
-          ? components.bottomNav.active
-          : components.bottomNav.inactive;
+        const textColor = item.active ? colors.gold : colors.textMuted;
         return (
           <PressableScale
             key={`${item.label}-${index}`}
@@ -32,10 +32,10 @@ function BottomNavComponent({ items, testID }: BottomNavProps) {
             accessibilityLabel={item.accessibilityLabel ?? item.label}
             accessibilityState={{ selected: item.active }}
           >
-            <View style={{ opacity: item.active ? 1 : 0.85 }}>{item.icon}</View>
+            <View style={{ opacity: item.active ? 1 : opacity.pressed }}>{item.icon}</View>
             <Text
               style={{
-                color: stateTokens.text,
+                color: textColor,
                 fontSize: typography.fontSize.xs,
                 marginTop: 2,
                 fontWeight: item.active
@@ -53,7 +53,7 @@ function BottomNavComponent({ items, testID }: BottomNavProps) {
 }
 
 const styles = StyleSheet.create({
-  base: { flexDirection: 'row', borderTopWidth: 1 },
+  base: { flexDirection: 'row' },
   item: { flex: 1 },
 });
 

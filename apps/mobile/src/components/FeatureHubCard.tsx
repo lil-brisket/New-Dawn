@@ -12,7 +12,8 @@ export interface FeatureHubCardProps {
 }
 
 export function FeatureHubCard({ title, subtitle, icon, onPress, disabled }: FeatureHubCardProps) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <Pressable

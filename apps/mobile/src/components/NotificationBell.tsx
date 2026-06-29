@@ -3,7 +3,8 @@ import { useTheme } from '@dawn/ui';
 import { AppIcon } from './AppIcon';
 
 export function NotificationBell() {
-  const { colors, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, radius, icons } = theme;
 
   return (
     <Pressable
@@ -12,7 +13,19 @@ export function NotificationBell() {
       style={[styles.button, { padding: spacing.sm }]}
     >
       <AppIcon name="bell" size="md" color={colors.text} accessibilityLabel="Notifications" />
-      <View style={[styles.badge, { backgroundColor: colors.error }]} />
+      <View
+        style={[
+          styles.badge,
+          {
+            backgroundColor: colors.error,
+            top: spacing.sm - 2,
+            right: spacing.sm - 2,
+            width: icons.xs,
+            height: icons.xs,
+            borderRadius: radius.xs,
+          },
+        ]}
+      />
     </Pressable>
   );
 }
@@ -21,10 +34,5 @@ const styles = StyleSheet.create({
   button: { position: 'relative' },
   badge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
 });

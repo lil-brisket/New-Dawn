@@ -14,7 +14,8 @@ export function MainLayout({
   onBack?: () => void;
   rightAction?: ReactNode;
 }) {
-  const { spacing } = useTheme();
+  const { theme } = useTheme();
+  const { spacing } = theme;
 
   return (
     <ScreenLayout>

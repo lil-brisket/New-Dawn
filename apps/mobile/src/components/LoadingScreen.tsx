@@ -7,7 +7,8 @@ export interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ message = 'Loading...' }: LoadingScreenProps) {
-  const { colors, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, spacing, typography } = theme;
 
   return (
     <ScreenBackground>

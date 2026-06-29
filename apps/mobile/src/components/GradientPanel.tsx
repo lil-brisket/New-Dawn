@@ -8,18 +8,20 @@ export interface GradientPanelProps {
 }
 
 export function GradientPanel({ children }: GradientPanelProps) {
-  const { colors, radius, spacing, shadows } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, shadow, border } = theme;
 
   return (
     <LinearGradient
-      colors={[colors.surface, colors.surfaceLight]}
+      colors={[colors.surface, colors.surfacePressed]}
       style={[
         styles.panel,
         {
           borderRadius: radius.lg,
           padding: spacing.lg,
           borderColor: colors.border,
-          ...shadows.md,
+          borderWidth: border.thin,
+          ...shadow.md,
         },
       ]}
     >
@@ -30,7 +32,6 @@ export function GradientPanel({ children }: GradientPanelProps) {
 
 const styles = StyleSheet.create({
   panel: {
-    borderWidth: 1,
     overflow: 'hidden',
   },
 });

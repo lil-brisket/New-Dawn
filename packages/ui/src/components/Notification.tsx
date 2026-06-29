@@ -9,7 +9,8 @@ export interface NotificationProps {
 }
 
 function NotificationComponent({ message, variant = 'info', testID }: NotificationProps) {
-  const { colors, radius, spacing } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, border } = theme;
 
   const variantColor = {
     info: colors.info,
@@ -26,6 +27,7 @@ function NotificationComponent({ message, variant = 'info', testID }: Notificati
         {
           backgroundColor: colors.surface,
           borderLeftColor: variantColor,
+          borderLeftWidth: border.thick,
           borderRadius: radius.md,
           padding: spacing.md,
         },
@@ -37,7 +39,7 @@ function NotificationComponent({ message, variant = 'info', testID }: Notificati
 }
 
 const styles = StyleSheet.create({
-  base: { borderLeftWidth: 4 },
+  base: {},
 });
 
 export const Notification = memo(NotificationComponent);

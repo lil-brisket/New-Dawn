@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -7,28 +7,31 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { useTheme } from '../../../theme';
-import { springs } from '../../../theme/motion/springs';
+import { createToastTokens } from '../../../theme/components/toast';
 import type { ToastMessageProps } from './Toast.types';
 
 function ToastMessageComponent({ item, onDismiss, testID }: ToastMessageProps) {
-  const { components, radius, spacing, typography } = useTheme();
-  const tokens = components.toast[item.variant];
+  const { theme } = useTheme();
+  const { colors, radius, spacing, typography, shadow } = theme;
+  const toastTokens = useMemo(() => createToastTokens(colors), [colors]);
+  const tokens = toastTokens[item.variant];
+  const spring = theme.animation.spring.gentle;
   const translateY = useSharedValue(-20);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    translateY.value = withSpring(0, springs.toastEnter);
-    opacity.value = withSpring(1, springs.toastEnter);
+    translateY.value = withSpring(0, spring);
+    opacity.value = withSpring(1, spring);
 
     const timer = setTimeout(() => {
-      opacity.value = withSpring(0, springs.toastEnter, (finished) => {
+      opacity.value = withSpring(0, spring, (finished) => {
         if (finished) runOnJS(onDismiss)(item.id);
       });
-      translateY.value = withSpring(-10, springs.toastEnter);
+      translateY.value = withSpring(-10, spring);
     }, item.duration);
 
     return () => clearTimeout(timer);
-  }, [item.id, item.duration, onDismiss, opacity, translateY]);
+  }, [item.id, item.duration, onDismiss, opacity, translateY, spring]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -40,12 +43,15 @@ function ToastMessageComponent({ item, onDismiss, testID }: ToastMessageProps) {
       testID={testID}
       style={[
         styles.base,
+        shadow.md,
         animatedStyle,
         {
           backgroundColor: tokens.bg,
           borderLeftColor: tokens.accent,
+          borderLeftWidth: tokens.accentBorderWidth,
           borderRadius: radius.md,
           padding: spacing.md,
+          marginBottom: spacing.sm,
         },
       ]}
       accessibilityRole="alert"
@@ -56,15 +62,7 @@ function ToastMessageComponent({ item, onDismiss, testID }: ToastMessageProps) {
 }
 
 const styles = StyleSheet.create({
-  base: {
-    borderLeftWidth: 4,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  base: {},
 });
 
 export const ToastMessage = memo(ToastMessageComponent);

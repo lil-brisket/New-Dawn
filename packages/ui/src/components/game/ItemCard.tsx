@@ -11,7 +11,8 @@ export interface ItemCardProps {
 }
 
 function ItemCardComponent({ name, rarity, quantity, testID }: ItemCardProps) {
-  const { colors, radius, spacing, typography } = useTheme();
+  const { theme } = useTheme();
+  const { colors, radius, spacing, typography, border, game } = theme;
 
   return (
     <View
@@ -23,14 +24,12 @@ function ItemCardComponent({ name, rarity, quantity, testID }: ItemCardProps) {
           borderRadius: radius.md,
           padding: spacing.sm,
           borderColor: colors.rarity[rarity],
-          borderWidth: 1,
+          borderWidth: border.thin,
+          minWidth: game.inventory.equipmentSlotSize,
         },
       ]}
     >
-      <Text
-        style={{ color: colors.textPrimary, fontSize: typography.fontSize.sm }}
-        numberOfLines={1}
-      >
+      <Text style={{ color: colors.text, fontSize: typography.fontSize.sm }} numberOfLines={1}>
         {name}
       </Text>
       {quantity !== undefined ? (
@@ -43,7 +42,7 @@ function ItemCardComponent({ name, rarity, quantity, testID }: ItemCardProps) {
 }
 
 const styles = StyleSheet.create({
-  base: { minWidth: 80 },
+  base: {},
 });
 
 export const ItemCard = memo(ItemCardComponent);

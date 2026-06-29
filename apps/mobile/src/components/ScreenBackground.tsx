@@ -9,7 +9,8 @@ export interface ScreenBackgroundProps {
 }
 
 export function ScreenBackground({ children, gradient = false }: ScreenBackgroundProps) {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const { colors } = theme;
 
   if (gradient) {
     return (
