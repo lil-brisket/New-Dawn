@@ -16,29 +16,35 @@ export interface BattlePlatformLayout {
   logMax: number;
   actionBarMaxBoost: number;
   headerMaxBoost: number;
+  headerRatioScale: number;
+  headerMinAdjust: number;
   headerPadding: 'sm' | 'lg';
   panelMaxWidth?: number;
   panelMaxWidthRatio?: number;
   actionBarPadding: 'tight' | 'normal' | 'wide';
   actionButtonLayout: 'equal-flex' | 'equal-percent';
+  compactHeader: boolean;
 }
 
 const NATIVE_LAYOUT: BattlePlatformLayout = {
   key: 'native',
-  axisMarginRatio: 0.9,
-  axisMarginMin: 30,
-  hexSizeMaxRatio: 0.05,
-  hexSizeMaxCap: 38,
-  hexSizeMinBoost: 4,
+  axisMarginRatio: 0.42,
+  axisMarginMin: 18,
+  hexSizeMaxRatio: 0.09,
+  hexSizeMaxCap: 56,
+  hexSizeMinBoost: 2,
   gridPadding: 'xs',
-  logHeightRatio: 0.09,
-  logMin: 52,
-  logMax: 72,
+  logHeightRatio: 0.065,
+  logMin: 40,
+  logMax: 56,
   actionBarMaxBoost: 0,
-  headerMaxBoost: 0,
+  headerMaxBoost: -4,
+  headerRatioScale: 0.92,
+  headerMinAdjust: 4,
   headerPadding: 'sm',
   actionBarPadding: 'tight',
-  actionButtonLayout: 'equal-percent',
+  actionButtonLayout: 'equal-flex',
+  compactHeader: true,
 };
 
 const WEB_LAYOUT: BattlePlatformLayout = {
@@ -54,11 +60,14 @@ const WEB_LAYOUT: BattlePlatformLayout = {
   logMax: 78,
   actionBarMaxBoost: -6,
   headerMaxBoost: 48,
+  headerRatioScale: 1.15,
+  headerMinAdjust: 24,
   headerPadding: 'lg',
   panelMaxWidth: 380,
   panelMaxWidthRatio: 0.34,
   actionBarPadding: 'wide',
   actionButtonLayout: 'equal-flex',
+  compactHeader: false,
 };
 
 export function getBattlePlatformLayout(): BattlePlatformLayout {

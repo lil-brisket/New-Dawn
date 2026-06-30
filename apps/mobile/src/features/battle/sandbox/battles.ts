@@ -56,11 +56,17 @@ const DEFINITIONS: readonly BattleDefinition[] = [
     sceneId: 'duel_arena',
     build: () => {
       const grid = createGrid({ width: 10, height: 8 });
-      const [p1, p2] = playerLine(2, 1, 3);
-      const [e1, e2] = enemyLine(2, 8, 3);
+      const playerSpawns = playerLine(2, 1, 3);
+      const enemySpawns = enemyLine(2, 8, 3);
       return {
-        party: [createKnight('knight-1', p1), createKnight('knight-2', p2)],
-        enemies: [createGoblin('goblin-1', e1), createGoblin('goblin-2', e2)],
+        party: [
+          createKnight('knight-1', playerSpawns[0]!),
+          createKnight('knight-2', playerSpawns[1]!),
+        ],
+        enemies: [
+          createGoblin('goblin-1', enemySpawns[0]!),
+          createGoblin('goblin-2', enemySpawns[1]!),
+        ],
         grid,
       };
     },
@@ -75,18 +81,18 @@ const DEFINITIONS: readonly BattleDefinition[] = [
     sceneId: 'grand_arena',
     build: () => {
       const grid = createGrid({ width: 12, height: 10 });
-      const [h1, h2, h3] = playerWedge([1, 2, 1], [3, 3, 4]);
-      const [g1, g2, g3] = enemyWedge([9, 10, 9], [3, 3, 4]);
+      const playerSpawns = playerWedge([1, 2, 1], [3, 3, 4]);
+      const enemySpawns = enemyWedge([9, 10, 9], [3, 3, 4]);
       return {
         party: [
-          createKnight('hero-1', h1, { name: 'Hero 1' }),
-          createKnight('hero-2', h2, { name: 'Hero 2' }),
-          createKnight('hero-3', h3, { name: 'Hero 3' }),
+          createKnight('hero-1', playerSpawns[0]!, { name: 'Hero 1' }),
+          createKnight('hero-2', playerSpawns[1]!, { name: 'Hero 2' }),
+          createKnight('hero-3', playerSpawns[2]!, { name: 'Hero 3' }),
         ],
         enemies: [
-          createGoblin('goblin-1', g1),
-          createGoblin('goblin-2', g2),
-          createGoblin('goblin-3', g3),
+          createGoblin('goblin-1', enemySpawns[0]!),
+          createGoblin('goblin-2', enemySpawns[1]!),
+          createGoblin('goblin-3', enemySpawns[2]!),
         ],
         grid,
       };

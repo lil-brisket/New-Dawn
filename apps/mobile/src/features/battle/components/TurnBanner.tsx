@@ -13,17 +13,21 @@ export interface TurnBannerProps {
 export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
   const { theme } = useTheme();
   const { colors, spacing, typography, radius } = theme;
+  const compact = battleTheme?.platform.compactHeader ?? false;
+  const isWeb = battleTheme?.platform.key === 'web';
 
   const displayMessage = message ?? turn.phaseLabel;
   const showPlayerArrow = turn.activeTeam === 'player';
   const showEnemyArrow = turn.activeTeam === 'enemy';
+  const arrowSize = compact ? typography.fontSize.md : typography.fontSize.lg;
 
   return (
     <View
       style={[
         styles.wrap,
-        { gap: spacing.xs },
-        battleTheme?.platform.key === 'web' && styles.wrapWeb,
+        { gap: compact ? 2 : spacing.xs },
+        isWeb && styles.wrapWeb,
+        compact && styles.wrapCompact,
       ]}
     >
       <View style={[styles.arrowRow, { paddingHorizontal: spacing.xs }]}>
@@ -32,7 +36,7 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
             styles.arrow,
             {
               color: colors.warning,
-              fontSize: typography.fontSize.lg,
+              fontSize: arrowSize,
               opacity: showPlayerArrow ? 1 : 0,
             },
           ]}
@@ -45,7 +49,7 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
             styles.arrow,
             {
               color: colors.warning,
-              fontSize: typography.fontSize.lg,
+              fontSize: arrowSize,
               opacity: showEnemyArrow ? 1 : 0,
             },
           ]}
@@ -59,21 +63,23 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
           fontSize: typography.fontSize.xs,
           fontWeight: typography.fontWeight.semibold,
           textAlign: 'center',
-          letterSpacing: 1,
+          letterSpacing: compact ? 0.5 : 1,
         }}
       >
-        ROUND
+        {compact ? `ROUND ${turn.round}` : 'ROUND'}
       </Text>
-      <Text
-        style={{
-          color: colors.text,
-          fontSize: typography.fontSize.lg,
-          fontWeight: typography.fontWeight.bold,
-          textAlign: 'center',
-        }}
-      >
-        {turn.round}
-      </Text>
+      {!compact ? (
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.bold,
+            textAlign: 'center',
+          }}
+        >
+          {turn.round}
+        </Text>
+      ) : null}
       <Text
         style={{
           color: colors.textSecondary,
@@ -85,46 +91,61 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
         {turn.areaName}
       </Text>
       {displayMessage ? (
-        <Animated.View
-          entering={FadeInDown.duration(theme.animation.duration.normal)}
-          exiting={FadeOut.duration(theme.animation.duration.fast)}
-          style={[
-            styles.banner,
-            {
-              backgroundColor: colors.primaryDark,
-              borderRadius: radius.md,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.xs,
-              marginTop: spacing.xs,
-            },
-          ]}
-        >
+        compact ? (
           <Text
             style={{
-              color: colors.textInverse,
-              fontSize: typography.fontSize.sm,
+              color: colors.primary,
+              fontSize: typography.fontSize.xs,
               fontWeight: typography.fontWeight.bold,
               textAlign: 'center',
             }}
+            numberOfLines={1}
           >
             {displayMessage}
           </Text>
-        </Animated.View>
+        ) : (
+          <Animated.View
+            entering={FadeInDown.duration(theme.animation.duration.normal)}
+            exiting={FadeOut.duration(theme.animation.duration.fast)}
+            style={[
+              styles.banner,
+              {
+                backgroundColor: colors.primaryDark,
+                borderRadius: radius.md,
+                paddingHorizontal: spacing.md,
+                paddingVertical: spacing.xs,
+                marginTop: spacing.xs,
+              },
+            ]}
+          >
+            <Text
+              style={{
+                color: colors.textInverse,
+                fontSize: typography.fontSize.sm,
+                fontWeight: typography.fontWeight.bold,
+                textAlign: 'center',
+              }}
+            >
+              {displayMessage}
+            </Text>
+          </Animated.View>
+        )
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', maxWidth: 120, minWidth: 96 },
+  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', maxWidth: 120, minWidth: 72 },
   wrapWeb: { maxWidth: 200, flexGrow: 0, flexShrink: 0 },
+  wrapCompact: { maxWidth: 104, minWidth: 80, flexShrink: 1 },
   arrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    minHeight: 20,
+    minHeight: 16,
   },
-  arrow: { fontWeight: 'bold', width: 20, textAlign: 'center' },
+  arrow: { fontWeight: 'bold', width: 18, textAlign: 'center' },
   arrowSpacer: { flex: 1 },
   banner: {},
 });

@@ -1,15 +1,21 @@
-import { View, Pressable, StyleSheet } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { View, Pressable, StyleSheet, Platform, PanResponder } from 'react-native';
 import Svg, { Text as SvgText } from 'react-native-svg';
 import type { HexCoord } from '@dawn/types';
 import { hexEquals } from '@dawn/utils';
 import type { GridAxisConfig } from '../theme/battlePlatformLayout';
 import { useTheme } from '@dawn/ui';
-import type { BattleGridLayers } from './types';
+import type { BattleGridLayers, TileRenderData } from './types';
 import { HexTile, PathPreviewLine, AxisLabel } from './HexTile';
 import { UnitSprite } from './UnitSprite';
 import { getTerrainFill } from './terrainStyles';
 import { GridViewport } from './GridViewport';
-import { columnLabelPosition, rowLabelPosition, formatCoord } from '../utils/hexLayout';
+import {
+  columnLabelPosition,
+  rowLabelPosition,
+  formatCoord,
+  findNearestTileCoord,
+} from '../utils/hexLayout';
 
 function coordKey(c: HexCoord): string {
   return `${c.x},${c.y},${c.z}`;
@@ -311,6 +317,86 @@ function CoordinateLayer({
   );
 }
 
+function MoveProbeLayer({
+  tiles,
+  hexSize,
+  svgWidth,
+  svgHeight,
+  reachableCoordKeys,
+  onTileHover,
+  onTilePress,
+}: {
+  tiles: TileRenderData[];
+  hexSize: number;
+  svgWidth: number;
+  svgHeight: number;
+  reachableCoordKeys: Set<string>;
+  onTileHover: (coord: HexCoord | null, unitId?: string | null) => void;
+  onTilePress: (coord: HexCoord) => void;
+}) {
+  const lastCoordKeyRef = useRef<string | null>(null);
+  const tilesRef = useRef(tiles);
+  const reachableRef = useRef(reachableCoordKeys);
+  const onTileHoverRef = useRef(onTileHover);
+  const onTilePressRef = useRef(onTilePress);
+  const hexSizeRef = useRef(hexSize);
+
+  tilesRef.current = tiles;
+  reachableRef.current = reachableCoordKeys;
+  onTileHoverRef.current = onTileHover;
+  onTilePressRef.current = onTilePress;
+  hexSizeRef.current = hexSize;
+
+  const resolveCoord = (x: number, y: number): HexCoord | null => {
+    const coord = findNearestTileCoord(x, y, tilesRef.current, hexSizeRef.current);
+    if (!coord) return null;
+    return reachableRef.current.has(coordKey(coord)) ? coord : null;
+  };
+
+  const probeAt = (x: number, y: number) => {
+    const coord = resolveCoord(x, y);
+    const key = coord ? coordKey(coord) : null;
+    if (key === lastCoordKeyRef.current) return;
+    lastCoordKeyRef.current = key;
+    onTileHoverRef.current(coord, null);
+  };
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: (event) => {
+          probeAt(event.nativeEvent.locationX, event.nativeEvent.locationY);
+        },
+        onPanResponderMove: (event) => {
+          probeAt(event.nativeEvent.locationX, event.nativeEvent.locationY);
+        },
+        onPanResponderRelease: (event) => {
+          const coord = resolveCoord(event.nativeEvent.locationX, event.nativeEvent.locationY);
+          lastCoordKeyRef.current = null;
+          if (coord) {
+            onTilePressRef.current(coord);
+          } else {
+            onTileHoverRef.current(null, null);
+          }
+        },
+        onPanResponderTerminate: () => {
+          lastCoordKeyRef.current = null;
+          onTileHoverRef.current(null, null);
+        },
+      }),
+    [],
+  );
+
+  return (
+    <View
+      style={[StyleSheet.absoluteFill, { width: svgWidth, height: svgHeight }]}
+      {...panResponder.panHandlers}
+    />
+  );
+}
+
 function GridInputLayer({
   tiles,
   hexSize,
@@ -318,6 +404,7 @@ function GridInputLayer({
   svgHeight,
   targetingMode,
   attackableCoordKeys,
+  reachableCoordKeys,
   onTilePress,
   onInvalidAttackTarget,
   onTileHover,
@@ -325,6 +412,22 @@ function GridInputLayer({
   onUnitLongPress,
   combatantAt,
 }: BattleGridLayers['input']) {
+  const useMoveProbe = Platform.OS !== 'web' && targetingMode === 'move';
+
+  if (useMoveProbe) {
+    return (
+      <MoveProbeLayer
+        tiles={tiles}
+        hexSize={hexSize}
+        svgWidth={svgWidth}
+        svgHeight={svgHeight}
+        reachableCoordKeys={reachableCoordKeys}
+        onTileHover={onTileHover}
+        onTilePress={onTilePress}
+      />
+    );
+  }
+
   return (
     <View style={[StyleSheet.absoluteFill, { width: svgWidth, height: svgHeight }]}>
       {tiles.map((t) => {

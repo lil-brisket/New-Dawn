@@ -35,9 +35,8 @@ export function ActionButton({
       ? accent + '33'
       : commandTokens.background;
   const textColor = disabled ? commandTokens.disabled : colors.text;
-  const stretchFill = fillParent && isWeb;
   const iconSize = isWeb ? typography.fontSize['2xl'] : typography.fontSize.xl;
-  const labelSize = isWeb ? typography.fontSize.sm : typography.fontSize.xs;
+  const labelSize = isWeb ? typography.fontSize.sm : 10;
 
   return (
     <Pressable
@@ -46,38 +45,35 @@ export function ActionButton({
       accessibilityLabel={accessibilityLabel ?? label}
       style={({ pressed }) => [
         fillParent ? styles.fillParent : styles.flex,
-        stretchFill && styles.fillParentWeb,
         { opacity: pressed && !disabled ? opacity.pressed : 1 },
       ]}
     >
       <View
         style={[
           styles.button,
-          stretchFill && styles.buttonWeb,
+          isWeb && styles.buttonWeb,
           {
             backgroundColor,
             borderColor,
             borderWidth: border.normal,
             borderRadius: radius.lg,
             paddingVertical: isWeb ? spacing.sm : spacing[2],
-            paddingHorizontal: spacing.xs,
+            paddingHorizontal: spacing[2],
             ...(selected && !disabled ? shadow.glow : shadow.sm),
           },
         ]}
       >
-        <View style={[styles.iconSlot, isWeb && styles.iconSlotWeb]}>
-          <Text
-            style={[
-              styles.icon,
-              {
-                fontSize: iconSize,
-                lineHeight: iconSize * 1.15,
-              },
-            ]}
-          >
-            {icon}
-          </Text>
-        </View>
+        <Text
+          style={[
+            styles.icon,
+            {
+              fontSize: iconSize,
+              lineHeight: iconSize,
+            },
+          ]}
+        >
+          {icon}
+        </Text>
         <Text
           style={[
             styles.label,
@@ -99,29 +95,21 @@ export function ActionButton({
 
 const styles = StyleSheet.create({
   flex: { flex: 1, flexBasis: 0, minWidth: 0 },
-  fillParent: { flex: 1, width: '100%', minWidth: 0 },
-  fillParentWeb: { alignSelf: 'stretch' },
+  fillParent: { flex: 1, alignSelf: 'stretch', width: '100%', minWidth: 0 },
   button: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
     flex: 1,
-    gap: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    minHeight: 60,
   },
   buttonWeb: {
     width: '100%',
     alignSelf: 'stretch',
+    justifyContent: 'space-between',
     minHeight: '100%',
+    gap: 4,
   },
-  iconSlot: {
-    flex: 1,
-    width: '100%',
-    minHeight: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconSlotWeb: {
-    minHeight: 32,
-  },
-  icon: { textAlign: 'center' },
+  icon: { textAlign: 'center', includeFontPadding: false },
   label: { textAlign: 'center', width: '100%' },
 });

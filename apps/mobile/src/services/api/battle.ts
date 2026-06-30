@@ -1,7 +1,8 @@
-import { createBattle, dispatchAction, offsetToCube } from '@dawn/game-core';
+import { createBattle, createGrid, dispatchAction } from '@dawn/game-core';
 import type { ActionResult, BattleAction, BattleEvent, BattleState, Combatant } from '@dawn/types';
 import { defaultRegistry } from '@dawn/game-data';
 import { createId } from '@dawn/utils';
+import { enemyLine, playerLine } from '@/features/battle/sandbox/spawns';
 import type { BattleRepository, StartBattleRequest } from './types';
 
 const battles = new Map<string, BattleState>();
@@ -9,8 +10,7 @@ const battles = new Map<string, BattleState>();
 function combatantFromDefinition(
   id: string,
   team: 'player' | 'enemy',
-  col: number,
-  row: number,
+  position: Combatant['position'],
 ): Combatant {
   const def = team === 'player' ? defaultRegistry.getCharacter(id) : defaultRegistry.getEnemy(id);
   const stats = def?.baseStats ?? {
@@ -29,7 +29,7 @@ function combatantFromDefinition(
     id: createId('combatant'),
     name: def?.name ?? (team === 'player' ? 'Hero' : 'Enemy'),
     team,
-    position: offsetToCube(col, row),
+    position,
     hp: stats.hp,
     maxHp: stats.maxHp,
     sp: stats.mp,
@@ -43,18 +43,28 @@ function combatantFromDefinition(
 }
 
 function createStateFromRequest(request: StartBattleRequest): BattleState {
-  const player = combatantFromDefinition(request.playerCharacterIds[0] ?? 'hero', 'player', 0, 0);
-  const enemies = request.enemyDefinitionIds.map((id, i) =>
-    combatantFromDefinition(id, 'enemy', 5, i),
+  const playerIds = request.playerCharacterIds.length > 0 ? request.playerCharacterIds : ['hero'];
+  const enemyIds = request.enemyDefinitionIds;
+
+  const grid = createGrid({ width: 8, height: 8 });
+  const playerSpawns = playerLine(playerIds.length, 1, 3);
+  const enemySpawns = enemyLine(enemyIds.length, 6, 3);
+
+  const party = playerIds.map((id, index) =>
+    combatantFromDefinition(id, 'player', playerSpawns[index]!),
   );
+  const enemies = enemyIds.map((id, index) =>
+    combatantFromDefinition(id, 'enemy', enemySpawns[index]!),
+  );
+
   const result = createBattle({
-    player,
+    party,
     enemies,
-    gridSize: { width: 8, height: 8 },
+    grid,
     seed: 42,
   });
   if (!result.ok) {
-    throw new Error('Failed to create battle');
+    throw new Error(`Failed to create battle: ${result.error.code}`);
   }
   return result.state;
 }

@@ -23,7 +23,9 @@ export function BattleHeader({
   onEndBattle,
 }: BattleHeaderProps) {
   const { theme } = useTheme();
-  const { spacing, colors, typography } = theme;
+  const { spacing, colors, typography, radius, border } = theme;
+  const isWeb = battleTheme.platform.key === 'web';
+  const compact = battleTheme.platform.compactHeader;
 
   return (
     <View
@@ -31,20 +33,16 @@ export function BattleHeader({
         styles.container,
         {
           paddingHorizontal: battleTheme.headerPaddingHorizontal,
-          gap: spacing.xs,
+          gap: compact ? spacing[2] : spacing.xs,
         },
-        battleTheme.platform.key === 'web' && {
+        isWeb && {
           paddingTop: spacing.sm,
           paddingBottom: spacing.xs,
         },
       ]}
     >
       <View
-        style={[
-          styles.row,
-          { gap: spacing.sm },
-          battleTheme.platform.key === 'web' && styles.rowWeb,
-        ]}
+        style={[styles.row, { gap: compact ? spacing.xs : spacing.sm }, isWeb && styles.rowWeb]}
       >
         <CombatantPanel
           team={teamA}
@@ -61,7 +59,20 @@ export function BattleHeader({
         />
       </View>
       {onEndBattle ? (
-        <Pressable onPress={onEndBattle} style={styles.endBattle}>
+        <Pressable
+          onPress={onEndBattle}
+          style={[
+            styles.endBattleBtn,
+            compact && {
+              borderColor: colors.border,
+              borderWidth: border.thin,
+              borderRadius: radius.sm,
+              paddingVertical: spacing[2],
+              paddingHorizontal: spacing.sm,
+            },
+          ]}
+          hitSlop={6}
+        >
           <Text
             style={{
               color: colors.textMuted,
@@ -82,5 +93,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'stretch' },
   rowWeb: { justifyContent: 'space-between', alignItems: 'center', width: '100%' },
-  endBattle: { alignSelf: 'center', paddingVertical: 2 },
+  endBattleBtn: { alignSelf: 'center' },
 });

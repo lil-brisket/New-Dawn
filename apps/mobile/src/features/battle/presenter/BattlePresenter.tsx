@@ -94,20 +94,17 @@ export function BattlePresenter() {
     battleTheme.gridAxis,
   );
   const cappedHexSize = Math.min(rawHexSize, battleTheme.hexSizeMax);
-  const hexSize =
-    battleTheme.platform.key === 'web'
-      ? growHexSizeToViewport(
-          cappedHexSize,
-          gridWidth,
-          gridHeight,
-          gridViewportWidth,
-          gridViewportHeight,
-          battleTheme.gridPadding,
-          battleTheme.hexSizeMax,
-          reserveAxisLabels,
-          battleTheme.gridAxis,
-        )
-      : cappedHexSize;
+  const hexSize = growHexSizeToViewport(
+    cappedHexSize,
+    gridWidth,
+    gridHeight,
+    gridViewportWidth,
+    gridViewportHeight,
+    battleTheme.gridPadding,
+    battleTheme.hexSizeMax,
+    reserveAxisLabels,
+    battleTheme.gridAxis,
+  );
   const gridLayoutOptions = { reserveAxisLabels, axis: battleTheme.gridAxis };
 
   useEffect(() => {
@@ -239,6 +236,12 @@ export function BattlePresenter() {
   const attackRangeCoordKeys = useMemo(() => {
     return new Set(battle.attackRangeTiles.map((c) => `${c.x},${c.y},${c.z}`));
   }, [battle.attackRangeTiles]);
+
+  const reachableCoordKeys = useMemo(() => {
+    return new Set(
+      reachableCosts.map((entry) => `${entry.coord.x},${entry.coord.y},${entry.coord.z}`),
+    );
+  }, [reachableCosts]);
 
   const handleEndBattle = useCallback(() => {
     router.replace(ROUTES.DEVELOPER);
@@ -407,8 +410,32 @@ export function BattlePresenter() {
   if (!battle.battleState) {
     return (
       <ScreenLayout>
-        <View style={[styles.centered, { backgroundColor: colors.background }]}>
-          <Text style={{ color: colors.text }}>Loading battle...</Text>
+        <View
+          style={[styles.centered, { backgroundColor: colors.background, padding: spacing.lg }]}
+        >
+          {battle.loadError ? (
+            <>
+              <Text
+                style={{
+                  color: colors.text,
+                  fontSize: theme.typography.fontSize.lg,
+                  fontWeight: theme.typography.fontWeight.bold,
+                  marginBottom: spacing.sm,
+                  textAlign: 'center',
+                }}
+              >
+                Failed to start battle
+              </Text>
+              <Text
+                style={{ color: colors.textMuted, textAlign: 'center', marginBottom: spacing.md }}
+              >
+                {battle.loadError.code}
+              </Text>
+              <Button title="Retry" onPress={battle.restart} />
+            </>
+          ) : (
+            <Text style={{ color: colors.text }}>Loading battle...</Text>
+          )}
         </View>
       </ScreenLayout>
     );
@@ -432,6 +459,7 @@ export function BattlePresenter() {
     attackableUnitIds: attackableIds,
     attackableCoordKeys,
     attackRangeCoordKeys,
+    reachableCoordKeys,
     selectedCombatantId: battle.selectedCombatantId,
     targetingMode: battle.mode,
     showGrid,

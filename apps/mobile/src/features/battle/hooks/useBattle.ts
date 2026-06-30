@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { BattleAction, BattleEvent, BattleState } from '@dawn/types';
+import type { BattleAction, BattleError, BattleEvent, BattleState } from '@dawn/types';
 import {
   appendAction,
   canMoveTo,
@@ -72,6 +72,7 @@ function applyMutation(
 export function useBattle(initialBattleId = 'training') {
   const [battleDefinitionId, setBattleDefinitionId] = useState(initialBattleId);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+  const [loadError, setLoadError] = useState<BattleError | null>(null);
   const [stateHistory, setStateHistory] = useState<BattleState[]>([]);
   const [recording, setRecording] = useState<BattleRecording | null>(null);
   const [selectedCombatantId, setSelectedCombatantId] = useState<string | null>(null);
@@ -93,9 +94,11 @@ export function useBattle(initialBattleId = 'training') {
   const loadBattle = useCallback((def: BattleDefinition) => {
     const result = startBattle(def);
     if (!result.ok) {
+      setLoadError(result.error);
       setLogEntries([createErrorLog(result.error)]);
       return;
     }
+    setLoadError(null);
     setBattleState(result.state);
     setStateHistory([]);
     setRecording(createRecording(result.state));
@@ -338,6 +341,7 @@ export function useBattle(initialBattleId = 'training') {
 
   return {
     battleState,
+    loadError,
     battleDefinition,
     battleDefinitionId,
     setBattleDefinitionId: (id: string) => {

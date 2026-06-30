@@ -64,6 +64,7 @@ export interface BattleGridLayers {
   input: GridLayerProps & {
     targetingMode: 'idle' | 'move' | 'attack';
     attackableCoordKeys: Set<string>;
+    reachableCoordKeys: Set<string>;
     onTilePress: (coord: HexCoord) => void;
     onInvalidAttackTarget: (coord: HexCoord) => void;
     onTileHover: (coord: HexCoord | null, unitId?: string | null) => void;

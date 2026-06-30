@@ -22,7 +22,8 @@ export function CombatantPanel({
   const isLeft = alignment === 'left';
   const rep = team.representative;
   const isWeb = battleTheme.platform.key === 'web';
-  const cardPadding = isWeb ? spacing.md : spacing.sm;
+  const compact = battleTheme.platform.compactHeader;
+  const cardPadding = isWeb ? spacing.md : compact ? spacing.xs : spacing.sm;
   const barHeight = isWeb ? theme.game.battle.healthBarHeightLg : theme.game.battle.healthBarHeight;
 
   if (!rep) {
@@ -48,7 +49,7 @@ export function CombatantPanel({
           borderWidth: isActiveTurn ? border.normal : border.thin,
           borderRadius: radius.lg,
           padding: cardPadding,
-          gap: isWeb ? spacing.sm : spacing.xs,
+          gap: isWeb ? spacing.sm : compact ? 2 : spacing.xs,
           minWidth: 0,
           overflow: 'hidden',
           ...shadow.sm,
@@ -62,6 +63,7 @@ export function CombatantPanel({
           portraitSize={battleTheme.portraitSize}
           alignment={alignment}
           isWeb={isWeb}
+          compact={compact}
         />
         {team.rosterCount > 1 ? (
           <View
@@ -76,27 +78,18 @@ export function CombatantPanel({
           </View>
         ) : null}
       </View>
-      <Text
-        style={{
-          color: colors.textMuted,
-          fontSize: isWeb ? typography.fontSize.sm : typography.fontSize.xs,
-          textAlign: isLeft ? 'left' : 'right',
-        }}
-      >
-        Lv. {rep.level}
-      </Text>
       <HealthBar value={rep.hp} max={rep.maxHp} animated height={barHeight} />
       <ManaBar value={rep.sp} max={rep.maxSp} animated height={barHeight} />
       <View
         style={[
           styles.statusSlot,
           {
-            minHeight: battleTheme.statusSlotHeight,
+            minHeight: compact ? 20 : battleTheme.statusSlotHeight,
             borderRadius: radius.sm,
             borderColor: colors.border,
             backgroundColor: colors.surfacePressed,
             paddingHorizontal: spacing.xs,
-            paddingVertical: spacing[2],
+            paddingVertical: compact ? 2 : spacing[2],
           },
         ]}
       >
@@ -106,7 +99,7 @@ export function CombatantPanel({
           <Text
             style={{
               color: colors.textMuted,
-              fontSize: typography.fontSize.xs,
+              fontSize: compact ? 10 : typography.fontSize.xs,
               textAlign: isLeft ? 'left' : 'right',
               opacity: 0.6,
             }}
@@ -131,12 +124,14 @@ function PortraitCard({
   portraitSize,
   alignment,
   isWeb = false,
+  compact = false,
 }: {
   name: string;
   teamLabel: string;
   portraitSize: number;
   alignment: 'left' | 'right';
   isWeb?: boolean;
+  compact?: boolean;
 }) {
   const { theme } = useTheme();
   const { colors, typography, spacing } = theme;
@@ -149,6 +144,7 @@ function PortraitCard({
         styles.row,
         alignment === 'right' && styles.rowRight,
         { gap: spacing.sm, flex: 1, minWidth: 0 },
+        compact && { gap: spacing.xs },
       ]}
     >
       {alignment === 'left' ? (
@@ -158,7 +154,7 @@ function PortraitCard({
             <Text
               style={{
                 color: colors.textMuted,
-                fontSize: isWeb ? typography.fontSize.sm : typography.fontSize.xs,
+                fontSize: isWeb ? typography.fontSize.sm : compact ? 10 : typography.fontSize.xs,
                 fontWeight: typography.fontWeight.semibold,
               }}
             >
@@ -167,7 +163,11 @@ function PortraitCard({
             <Text
               style={{
                 color: colors.text,
-                fontSize: isWeb ? typography.fontSize.md : typography.fontSize.sm,
+                fontSize: isWeb
+                  ? typography.fontSize.md
+                  : compact
+                    ? typography.fontSize.xs
+                    : typography.fontSize.sm,
                 fontWeight: typography.fontWeight.bold,
               }}
               numberOfLines={1}
@@ -182,7 +182,7 @@ function PortraitCard({
             <Text
               style={{
                 color: colors.textMuted,
-                fontSize: isWeb ? typography.fontSize.sm : typography.fontSize.xs,
+                fontSize: isWeb ? typography.fontSize.sm : compact ? 10 : typography.fontSize.xs,
                 fontWeight: typography.fontWeight.semibold,
               }}
             >
@@ -191,7 +191,11 @@ function PortraitCard({
             <Text
               style={{
                 color: colors.text,
-                fontSize: isWeb ? typography.fontSize.md : typography.fontSize.sm,
+                fontSize: isWeb
+                  ? typography.fontSize.md
+                  : compact
+                    ? typography.fontSize.xs
+                    : typography.fontSize.sm,
                 fontWeight: typography.fontWeight.bold,
               }}
               numberOfLines={1}

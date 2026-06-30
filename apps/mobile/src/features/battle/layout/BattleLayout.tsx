@@ -32,7 +32,7 @@ export function BattleLayout({
             styles.header,
             battleTheme.platform.key === 'web'
               ? styles.headerWeb
-              : { height: battleTheme.headerHeight },
+              : { minHeight: battleTheme.headerHeight },
             battleTheme.platform.key === 'web' && { minHeight: battleTheme.headerHeight },
           ]}
         >
@@ -55,7 +55,7 @@ export function BattleLayout({
 const styles = StyleSheet.create({
   root: { flex: 1 },
   main: { flex: 1, minHeight: 0 },
-  header: { flexShrink: 0, overflow: 'hidden' },
+  header: { flexShrink: 0 },
   headerWeb: { overflow: 'hidden' },
   grid: { flex: 1, flexShrink: 1, minHeight: 0 },
   gridWeb: { overflow: 'visible' },

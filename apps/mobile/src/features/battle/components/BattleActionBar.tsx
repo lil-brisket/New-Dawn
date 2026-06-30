@@ -37,7 +37,7 @@ export function BattleActionBar({
         {
           paddingHorizontal: pad,
           paddingVertical: spacing.xs,
-          gap: isNative ? 4 : spacing.sm,
+          gap: isNative ? spacing[2] : spacing.sm,
           backgroundColor: theme.game.battle.command.background,
           borderTopWidth: theme.border.thin,
           borderTopColor: theme.game.battle.command.border,
@@ -47,13 +47,7 @@ export function BattleActionBar({
       {commands.map((command) => (
         <View
           key={command.type}
-          style={
-            platform.key === 'web'
-              ? styles.webCell
-              : platform.actionButtonLayout === 'equal-percent'
-                ? styles.nativeCell
-                : styles.cell
-          }
+          style={platform.key === 'web' ? styles.webCell : styles.nativeCell}
         >
           <ActionButton
             icon={command.icon}
@@ -79,7 +73,6 @@ const styles = StyleSheet.create({
     minHeight: 68,
     maxWidth: '100%',
   },
-  cell: { flex: 1, flexBasis: 0, minWidth: 0 },
   webCell: { flex: 1, flexBasis: 0, minWidth: 0, width: 0, alignSelf: 'stretch' },
-  nativeCell: { width: '20%', minWidth: 0 },
+  nativeCell: { flex: 1, flexBasis: 0, minWidth: 0, alignSelf: 'stretch' },
 });

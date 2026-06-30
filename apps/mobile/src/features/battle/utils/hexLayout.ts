@@ -136,3 +136,28 @@ export function formatGridAddress(coord: HexCoord): string {
 export function formatCoord(coord: HexCoord): string {
   return formatGridAddress(coord);
 }
+
+/** Snap a touch point in grid SVG space to the nearest tile center. */
+export function findNearestTileCoord(
+  x: number,
+  y: number,
+  tiles: readonly { coord: HexCoord; cx: number; cy: number }[],
+  hexSize: number,
+  maxDistanceRatio = 1.15,
+): HexCoord | null {
+  const maxDistSq = (hexSize * maxDistanceRatio) ** 2;
+  let best: HexCoord | null = null;
+  let bestDistSq = maxDistSq;
+
+  for (const tile of tiles) {
+    const dx = x - tile.cx;
+    const dy = y - tile.cy;
+    const distSq = dx * dx + dy * dy;
+    if (distSq < bestDistSq) {
+      bestDistSq = distSq;
+      best = tile.coord;
+    }
+  }
+
+  return best;
+}

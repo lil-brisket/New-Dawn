@@ -39,8 +39,10 @@ export function createBattleTheme(
   const platform = getBattlePlatformLayout();
   const isSmall = screenWidth < 380;
 
-  const headerRatio = platform.key === 'web' ? layout.headerRatio * 1.15 : layout.headerRatio;
-  const headerMin = platform.key === 'web' ? layout.headerMin + 24 : layout.headerMin;
+  const isLargePhone = screenWidth >= 400 && screenHeight >= 800;
+
+  const headerRatio = layout.headerRatio * platform.headerRatioScale;
+  const headerMin = layout.headerMin + platform.headerMinAdjust;
 
   const headerHeight = clamp(
     screenHeight * headerRatio,
@@ -50,10 +52,17 @@ export function createBattleTheme(
 
   const logHeight = clamp(screenHeight * platform.logHeightRatio, platform.logMin, platform.logMax);
 
+  const hexCap =
+    platform.key === 'native' && isLargePhone ? platform.hexSizeMaxCap + 6 : platform.hexSizeMaxCap;
+  const hexRatio =
+    platform.key === 'native' && isLargePhone
+      ? platform.hexSizeMaxRatio + 0.012
+      : platform.hexSizeMaxRatio;
+
   const hexSizeMax = clamp(
-    Math.min(screenWidth, screenHeight) * platform.hexSizeMaxRatio,
+    Math.min(screenWidth, screenHeight) * hexRatio,
     layout.hexSizeMin + platform.hexSizeMinBoost,
-    platform.hexSizeMaxCap,
+    hexCap,
   );
 
   const gridPadding = platform.gridPadding === 'sm' ? spacing.sm : spacing.xs;
@@ -78,10 +87,16 @@ export function createBattleTheme(
       layout.actionMax + platform.actionBarMaxBoost,
     ),
     portraitSize:
-      platform.key === 'web' ? sizes.avatar.lg : isSmall ? sizes.avatar.sm : sizes.avatar.md,
+      platform.key === 'web'
+        ? sizes.avatar.lg
+        : platform.compactHeader
+          ? sizes.avatar.sm
+          : isSmall
+            ? sizes.avatar.sm
+            : sizes.avatar.md,
     statusSlotHeight: clamp(
-      screenHeight * (platform.key === 'web' ? 0.04 : 0.03),
-      layout.statusSlotMin,
+      screenHeight * (platform.key === 'web' ? 0.04 : 0.025),
+      platform.compactHeader ? 18 : layout.statusSlotMin,
       platform.key === 'web' ? layout.statusSlotMax + 8 : layout.statusSlotMax,
     ),
     hexSizeMin: layout.hexSizeMin,

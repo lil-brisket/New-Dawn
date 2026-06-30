@@ -22,6 +22,7 @@ export function buildGridLayers(params: {
   attackableUnitIds: Set<string>;
   attackableCoordKeys: Set<string>;
   attackRangeCoordKeys: Set<string>;
+  reachableCoordKeys: Set<string>;
   selectedCombatantId: string | null;
   targetingMode: 'idle' | 'move' | 'attack';
   showGrid: boolean;
@@ -43,6 +44,7 @@ export function buildGridLayers(params: {
     attackableUnitIds,
     attackableCoordKeys,
     attackRangeCoordKeys,
+    reachableCoordKeys,
     selectedCombatantId,
     targetingMode,
     showGrid,
@@ -177,6 +179,7 @@ export function buildGridLayers(params: {
       ...baseLayer,
       targetingMode,
       attackableCoordKeys,
+      reachableCoordKeys,
       onTilePress,
       onTileHover,
       onInvalidAttackTarget,
