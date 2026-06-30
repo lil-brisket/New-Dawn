@@ -10,6 +10,7 @@ import {
   type ContentListItem,
 } from '../api/contentApi';
 import { useUndoRedo } from '../history/useUndoRedo';
+import { upgradeDraft } from '../utils/upgradeDraft';
 
 export function useContentEditor(domain: ContentDomain) {
   const [items, setItems] = useState<ContentListItem[]>([]);
@@ -24,6 +25,8 @@ export function useContentEditor(domain: ContentDomain) {
     clearHistory,
     undo,
     redo,
+    canUndo,
+    canRedo,
   } = useUndoRedo<Record<string, unknown>>({});
 
   const loadList = useCallback(async () => {
@@ -38,7 +41,7 @@ export function useContentEditor(domain: ContentDomain) {
   const loadItem = useCallback(
     async (id: string) => {
       const data = await getContent(domain, id);
-      reset(data);
+      reset(upgradeDraft(domain, data));
       setSelectedId(id);
       clearHistory();
     },
@@ -62,7 +65,8 @@ export function useContentEditor(domain: ContentDomain) {
     setSaving(true);
     setMessage('');
     try {
-      const stripped = await stripDefaults(domain, draft);
+      const upgraded = upgradeDraft(domain, draft);
+      const stripped = await stripDefaults(domain, upgraded);
       await saveContent(domain, selectedId, stripped);
       await loadList();
       clearHistory();
@@ -79,7 +83,7 @@ export function useContentEditor(domain: ContentDomain) {
     if (!id) return;
     const name = prompt('Display name:') ?? id;
     const category = prompt('Category folder (e.g. magic, physical):') ?? 'misc';
-    const base = { id, name, category };
+    const base = upgradeDraft(domain, { id, name, category });
     await createContent(domain, base);
     await loadList();
     await loadItem(id);
@@ -89,7 +93,11 @@ export function useContentEditor(domain: ContentDomain) {
     if (!draft.id) return;
     const newId = prompt('Duplicate as id:', `${String(draft.id)}_copy`);
     if (!newId) return;
-    const copy = { ...draft, id: newId, name: `${draft.name} (Copy)` };
+    const copy = upgradeDraft(domain, {
+      ...draft,
+      id: newId,
+      name: `${draft.name} (Copy)`,
+    });
     await createContent(domain, copy);
     await loadList();
     await loadItem(newId);
@@ -119,5 +127,7 @@ export function useContentEditor(domain: ContentDomain) {
     message,
     undo,
     redo,
+    canUndo,
+    canRedo,
   };
 }

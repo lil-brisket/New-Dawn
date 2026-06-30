@@ -2,7 +2,7 @@
   "id": "skill_shield_bash",
   "name": "Shield Bash",
   "description": "Stuns the target with a heavy shield strike.",
-  "mpCost": 15,
+  "spCost": 15,
   "cooldown": 3,
   "effects": [
     { "type": "damage", "element": "physical", "multiplier": 0.8 },

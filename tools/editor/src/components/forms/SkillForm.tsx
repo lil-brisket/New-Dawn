@@ -1,75 +1,70 @@
 import type { SkillEffect, TargetSelector } from '@dawn/types';
+import { CostEditor } from '../fields/CostEditor';
+import { MetadataSection } from '../fields/MetadataSection';
+import { NumberField } from '../fields/NumberField';
+import { TargetingEditor } from '../fields/TargetingEditor';
+import { ValidationMessage } from '../fields/ValidationMessage';
+import { field, input, sectionTitle } from '../fields/styles';
+import type { FlatCosts } from '../fields/costAdapter';
+import { useSkillOptions } from '../../hooks/useContentOptions';
+import { issueAt, useDraftValidation } from '../../hooks/useDraftValidation';
 import { EffectBuilder } from '../EffectBuilder/EffectBuilder';
 
-const field: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 4,
-  marginBottom: 12,
-};
-const input: React.CSSProperties = {
-  padding: '6px 8px',
-  borderRadius: 4,
-  border: '1px solid #444',
-  background: '#1a1a22',
-  color: '#eee',
-};
+function formatCosts(costs: FlatCosts): string {
+  const parts: string[] = [];
+  if ((costs.hpCost ?? 0) > 0) parts.push(`HP ${costs.hpCost}`);
+  if ((costs.spCost ?? 0) > 0) parts.push(`SP ${costs.spCost}`);
+  if ((costs.apCost ?? 0) > 0) parts.push(`AP ${costs.apCost}`);
+  return parts.length > 0 ? parts.join(' · ') : 'Free';
+}
 
 export function SkillPreview({ draft }: { draft: Record<string, unknown> }) {
   const effects = (draft.effects as SkillEffect[] | undefined) ?? [];
   const targeting = draft.targeting as TargetSelector | undefined;
-  const range = targeting && 'range' in targeting ? targeting.range : 0;
+  const costs: FlatCosts = {
+    hpCost: Number(draft.hpCost ?? 0),
+    spCost: Number(draft.spCost ?? 0),
+    apCost: Number(draft.apCost ?? 0),
+  };
 
   return (
-    <div style={{ background: '#252530', borderRadius: 8, padding: 16 }}>
-      <h3 style={{ margin: '0 0 8px' }}>{String(draft.name ?? 'Skill')}</h3>
-      <p style={{ margin: '0 0 12px', fontSize: 13, color: '#aaa' }}>
+    <div style={{ background: '#252530', borderRadius: 8, padding: 16, fontSize: 13 }}>
+      <h3 style={{ margin: '0 0 4px' }}>{String(draft.name ?? 'Skill')}</h3>
+      <div style={{ color: '#888', marginBottom: 12 }}>
+        {[draft.element, draft.category].filter(Boolean).join(' · ') || '—'}
+      </div>
+      <p style={{ margin: '0 0 12px', color: '#aaa', fontSize: 12 }}>
         {String(draft.description ?? '')}
       </p>
-      <div style={{ fontSize: 12, color: '#888' }}>
-        <div>
-          MP: {String(draft.mpCost ?? 0)} · CD: {String(draft.cooldown ?? 0)}
-        </div>
-        <div>Range: {range}</div>
+      <div style={{ marginBottom: 8 }}>
+        <strong>Costs:</strong> {formatCosts(costs)}
+        {Number(draft.cooldown ?? 0) > 0 && ` · CD ${draft.cooldown}`}
       </div>
-      <div style={{ marginTop: 12 }}>
+      {targeting && (
+        <div style={{ marginBottom: 8 }}>
+          <strong>Range:</strong> {'range' in targeting ? targeting.range : 0}
+          {targeting.type === 'area' && ` · Area radius ${targeting.radius}`}
+        </div>
+      )}
+      <div>
+        <strong>Effects</strong>
         {effects.map((e, i) => (
-          <div key={i} style={{ fontSize: 12, padding: '4px 0', borderTop: '1px solid #333' }}>
-            {e.type === 'damage' && `Damage ${e.multiplier}x ${e.element}`}
-            {e.type === 'heal' && `Heal ${e.multiplier}x`}
-            {e.type === 'apply_status' && `Apply ${e.statusId} @ ${Math.round(e.chance * 100)}%`}
-            {e.type === 'move' && `Move ${e.range}`}
-            {e.type === 'teleport' && `Teleport ${e.range}`}
+          <div key={i} style={{ padding: '4px 0', borderTop: '1px solid #333', color: '#ccc' }}>
+            {e.type === 'damage' && `Damage — ${e.multiplier}x ${e.element}`}
+            {e.type === 'heal' && `Heal — ${e.multiplier}x`}
+            {e.type === 'apply_status' &&
+              `Apply ${e.statusId} — ${Math.round(e.chance * 100)}%${e.duration !== undefined ? ` · ${e.duration} turns` : ''}`}
+            {e.type === 'move' && `Move — ${e.range}`}
+            {e.type === 'teleport' && `Teleport — ${e.range}`}
+            {e.type === 'summon' && `Summon — ${e.entityDefinitionId}`}
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 16 }}>
-        <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>Target area</div>
-        <div
-          style={{
-            display: 'inline-grid',
-            gridTemplateColumns: `repeat(${Math.min(range * 2 + 1, 7)}, 20px)`,
-            gap: 2,
-          }}
-        >
-          {Array.from({ length: Math.min((range * 2 + 1) ** 2, 49) }).map((_, i, arr) => {
-            const mid = Math.floor(arr.length / 2);
-            const isCenter = i === mid;
-            return (
-              <div
-                key={i}
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 3,
-                  background: isCenter ? '#f0c674' : '#3a3a48',
-                  opacity: isCenter ? 1 : 0.6,
-                }}
-              />
-            );
-          })}
+      {Boolean(draft.vfxId) && (
+        <div style={{ marginTop: 12, fontSize: 11, color: '#666' }}>
+          Animation: {String(draft.vfxId)}
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -82,16 +77,20 @@ export function SkillForm({
   onChange: (d: Record<string, unknown>) => void;
 }) {
   const set = (key: string, value: unknown) => onChange({ ...draft, [key]: value });
-  const targeting = (draft.targeting as TargetSelector | undefined) ?? {
-    type: 'single_enemy',
-    range: 1,
-  };
+  const skillOptions = useSkillOptions();
+  const issues = useDraftValidation('skills', draft);
+  const targeting = (draft.targeting as TargetSelector) ?? { type: 'single_enemy', range: 1 };
   const effects = (draft.effects as SkillEffect[] | undefined) ?? [];
+  const costs: FlatCosts = {
+    hpCost: Number(draft.hpCost ?? 0),
+    spCost: Number(draft.spCost ?? 0),
+    apCost: Number(draft.apCost ?? 0),
+  };
 
   return (
     <div>
       <section>
-        <h3>Identity</h3>
+        <h3 style={sectionTitle}>Identity</h3>
         <label style={field}>
           ID <input style={input} value={String(draft.id ?? '')} readOnly />
         </label>
@@ -112,127 +111,46 @@ export function SkillForm({
           />
         </label>
       </section>
+
+      <MetadataSection
+        draft={draft}
+        onChange={onChange}
+        inheritOptions={skillOptions.filter((s) => s.id !== draft.id)}
+        inheritDomain="skills"
+      />
+
       <section>
-        <h3>Metadata</h3>
-        <label style={field}>
-          Category{' '}
-          <input
-            style={input}
-            value={String(draft.category ?? '')}
-            onChange={(e) => set('category', e.target.value)}
-          />
-        </label>
-        <label style={field}>
-          Element{' '}
-          <input
-            style={input}
-            value={String(draft.element ?? '')}
-            onChange={(e) => set('element', e.target.value)}
-          />
-        </label>
-        <label style={field}>
-          Tags{' '}
-          <input
-            style={input}
-            value={Array.isArray(draft.tags) ? draft.tags.join(', ') : ''}
-            onChange={(e) =>
-              set(
-                'tags',
-                e.target.value
-                  .split(',')
-                  .map((t) => t.trim())
-                  .filter(Boolean),
-              )
-            }
-          />
-        </label>
-        <label style={field}>
-          Inherits{' '}
-          <input
-            style={input}
-            value={String(draft.inherits ?? '')}
-            onChange={(e) => set('inherits', e.target.value || undefined)}
-            placeholder="skill_fireball"
-          />
-        </label>
+        <CostEditor
+          costs={costs}
+          onChange={(c) =>
+            onChange({
+              ...draft,
+              hpCost: c.hpCost ?? 0,
+              spCost: c.spCost ?? 0,
+              apCost: c.apCost ?? 0,
+            })
+          }
+        />
+        <NumberField
+          label="Cooldown"
+          value={Number(draft.cooldown ?? 0)}
+          min={0}
+          onChange={(v) => set('cooldown', v)}
+        />
       </section>
+
+      <TargetingEditor targeting={targeting} onChange={(t) => set('targeting', t)} />
+      {issueAt(issues, 'targeting') && (
+        <ValidationMessage message={issueAt(issues, 'targeting')!} />
+      )}
+
       <section>
-        <h3>Costs</h3>
-        <label style={field}>
-          MP Cost{' '}
-          <input
-            style={input}
-            type="number"
-            value={Number(draft.mpCost ?? 0)}
-            onChange={(e) => set('mpCost', Number(e.target.value))}
-          />
-        </label>
-        <label style={field}>
-          Cooldown{' '}
-          <input
-            style={input}
-            type="number"
-            value={Number(draft.cooldown ?? 0)}
-            onChange={(e) => set('cooldown', Number(e.target.value))}
-          />
-        </label>
+        <h3 style={sectionTitle}>Effects</h3>
+        <EffectBuilder effects={effects} onChange={(e) => set('effects', e)} />
       </section>
+
       <section>
-        <h3>Targeting</h3>
-        <label style={field}>
-          Type{' '}
-          <select
-            style={input}
-            value={targeting.type}
-            onChange={(e) => {
-              const t = e.target.value;
-              if (t === 'self') set('targeting', { type: 'self' });
-              else if (t === 'single_enemy') set('targeting', { type: 'single_enemy', range: 1 });
-              else if (t === 'single_ally') set('targeting', { type: 'single_ally', range: 1 });
-              else if (t === 'tile') set('targeting', { type: 'tile', range: 1 });
-              else
-                set('targeting', {
-                  type: 'area',
-                  range: 2,
-                  radius: 1,
-                  filter: 'enemy',
-                  center: 'unit',
-                });
-            }}
-          >
-            {['single_enemy', 'single_ally', 'self', 'tile', 'area'].map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
-        {'range' in targeting && (
-          <label style={field}>
-            Range{' '}
-            <input
-              style={input}
-              type="number"
-              value={targeting.range}
-              onChange={(e) => set('targeting', { ...targeting, range: Number(e.target.value) })}
-            />
-          </label>
-        )}
-      </section>
-      <section>
-        <h3>Effects</h3>
-        <EffectBuilder effects={effects} onChange={(e: SkillEffect[]) => set('effects', e)} />
-      </section>
-      <section>
-        <h3>Assets</h3>
-        <label style={field}>
-          iconId{' '}
-          <input
-            style={input}
-            value={String(draft.iconId ?? '')}
-            onChange={(e) => set('iconId', e.target.value)}
-          />
-        </label>
+        <h3 style={sectionTitle}>Assets</h3>
         <label style={field}>
           vfxId{' '}
           <input
@@ -250,6 +168,23 @@ export function SkillForm({
           />
         </label>
       </section>
+
+      <details style={{ marginTop: 16, opacity: 0.5 }}>
+        <summary style={{ cursor: 'pointer', color: '#666' }}>Conditions (coming soon)</summary>
+        <p style={{ fontSize: 12, color: '#555' }}>
+          HP thresholds, required statuses, target tags, adjacency, boss-only — reserved for a
+          future pass.
+        </p>
+      </details>
+
+      {issues.length > 0 && (
+        <div style={{ marginTop: 16, padding: 12, background: '#2a2218', borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#e6a23c', marginBottom: 4 }}>Validation</div>
+          {issues.slice(0, 5).map((i) => (
+            <ValidationMessage key={i.path} message={`${i.path}: ${i.message}`} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

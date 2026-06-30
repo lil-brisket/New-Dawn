@@ -1,5 +1,5 @@
 import type { SkillAction, BattleEvent, BattleState } from '@dawn/types';
-import { withCooldown, withSp } from '../../entities/Combatant';
+import { withAp, withCooldown, withHp, withSp } from '../../entities/Combatant';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { updateMap } from '../../utils/immutable';
 import type { SkillCalculation } from './calculate';
@@ -19,6 +19,10 @@ export function applySkill(
 
   const resolvedSource = combatants.get(action.combatantId) ?? originalSource;
   let updatedSource = withSp(resolvedSource, originalSource.sp - calculated.spCost);
+  updatedSource = withAp(updatedSource, originalSource.ap - calculated.apCost);
+  if (calculated.hpCost > 0) {
+    updatedSource = withHp(updatedSource, originalSource.hp - calculated.hpCost);
+  }
 
   if (calculated.cooldown > 0) {
     updatedSource = withCooldown(updatedSource, calculated.skillId, calculated.cooldown);

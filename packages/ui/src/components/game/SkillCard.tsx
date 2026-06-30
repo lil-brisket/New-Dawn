@@ -4,16 +4,28 @@ import { useTheme } from '../../theme';
 
 export interface SkillCardProps {
   name: string;
-  mpCost: number;
+  hpCost?: number;
+  spCost?: number;
+  apCost?: number;
   cooldown: number;
   aoeLabel?: string;
   selected?: boolean;
   testID?: string;
 }
 
+function formatCosts(hpCost: number, spCost: number, apCost: number): string {
+  const parts: string[] = [];
+  if (hpCost > 0) parts.push(`HP ${hpCost}`);
+  if (spCost > 0) parts.push(`SP ${spCost}`);
+  if (apCost > 0) parts.push(`AP ${apCost}`);
+  return parts.length > 0 ? parts.join(' · ') : 'Free';
+}
+
 function SkillCardComponent({
   name,
-  mpCost,
+  hpCost = 0,
+  spCost = 0,
+  apCost = 0,
   cooldown,
   aoeLabel,
   selected,
@@ -39,7 +51,7 @@ function SkillCardComponent({
     >
       <Text style={{ color: colors.text, fontWeight: typography.fontWeight.semibold }}>{name}</Text>
       <Text style={{ color: colors.mana, fontSize: typography.fontSize.xs, marginTop: spacing.xs }}>
-        MP {mpCost}
+        {formatCosts(hpCost, spCost, apCost)}
       </Text>
       {cooldown > 0 ? (
         <Text style={{ color: colors.textMuted, fontSize: typography.fontSize.xs }}>

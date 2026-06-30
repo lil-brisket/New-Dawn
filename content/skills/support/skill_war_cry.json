@@ -2,7 +2,7 @@
   "id": "skill_war_cry",
   "name": "War Cry",
   "description": "Boosts your attack power.",
-  "mpCost": 10,
+  "spCost": 10,
   "cooldown": 3,
   "effects": [{ "type": "apply_status", "statusId": "status_attack_up", "chance": 1 }],
   "targeting": { "type": "self" }

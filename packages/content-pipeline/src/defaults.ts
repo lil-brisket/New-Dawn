@@ -17,7 +17,9 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
   const slug = skillSlug(id);
   return {
     description: '',
-    mpCost: 0,
+    hpCost: 0,
+    spCost: 0,
+    apCost: 0,
     cooldown: 0,
     effects: [{ type: 'damage', element: 'physical', multiplier: 1.0 }],
     targeting: { type: 'single_enemy', range: 1 },

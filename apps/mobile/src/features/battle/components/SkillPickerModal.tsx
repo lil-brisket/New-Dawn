@@ -33,8 +33,10 @@ export function SkillPickerModal({ visible, combatant, onSelect, onClose }: Skil
             {skills.map((skill) => {
               const cd = combatant?.skillCooldowns[skill.id];
               const onCd = cd !== undefined && cd > 0;
-              const noSp = (combatant?.sp ?? 0) < skill.mpCost;
-              const disabled = onCd || noSp;
+              const noSp = (combatant?.sp ?? 0) < skill.spCost;
+              const noAp = (combatant?.ap ?? 0) < skill.apCost;
+              const noHp = skill.hpCost > 0 && (combatant?.hp ?? 0) - skill.hpCost < 1;
+              const disabled = onCd || noSp || noAp || noHp;
               return (
                 <Pressable
                   key={skill.id}
@@ -52,7 +54,9 @@ export function SkillPickerModal({ visible, combatant, onSelect, onClose }: Skil
                 >
                   <SkillCard
                     name={onCd ? `${skill.name} (${cd})` : skill.name}
-                    mpCost={skill.mpCost}
+                    hpCost={skill.hpCost}
+                    spCost={skill.spCost}
+                    apCost={skill.apCost}
                     cooldown={skill.cooldown}
                     aoeLabel={getSkillAoeLabel(skill)}
                   />

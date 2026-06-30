@@ -17,7 +17,7 @@ import {
   skillToAuthoringJson,
   statusToAuthoringJson,
   type ContentDomain,
-} from '@dawn/content-pipeline';
+} from '../../packages/content-pipeline/src/index';
 
 const DOMAINS: ContentDomain[] = ['skills', 'statuses', 'enemies'];
 

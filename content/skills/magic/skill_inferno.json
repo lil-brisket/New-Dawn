@@ -2,6 +2,6 @@
   "id": "skill_inferno",
   "inherits": "skill_fireball",
   "name": "Inferno",
-  "mpCost": 50,
+  "spCost": 50,
   "effects": [{ "type": "damage", "element": "fire", "multiplier": 2.4 }]
 }

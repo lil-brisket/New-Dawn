@@ -164,7 +164,7 @@ export function computeDashboardStats(
 ): Record<string, number | string> {
   const avgMp =
     processed.skills.length > 0
-      ? processed.skills.reduce((s, sk) => s + sk.mpCost, 0) / processed.skills.length
+      ? processed.skills.reduce((s, sk) => s + sk.spCost, 0) / processed.skills.length
       : 0;
   const avgHp =
     processed.enemies.length > 0

@@ -2,7 +2,7 @@
   "id": "skill_poison_dart",
   "name": "Poison Dart",
   "description": "A toxic dart that poisons the target.",
-  "mpCost": 12,
+  "spCost": 12,
   "effects": [
     { "type": "damage", "element": "physical", "multiplier": 0.6 },
     { "type": "apply_status", "statusId": "status_poison", "chance": 0.7 }

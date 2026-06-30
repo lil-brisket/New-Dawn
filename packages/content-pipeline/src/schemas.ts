@@ -79,6 +79,10 @@ export const rawSkillSchema = z
     inherits: z.string().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
+    hpCost: z.number().int().min(0).optional(),
+    spCost: z.number().int().min(0).optional(),
+    apCost: z.number().int().min(0).optional(),
+    /** @deprecated use spCost */
     mpCost: z.number().int().min(0).optional(),
     cooldown: z.number().int().min(0).optional(),
     effects: z.array(skillEffectSchema).optional(),

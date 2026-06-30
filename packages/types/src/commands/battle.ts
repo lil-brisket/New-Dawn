@@ -46,6 +46,7 @@ export type BattleError =
   | { readonly code: 'InvalidBattleSetup' }
   | { readonly code: 'UnknownAction' }
   | { readonly code: 'InsufficientSp' }
+  | { readonly code: 'InsufficientHp' }
   | { readonly code: 'SkillOnCooldown' }
   | { readonly code: 'InvalidSkillTarget' }
   | { readonly code: 'SkillNotFound' }

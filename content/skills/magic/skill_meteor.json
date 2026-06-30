@@ -2,7 +2,7 @@
   "id": "skill_meteor",
   "name": "Meteor",
   "description": "Calls down fire on a tile, scorching all enemies in the blast.",
-  "mpCost": 35,
+  "spCost": 35,
   "cooldown": 3,
   "element": "fire",
   "effects": [

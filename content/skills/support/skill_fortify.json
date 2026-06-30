@@ -2,7 +2,7 @@
   "id": "skill_fortify",
   "name": "Fortify",
   "description": "Bolsters an ally defenses.",
-  "mpCost": 15,
+  "spCost": 15,
   "cooldown": 2,
   "effects": [{ "type": "apply_status", "statusId": "status_defense_up", "chance": 1 }],
   "targeting": { "type": "single_ally", "range": 1 }

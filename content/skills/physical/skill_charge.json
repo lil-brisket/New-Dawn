@@ -2,7 +2,7 @@
   "id": "skill_charge",
   "name": "Charge",
   "description": "Rush an enemy and strike.",
-  "mpCost": 20,
+  "spCost": 20,
   "cooldown": 3,
   "effects": [
     { "type": "move", "range": 4 },

@@ -2,7 +2,7 @@
   "id": "skill_fireball",
   "name": "Fireball",
   "description": "Hurls a ball of flame at a distant foe.",
-  "mpCost": 25,
+  "spCost": 25,
   "cooldown": 2,
   "element": "fire",
   "effects": [

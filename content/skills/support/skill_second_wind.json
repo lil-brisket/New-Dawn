@@ -2,7 +2,7 @@
   "id": "skill_second_wind",
   "name": "Second Wind",
   "description": "Recovers your own vitality.",
-  "mpCost": 15,
+  "spCost": 15,
   "cooldown": 2,
   "effects": [{ "type": "heal", "multiplier": 0.8 }],
   "targeting": { "type": "self" }

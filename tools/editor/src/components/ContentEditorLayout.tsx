@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { ContentList } from '../components/ContentList';
 import { ReferencedByPanel } from '../components/ReferencedByPanel';
 import { useContentEditor } from '../hooks/useContentEditor';
-import { listContent } from '../api/contentApi';
 
 const layout: React.CSSProperties = { display: 'flex', height: '100vh' };
 const editor: React.CSSProperties = { flex: 1, overflow: 'auto', padding: 24 };
@@ -60,10 +58,20 @@ export function ContentEditorLayout({
               >
                 Save
               </button>
-              <button type="button" style={btn} onClick={editorState.undo}>
+              <button
+                type="button"
+                style={btn}
+                onClick={editorState.undo}
+                disabled={!editorState.canUndo}
+              >
                 Undo
               </button>
-              <button type="button" style={btn} onClick={editorState.redo}>
+              <button
+                type="button"
+                style={btn}
+                onClick={editorState.redo}
+                disabled={!editorState.canRedo}
+              >
                 Redo
               </button>
               <button type="button" style={btn} onClick={editorState.handleDuplicate}>
@@ -88,14 +96,4 @@ export function ContentEditorLayout({
       <ReferencedByPanel id={editorState.selectedId} />
     </div>
   );
-}
-
-export function useSkillOptions(): string[] {
-  const [skills, setSkills] = useState<string[]>([]);
-  useEffect(() => {
-    listContent('skills')
-      .then((list) => setSkills(list.map((s) => s.id)))
-      .catch(console.error);
-  }, []);
-  return skills;
 }

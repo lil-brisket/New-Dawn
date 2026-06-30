@@ -40,7 +40,9 @@ export interface SkillDefinition extends ContentMetadata {
   id: string;
   name: string;
   description: string;
-  mpCost: number;
+  hpCost: number;
+  spCost: number;
+  apCost: number;
   cooldown: number;
   effects: SkillEffect[];
   targeting: TargetSelector;

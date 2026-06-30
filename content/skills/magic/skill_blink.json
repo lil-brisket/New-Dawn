@@ -2,7 +2,7 @@
   "id": "skill_blink",
   "name": "Blink",
   "description": "Teleport to a nearby tile.",
-  "mpCost": 18,
+  "spCost": 18,
   "cooldown": 2,
   "effects": [{ "type": "teleport", "range": 3 }],
   "targeting": { "type": "tile", "range": 3 }

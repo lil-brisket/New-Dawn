@@ -17,6 +17,16 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 import type { SkillEffect } from '@dawn/types';
+import { EFFECT_TYPES } from '../fields/constants';
+import { EnumSelect } from '../fields/EnumSelect';
+import {
+  ApplyStatusEffectEditor,
+  DamageEffectEditor,
+  HealEffectEditor,
+  RangeEffectEditor,
+  SummonEffectEditor,
+  createDefaultEffect,
+} from './editors';
 
 const block: React.CSSProperties = {
   background: '#252530',
@@ -33,85 +43,21 @@ function EffectFields({
   onChange: (e: SkillEffect) => void;
 }) {
   if (effect.type === 'damage') {
-    return (
-      <>
-        <label>
-          Element{' '}
-          <select
-            value={effect.element}
-            onChange={(e) => onChange({ ...effect, element: e.target.value as never })}
-          >
-            {['physical', 'fire', 'ice', 'lightning', 'wind', 'earth', 'light', 'dark'].map(
-              (el) => (
-                <option key={el} value={el}>
-                  {el}
-                </option>
-              ),
-            )}
-          </select>
-        </label>
-        <label>
-          Multiplier{' '}
-          <input
-            type="number"
-            step="0.1"
-            value={effect.multiplier}
-            onChange={(e) => onChange({ ...effect, multiplier: Number(e.target.value) })}
-          />
-        </label>
-      </>
-    );
+    return <DamageEffectEditor effect={effect} onChange={onChange} />;
   }
   if (effect.type === 'heal') {
-    return (
-      <label>
-        Multiplier{' '}
-        <input
-          type="number"
-          step="0.1"
-          value={effect.multiplier}
-          onChange={(e) => onChange({ ...effect, multiplier: Number(e.target.value) })}
-        />
-      </label>
-    );
+    return <HealEffectEditor effect={effect} onChange={onChange} />;
   }
   if (effect.type === 'apply_status') {
-    return (
-      <>
-        <label>
-          Status{' '}
-          <input
-            value={effect.statusId}
-            onChange={(e) => onChange({ ...effect, statusId: e.target.value })}
-          />
-        </label>
-        <label>
-          Chance{' '}
-          <input
-            type="number"
-            step="0.05"
-            min={0}
-            max={1}
-            value={effect.chance}
-            onChange={(e) => onChange({ ...effect, chance: Number(e.target.value) })}
-          />
-        </label>
-      </>
-    );
+    return <ApplyStatusEffectEditor effect={effect} onChange={onChange} />;
   }
   if (effect.type === 'move' || effect.type === 'teleport') {
-    return (
-      <label>
-        Range{' '}
-        <input
-          type="number"
-          value={effect.range}
-          onChange={(e) => onChange({ ...effect, range: Number(e.target.value) })}
-        />
-      </label>
-    );
+    return <RangeEffectEditor effect={effect} onChange={onChange} />;
   }
-  return <span>{effect.type}</span>;
+  if (effect.type === 'summon') {
+    return <SummonEffectEditor effect={effect} onChange={onChange} />;
+  }
+  return <span>{(effect as SkillEffect).type}</span>;
 }
 
 function SortableBlock({
@@ -162,35 +108,21 @@ function SortableBlock({
           {collapsed ? '▸' : '▾'}
         </button>
         <button type="button" onClick={onDuplicate}>
-          ⧉
+          Duplicate
         </button>
         <button type="button" onClick={onDelete}>
-          ✕
+          Delete
         </button>
       </div>
       {!collapsed && (
         <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <label>
             Type{' '}
-            <select
+            <EnumSelect
               value={effect.type}
-              onChange={(e) => {
-                const t = e.target.value;
-                if (t === 'damage')
-                  onChange({ type: 'damage', element: 'physical', multiplier: 1 });
-                else if (t === 'heal') onChange({ type: 'heal', multiplier: 1 });
-                else if (t === 'apply_status')
-                  onChange({ type: 'apply_status', statusId: 'status_burn', chance: 0.3 });
-                else if (t === 'move') onChange({ type: 'move', range: 1 });
-                else if (t === 'teleport') onChange({ type: 'teleport', range: 1 });
-              }}
-            >
-              {['damage', 'heal', 'apply_status', 'move', 'teleport'].map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
+              options={[...EFFECT_TYPES]}
+              onChange={(t) => t && onChange(createDefaultEffect(t))}
+            />
           </label>
           <EffectFields effect={effect} onChange={onChange} />
         </div>
@@ -202,11 +134,14 @@ function SortableBlock({
 export function EffectBuilder({
   effects,
   onChange,
+  single = false,
 }: {
   effects: SkillEffect[];
   onChange: (effects: SkillEffect[]) => void;
+  single?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
+  const [addType, setAddType] = useState<SkillEffect['type']>('damage');
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -220,8 +155,28 @@ export function EffectBuilder({
     onChange(arrayMove(effects, oldIndex, newIndex));
   };
 
+  const collapseAll = () => {
+    const next: Record<number, boolean> = {};
+    effects.forEach((_, i) => {
+      next[i] = true;
+    });
+    setCollapsed(next);
+  };
+
+  const expandAll = () => setCollapsed({});
+
   return (
     <div>
+      {effects.length > 1 && !single && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <button type="button" onClick={collapseAll} style={{ fontSize: 12 }}>
+            Collapse all
+          </button>
+          <button type="button" onClick={expandAll} style={{ fontSize: 12 }}>
+            Expand all
+          </button>
+        </div>
+      )}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext
           items={effects.map((_, i) => String(i))}
@@ -239,34 +194,46 @@ export function EffectBuilder({
                 next[index] = e;
                 onChange(next);
               }}
-              onDuplicate={() =>
+              onDuplicate={() => {
+                if (single) return;
                 onChange([
                   ...effects.slice(0, index + 1),
                   structuredClone(effect),
                   ...effects.slice(index + 1),
-                ])
-              }
-              onDelete={() => onChange(effects.filter((_, i) => i !== index))}
+                ]);
+              }}
+              onDelete={() => onChange(single ? [] : effects.filter((_, i) => i !== index))}
             />
           ))}
         </SortableContext>
       </DndContext>
-      <button
-        type="button"
-        onClick={() =>
-          onChange([...effects, { type: 'damage', element: 'physical', multiplier: 1 }])
-        }
-        style={{
-          marginTop: 8,
-          padding: '8px 12px',
-          borderRadius: 6,
-          border: '1px dashed #555',
-          background: 'transparent',
-          color: '#8ab4f8',
-        }}
-      >
-        + Add Effect
-      </button>
+      {!single && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+          <EnumSelect
+            value={addType}
+            options={[...EFFECT_TYPES]}
+            onChange={(t) => t && setAddType(t)}
+          />
+          <button
+            type="button"
+            onClick={() => onChange([...effects, createDefaultEffect(addType)])}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 6,
+              border: '1px dashed #555',
+              background: 'transparent',
+              color: '#8ab4f8',
+            }}
+          >
+            + Add Effect
+          </button>
+        </div>
+      )}
+      {single && effects.length === 0 && (
+        <button type="button" onClick={() => onChange([createDefaultEffect('damage')])}>
+          + Add trigger effect
+        </button>
+      )}
     </div>
   );
 }

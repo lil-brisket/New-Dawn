@@ -11,7 +11,9 @@ import { resolveSkillTargets } from './targeting';
 export interface SkillCalculation {
   readonly state: BattleState;
   readonly events: readonly BattleEvent[];
+  readonly hpCost: number;
   readonly spCost: number;
+  readonly apCost: number;
   readonly cooldown: number;
   readonly skillId: string;
 }
@@ -72,7 +74,9 @@ export function calculateSkill(
   return {
     state: ctx.battle,
     events: ctx.events,
-    spCost: skill.mpCost,
+    hpCost: skill.hpCost,
+    spCost: skill.spCost,
+    apCost: skill.apCost,
     cooldown: skill.cooldown,
     skillId: action.skillId,
   };

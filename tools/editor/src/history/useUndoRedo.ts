@@ -5,6 +5,9 @@ export function useUndoRedo<T>(initial: T) {
   const past = useRef<T[]>([]);
   const future = useRef<T[]>([]);
   const skipHistory = useRef(false);
+  const [historyTick, setHistoryTick] = useState(0);
+
+  const bump = () => setHistoryTick((n) => n + 1);
 
   const set = useCallback((next: T | ((prev: T) => T)) => {
     setState((prev) => {
@@ -12,6 +15,7 @@ export function useUndoRedo<T>(initial: T) {
       if (!skipHistory.current) {
         past.current.push(structuredClone(prev));
         future.current = [];
+        bump();
       }
       skipHistory.current = false;
       return value;
@@ -24,6 +28,7 @@ export function useUndoRedo<T>(initial: T) {
     future.current.push(structuredClone(state));
     skipHistory.current = true;
     setState(prev);
+    bump();
   }, [state]);
 
   const redo = useCallback(() => {
@@ -32,6 +37,7 @@ export function useUndoRedo<T>(initial: T) {
     past.current.push(structuredClone(state));
     skipHistory.current = true;
     setState(next);
+    bump();
   }, [state]);
 
   const reset = useCallback((value: T) => {
@@ -39,11 +45,13 @@ export function useUndoRedo<T>(initial: T) {
     future.current = [];
     skipHistory.current = true;
     setState(value);
+    bump();
   }, []);
 
   const clearHistory = useCallback(() => {
     past.current = [];
     future.current = [];
+    bump();
   }, []);
 
   useEffect(() => {
@@ -60,6 +68,8 @@ export function useUndoRedo<T>(initial: T) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [undo, redo]);
+
+  void historyTick;
 
   return {
     state,

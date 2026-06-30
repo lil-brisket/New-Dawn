@@ -6,7 +6,9 @@ export const generatedSkills = [
     id: 'skill_arcane_burst',
     name: 'Arcane Burst',
     description: 'Unleashes arcane energy around a foe, hitting nearby enemies.',
-    mpCost: 30,
+    hpCost: 0,
+    spCost: 30,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -35,7 +37,9 @@ export const generatedSkills = [
     id: 'skill_blink',
     name: 'Blink',
     description: 'Teleport to a nearby tile.',
-    mpCost: 18,
+    hpCost: 0,
+    spCost: 18,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -59,7 +63,9 @@ export const generatedSkills = [
     id: 'skill_fireball',
     name: 'Fireball',
     description: 'Hurls a ball of flame at a distant foe.',
-    mpCost: 25,
+    hpCost: 0,
+    spCost: 25,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -90,7 +96,9 @@ export const generatedSkills = [
     id: 'skill_inferno',
     name: 'Inferno',
     description: 'Hurls a ball of flame at a distant foe.',
-    mpCost: 50,
+    hpCost: 0,
+    spCost: 50,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -116,7 +124,9 @@ export const generatedSkills = [
     id: 'skill_meteor',
     name: 'Meteor',
     description: 'Calls down fire on a tile, scorching all enemies in the blast.',
-    mpCost: 35,
+    hpCost: 0,
+    spCost: 35,
+    apCost: 0,
     cooldown: 3,
     effects: [
       {
@@ -150,7 +160,9 @@ export const generatedSkills = [
     id: 'skill_charge',
     name: 'Charge',
     description: 'Rush an enemy and strike.',
-    mpCost: 20,
+    hpCost: 0,
+    spCost: 20,
+    apCost: 0,
     cooldown: 3,
     effects: [
       {
@@ -179,7 +191,9 @@ export const generatedSkills = [
     id: 'skill_poison_dart',
     name: 'Poison Dart',
     description: 'A toxic dart that poisons the target.',
-    mpCost: 12,
+    hpCost: 0,
+    spCost: 12,
+    apCost: 0,
     cooldown: 0,
     effects: [
       {
@@ -209,7 +223,9 @@ export const generatedSkills = [
     id: 'skill_shield_bash',
     name: 'Shield Bash',
     description: 'Stuns the target with a heavy shield strike.',
-    mpCost: 15,
+    hpCost: 0,
+    spCost: 15,
+    apCost: 0,
     cooldown: 3,
     effects: [
       {
@@ -239,7 +255,9 @@ export const generatedSkills = [
     id: 'skill_slash',
     name: 'Slash',
     description: 'A swift physical strike.',
-    mpCost: 0,
+    hpCost: 0,
+    spCost: 0,
+    apCost: 0,
     cooldown: 0,
     effects: [
       {
@@ -264,7 +282,9 @@ export const generatedSkills = [
     id: 'skill_fortify',
     name: 'Fortify',
     description: 'Bolsters an ally defenses.',
-    mpCost: 15,
+    hpCost: 0,
+    spCost: 15,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -289,7 +309,9 @@ export const generatedSkills = [
     id: 'skill_healing_rain',
     name: 'Healing Rain',
     description: 'Restores HP to allies around the target.',
-    mpCost: 25,
+    hpCost: 0,
+    spCost: 25,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -316,7 +338,9 @@ export const generatedSkills = [
     id: 'skill_mend',
     name: 'Mend',
     description: 'Restores an ally health.',
-    mpCost: 20,
+    hpCost: 0,
+    spCost: 20,
+    apCost: 0,
     cooldown: 0,
     effects: [
       {
@@ -340,7 +364,9 @@ export const generatedSkills = [
     id: 'skill_second_wind',
     name: 'Second Wind',
     description: 'Recovers your own vitality.',
-    mpCost: 15,
+    hpCost: 0,
+    spCost: 15,
+    apCost: 0,
     cooldown: 2,
     effects: [
       {
@@ -363,7 +389,9 @@ export const generatedSkills = [
     id: 'skill_war_cry',
     name: 'War Cry',
     description: 'Boosts your attack power.',
-    mpCost: 10,
+    hpCost: 0,
+    spCost: 10,
+    apCost: 0,
     cooldown: 3,
     effects: [
       {

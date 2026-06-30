@@ -1,4 +1,4 @@
-import type { BattleError, BattleState, SkillAction } from '@dawn/types';
+import type { SkillAction, BattleError, BattleState } from '@dawn/types';
 import type { Result } from '@dawn/utils';
 import { err, ok } from '@dawn/utils';
 import { defaultRegistry, type DefinitionRegistry } from '@dawn/game-data';
@@ -6,6 +6,9 @@ import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
 import { isStunned } from '../status/hasControlEffect';
 import { canTarget } from './targeting';
+
+/** Minimum HP combatant must retain after paying an HP cost (self-sacrifice skills may override later). */
+export const SKILL_MINIMUM_HP_AFTER_COST = 1;
 
 function isSkillOnCooldown(
   combatant: { skillCooldowns: Readonly<Record<string, number>> },
@@ -56,8 +59,16 @@ export function validateSkill(
     return err({ code: 'SkillNotFound' });
   }
 
-  if (combatant.sp < skill.mpCost) {
+  if (combatant.sp < skill.spCost) {
     return err({ code: 'InsufficientSp' });
+  }
+
+  if (combatant.ap < skill.apCost) {
+    return err({ code: 'InsufficientAp' });
+  }
+
+  if (skill.hpCost > 0 && combatant.hp - skill.hpCost < SKILL_MINIMUM_HP_AFTER_COST) {
+    return err({ code: 'InsufficientHp' });
   }
 
   if (isSkillOnCooldown(combatant, action.skillId, skill.cooldown)) {

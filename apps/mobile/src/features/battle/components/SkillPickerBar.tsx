@@ -35,8 +35,10 @@ export function SkillPickerBar({
       {skills.map((skill) => {
         const cd = combatant?.skillCooldowns[skill.id];
         const onCd = cd !== undefined && cd > 0;
-        const noSp = (combatant?.sp ?? 0) < skill.mpCost;
-        const disabled = onCd || noSp;
+        const noSp = (combatant?.sp ?? 0) < skill.spCost;
+        const noAp = (combatant?.ap ?? 0) < skill.apCost;
+        const noHp = skill.hpCost > 0 && (combatant?.hp ?? 0) - skill.hpCost < 1;
+        const disabled = onCd || noSp || noAp || noHp;
         const aoeLabel = getSkillAoeLabel(skill);
         const selected = selectedSkillId === skill.id;
 
@@ -84,7 +86,13 @@ export function SkillPickerBar({
                   marginTop: 2,
                 }}
               >
-                MP {skill.mpCost}
+                {[
+                  skill.spCost > 0 ? `SP ${skill.spCost}` : null,
+                  skill.apCost > 0 ? `AP ${skill.apCost}` : null,
+                  skill.hpCost > 0 ? `HP ${skill.hpCost}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ') || 'Free'}
               </Text>
               {skill.cooldown > 0 ? (
                 <Text

@@ -2,7 +2,7 @@
   "id": "skill_arcane_burst",
   "name": "Arcane Burst",
   "description": "Unleashes arcane energy around a foe, hitting nearby enemies.",
-  "mpCost": 30,
+  "spCost": 30,
   "cooldown": 2,
   "element": "fire",
   "effects": [{ "type": "damage", "element": "fire", "multiplier": 0.9 }],
