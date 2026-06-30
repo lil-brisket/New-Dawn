@@ -1,38 +1,28 @@
-import type { BaseStats } from '../definitions';
-import type { BattleOutcome, BattlePhase, Faction } from '../common';
-import type { HexCell, HexCoord } from './grid';
+import type { BattleAction } from '../commands/battle';
+import type { BattleConfig } from './config';
+import type { Combatant } from './combatant';
+import type { Grid } from './grid';
+import type { Team } from './team';
 
-export interface BattleEntity {
-  id: string;
-  definitionId: string;
-  name: string;
-  faction: Faction;
-  position: HexCoord;
-  stats: BaseStats;
-  skillIds: string[];
-  statusEffectIds: string[];
-  isAlive: boolean;
-}
-
-export interface BattleUnit extends BattleEntity {
-  turnOrder: number;
-  cooldowns: Record<string, number>;
-}
-
-export interface TurnState {
-  currentEntityId: string | null;
-  round: number;
-  turnIndex: number;
-  initiativeOrder: string[];
+export interface TurnActionState {
+  readonly movesUsed: number;
+  readonly hasAttacked: boolean;
+  readonly apSpent: number;
 }
 
 export interface BattleState {
-  id: string;
-  phase: BattlePhase;
-  outcome: BattleOutcome;
-  gridWidth: number;
-  gridHeight: number;
-  entities: Record<string, BattleUnit>;
-  turn: TurnState;
-  cells: HexCell[];
+  readonly battleId: string;
+  readonly round: number;
+  readonly turn: number;
+  readonly seed: number;
+  readonly createdAt: number;
+  readonly playerId: string;
+  readonly activeCombatantId: string | null;
+  readonly combatants: ReadonlyMap<string, Combatant>;
+  readonly grid: Grid;
+  readonly config: BattleConfig;
+  readonly turnOrder: readonly string[];
+  readonly turnActionState: TurnActionState;
+  readonly winner: Team | null;
+  readonly history: readonly BattleAction[];
 }

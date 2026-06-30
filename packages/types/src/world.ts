@@ -1,4 +1,4 @@
-export interface Tile {
+export interface WorldTile {
   id: string;
   x: number;
   y: number;
@@ -27,7 +27,7 @@ export interface MapData {
   name: string;
   width: number;
   height: number;
-  tiles: Tile[];
+  tiles: WorldTile[];
   npcs: NPC[];
   interactables: Interactable[];
   spawnPoint: { x: number; y: number };

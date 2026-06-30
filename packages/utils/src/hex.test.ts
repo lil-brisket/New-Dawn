@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { hexDistance, hexNeighbors, hexEquals } from './hex';
+import { hexDistance, hexNeighbors, hexEquals, createHex } from './hex';
 import { SeededRandom } from './random';
 
 describe('hex', () => {
   it('calculates distance between same cell as 0', () => {
-    expect(hexDistance({ q: 0, r: 0 }, { q: 0, r: 0 })).toBe(0);
+    expect(hexDistance(createHex(0, 0), createHex(0, 0))).toBe(0);
   });
 
   it('returns 6 neighbors', () => {
-    expect(hexNeighbors({ q: 0, r: 0 })).toHaveLength(6);
+    expect(hexNeighbors(createHex(0, 0))).toHaveLength(6);
   });
 
   it('compares coordinates', () => {
-    expect(hexEquals({ q: 1, r: 2 }, { q: 1, r: 2 })).toBe(true);
+    expect(hexEquals(createHex(1, 2), createHex(1, 2))).toBe(true);
   });
 });
 

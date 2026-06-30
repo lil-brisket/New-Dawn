@@ -1,7 +1,8 @@
 import { View, StyleSheet } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 import { useTheme } from '@dawn/ui';
-import { GRID_CONSTANTS } from '@dawn/game-core';
+
+const DEFAULT_GRID_SIZE = 9;
 
 function hexPoints(cx: number, cy: number, size: number): string {
   const points: string[] = [];
@@ -17,7 +18,7 @@ export function BattleViewport() {
   const { colors, game, border } = theme;
   const hexSize = game.battle.hexSize;
   const gridPadding = game.battle.gridSpacing;
-  const size = GRID_CONSTANTS.SIZE;
+  const size = DEFAULT_GRID_SIZE;
   const hexWidth = hexSize * 2;
   const hexHeight = hexSize * Math.sqrt(3);
 

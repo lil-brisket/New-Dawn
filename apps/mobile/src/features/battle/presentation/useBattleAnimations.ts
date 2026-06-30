@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
 import type { BattleEvent } from '@dawn/types';
-import type { EventBus } from '@dawn/game-core';
 import { useBattleStore } from '@/stores/battleStore';
 import { AnimationQueue } from './AnimationQueue';
 import { battleEventToAnimationSteps } from './AnimationStep';
 
-export function useBattleAnimations(eventBus: EventBus<BattleEvent> | null) {
+/** Processes domain battle events from the store into the animation queue. */
+export function useBattleAnimations(events: readonly BattleEvent[] | null) {
   const queueRef = useRef(new AnimationQueue());
   const setIsAnimating = useBattleStore((s) => s.setIsAnimating);
 
   useEffect(() => {
-    if (!eventBus) return;
+    if (!events || events.length === 0) return;
 
     queueRef.current.setStepHandler(async (step) => {
       setIsAnimating(true);
@@ -18,25 +18,10 @@ export function useBattleAnimations(eventBus: EventBus<BattleEvent> | null) {
       setIsAnimating(false);
     });
 
-    const handlers: Array<() => void> = [];
-
-    const eventTypes = [
-      'player_moved',
-      'damage_taken',
-      'skill_used',
-      'enemy_died',
-      'buff_applied',
-    ] as const;
-
-    for (const type of eventTypes) {
-      const unsub = eventBus.subscribe(type, (event) => {
-        const steps = battleEventToAnimationSteps(event);
-        queueRef.current.enqueue(steps);
-        useBattleStore.getState().enqueueAnimations(steps);
-      });
-      handlers.push(unsub);
+    for (const event of events) {
+      const steps = battleEventToAnimationSteps(event);
+      queueRef.current.enqueue(steps);
+      useBattleStore.getState().enqueueAnimations(steps);
     }
-
-    return () => handlers.forEach((u) => u());
-  }, [eventBus, setIsAnimating]);
+  }, [events, setIsAnimating]);
 }

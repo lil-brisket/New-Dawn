@@ -1,15 +1,27 @@
-export * from './context/EngineContext';
-export * from './events/EventBus';
-export * from './battle/BattleEngine';
-export * from './battle/BattleState';
-export * from './battle/BattleLog';
-export * from './battle/CommandValidator';
-export * from './grid/HexGrid';
-export * from './pathfinding/Pathfinding';
-export * from './combat/DamageCalculator';
-export * from './skills/SkillResolver';
-export * from './ai/DecisionPipeline';
-export * from './world/MapLoader';
-export * from './constants/BattleConstants';
-export * from './constants/GridConstants';
-export * from './constants/GameConstants';
+export {
+  getActiveCombatant,
+  getCombatant,
+  getReachableTiles,
+  isCombatantAlive,
+  canMoveTo,
+  isPlayerTurn,
+} from './queries';
+
+export type {
+  BattleState,
+  BattleAction,
+  BattleEvent,
+  BattleError,
+  ActionResult,
+  BattleConfig,
+  Combatant,
+  Team,
+  Grid,
+  Tile,
+  HexCoord,
+  TurnActionState,
+} from '@dawn/types';
+
+export { createBattle } from './battle/createBattle';
+export type { CreateBattleInput, CreateBattleResult } from './battle/createBattle';
+export { dispatchAction } from './battle/dispatchAction';

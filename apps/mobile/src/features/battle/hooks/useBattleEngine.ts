@@ -1,31 +1,31 @@
-import { useCallback, useRef } from 'react';
-import { BattleEngine } from '@dawn/game-core';
-import { defaultRegistry } from '@dawn/game-data';
-import { createTestClock, createSeededRandom } from '@dawn/utils';
-import type { BattleCommand, BattleState } from '@dawn/types';
+import { useCallback } from 'react';
+import { dispatchAction } from '@dawn/game-core';
+import type { BattleAction, BattleState } from '@dawn/types';
 import { useBattleStore } from '@/stores/battleStore';
-import { useBattleAnimations } from '../presentation/useBattleAnimations';
 
 export function useBattleEngine(initialState?: BattleState) {
-  const engineRef = useRef<BattleEngine | null>(null);
+  const snapshot = useBattleStore((s) => s.snapshot);
+  const setSnapshot = useBattleStore((s) => s.setSnapshot);
+  const setLastEvents = useBattleStore((s) => s.setLastEvents);
 
-  if (!engineRef.current && initialState) {
-    engineRef.current = new BattleEngine(initialState, {
-      clock: createTestClock(),
-      random: createSeededRandom(42),
-      definitions: defaultRegistry,
-    });
+  if (initialState && !snapshot) {
+    setSnapshot(initialState);
   }
 
-  useBattleAnimations(engineRef.current?.getEventBus() ?? null);
+  const submitAction = useCallback(
+    (action: BattleAction) => {
+      const state = useBattleStore.getState().snapshot;
+      if (!state) return null;
 
-  const submitCommand = useCallback((command: BattleCommand) => {
-    if (!engineRef.current) return null;
-    const result = engineRef.current.submitCommand(command);
-    useBattleStore.getState().setSnapshot(engineRef.current.getSnapshot());
-    useBattleStore.getState().setBattleLog([...engineRef.current.getBattleLog()]);
-    return result;
-  }, []);
+      const result = dispatchAction(state, action);
+      if (result.ok) {
+        setSnapshot(result.state);
+        setLastEvents([...result.events]);
+      }
+      return result;
+    },
+    [setSnapshot, setLastEvents],
+  );
 
-  return { engine: engineRef.current, submitCommand };
+  return { state: snapshot, submitAction };
 }

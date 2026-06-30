@@ -1,4 +1,4 @@
-import type { BattleCommand, BattleState, BattleLogEntry, CommandResult } from '@dawn/types';
+import type { ActionResult, BattleAction, BattleEvent, BattleState } from '@dawn/types';
 
 export interface StartBattleRequest {
   playerCharacterIds: string[];
@@ -8,9 +8,6 @@ export interface StartBattleRequest {
 export interface BattleRepository {
   startBattle(
     request: StartBattleRequest,
-  ): Promise<{ snapshot: BattleState; log: BattleLogEntry[] }>;
-  submitCommand(
-    battleId: string,
-    command: BattleCommand,
-  ): Promise<CommandResult & { snapshot?: BattleState }>;
+  ): Promise<{ snapshot: BattleState; events: BattleEvent[] }>;
+  submitCommand(battleId: string, command: BattleAction): Promise<ActionResult>;
 }
