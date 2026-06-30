@@ -51,9 +51,10 @@ export function getTileHighlightFill(theme: Theme, highlight: string): string | 
       return tile.move;
     case 'path':
       return tile.movePath;
-    case 'attackable':
     case 'attack_range':
       return tile.attack;
+    case 'attackable':
+      return theme.colors.error + '44';
     case 'occupied':
       return theme.colors.surfaceElevated;
     case 'blocked':
@@ -81,8 +82,11 @@ export function getTileStroke(
   if (highlight === 'path') {
     return { stroke: colors.success, strokeWidth: 2 };
   }
-  if (highlight === 'attackable' || highlight === 'attack_range') {
+  if (highlight === 'attack_range') {
     return { stroke: colors.success, strokeWidth: 2 };
+  }
+  if (highlight === 'attackable') {
+    return { stroke: colors.error, strokeWidth: 3 };
   }
   if (showGrid) {
     return {
@@ -100,9 +104,10 @@ export function getTileHighlightOpacity(_theme: Theme, highlight: string): numbe
       return 0.55;
     case 'path':
       return 0.82;
-    case 'attackable':
     case 'attack_range':
       return 0.8;
+    case 'attackable':
+      return 0.9;
     case 'hover':
       return 0.7;
     default:

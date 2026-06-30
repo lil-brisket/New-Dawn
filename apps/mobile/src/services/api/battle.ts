@@ -1,7 +1,7 @@
-import { createBattle, dispatchAction } from '@dawn/game-core';
+import { createBattle, dispatchAction, offsetToCube } from '@dawn/game-core';
 import type { ActionResult, BattleAction, BattleEvent, BattleState, Combatant } from '@dawn/types';
 import { defaultRegistry } from '@dawn/game-data';
-import { createHex, createId } from '@dawn/utils';
+import { createId } from '@dawn/utils';
 import type { BattleRepository, StartBattleRequest } from './types';
 
 const battles = new Map<string, BattleState>();
@@ -29,7 +29,7 @@ function combatantFromDefinition(
     id: createId('combatant'),
     name: def?.name ?? (team === 'player' ? 'Hero' : 'Enemy'),
     team,
-    position: createHex(col, row),
+    position: offsetToCube(col, row),
     hp: stats.hp,
     maxHp: stats.maxHp,
     sp: stats.mp,

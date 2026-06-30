@@ -34,6 +34,7 @@ export interface UnitRenderData {
   cy: number;
   isActive: boolean;
   isSelected: boolean;
+  isAttackableTarget?: boolean;
 }
 
 export interface BattleGridLayers {

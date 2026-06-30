@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Combatant } from '@dawn/types';
 import { createHex } from '../../grid/HexCoord';
-import { createGrid } from '../../grid/Grid';
+import { createGrid, offsetToCube } from '../../grid/Grid';
 import { createCombatant } from '../../entities/Combatant';
 import { createBattle } from '../../battle/createBattle';
 import { dispatchAction } from '../../battle/dispatchAction';
@@ -64,5 +64,47 @@ describe('nearestEnemyStrategy', () => {
     const actions = nearestEnemyStrategy.planTurn(afterPlayer.state);
     expect(actions[0]?.type).toBe('move');
     expect(actions[actions.length - 1]?.type).toBe('end_turn');
+  });
+
+  it('plans end_turn for each enemy in a 2v2 duel round', () => {
+    const grid = createGrid({ width: 10, height: 8 });
+    const p1 = makeCombatant({ id: 'knight-1', team: 'player', position: offsetToCube(1, 3) });
+    const p2 = makeCombatant({ id: 'knight-2', team: 'player', position: offsetToCube(2, 3) });
+    const g1 = makeCombatant({ id: 'goblin-1', team: 'enemy', position: offsetToCube(7, 3) });
+    const g2 = makeCombatant({ id: 'goblin-2', team: 'enemy', position: offsetToCube(8, 3) });
+    const battle = createBattle({ party: [p1, p2], enemies: [g1, g2], grid });
+    if (!battle.ok) return;
+
+    let state = battle.state;
+    for (const id of ['knight-1', 'knight-2'] as const) {
+      const end = dispatchAction(state, { type: 'end_turn', combatantId: id });
+      if (!end.ok) return;
+      state = end.state;
+    }
+
+    expect(state.activeCombatantId).toBe('goblin-1');
+
+    const g1Actions = nearestEnemyStrategy.planTurn(state);
+    expect(g1Actions[g1Actions.length - 1]?.type).toBe('end_turn');
+
+    for (const action of g1Actions) {
+      const result = dispatchAction(state, action);
+      if (!result.ok) return;
+      state = result.state;
+    }
+
+    expect(state.activeCombatantId).toBe('goblin-2');
+
+    const g2Actions = nearestEnemyStrategy.planTurn(state);
+    expect(g2Actions[g2Actions.length - 1]?.type).toBe('end_turn');
+
+    for (const action of g2Actions) {
+      const result = dispatchAction(state, action);
+      if (!result.ok) return;
+      state = result.state;
+    }
+
+    expect(state.activeCombatantId).toBe('knight-1');
+    expect(state.round).toBe(2);
   });
 });

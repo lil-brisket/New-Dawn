@@ -15,6 +15,8 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
   const { colors, spacing, typography, radius } = theme;
 
   const displayMessage = message ?? turn.phaseLabel;
+  const showPlayerArrow = turn.activeTeam === 'player';
+  const showEnemyArrow = turn.activeTeam === 'enemy';
 
   return (
     <View
@@ -24,6 +26,33 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
         battleTheme?.platform.key === 'web' && styles.wrapWeb,
       ]}
     >
+      <View style={[styles.arrowRow, { paddingHorizontal: spacing.xs }]}>
+        <Text
+          style={[
+            styles.arrow,
+            {
+              color: colors.warning,
+              fontSize: typography.fontSize.lg,
+              opacity: showPlayerArrow ? 1 : 0,
+            },
+          ]}
+        >
+          ◀
+        </Text>
+        <View style={styles.arrowSpacer} />
+        <Text
+          style={[
+            styles.arrow,
+            {
+              color: colors.warning,
+              fontSize: typography.fontSize.lg,
+              opacity: showEnemyArrow ? 1 : 0,
+            },
+          ]}
+        >
+          ▶
+        </Text>
+      </View>
       <Text
         style={{
           color: colors.textMuted,
@@ -33,7 +62,7 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
           letterSpacing: 1,
         }}
       >
-        TURN
+        ROUND
       </Text>
       <Text
         style={{
@@ -43,7 +72,7 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
           textAlign: 'center',
         }}
       >
-        {turn.turn}
+        {turn.round}
       </Text>
       <Text
         style={{
@@ -89,5 +118,13 @@ export function TurnBanner({ turn, message, battleTheme }: TurnBannerProps) {
 const styles = StyleSheet.create({
   wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', maxWidth: 120, minWidth: 96 },
   wrapWeb: { maxWidth: 200, flexGrow: 0, flexShrink: 0 },
+  arrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    minHeight: 20,
+  },
+  arrow: { fontWeight: 'bold', width: 20, textAlign: 'center' },
+  arrowSpacer: { flex: 1 },
   banner: {},
 });

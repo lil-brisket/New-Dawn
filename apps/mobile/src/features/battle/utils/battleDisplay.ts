@@ -93,6 +93,11 @@ export interface TurnDisplay {
   readonly turn: number;
   readonly areaName: string;
   readonly phaseLabel: string;
+  readonly activeTeam: Team | null;
+}
+
+export function getGlobalTurnNumber(state: BattleState): number {
+  return (state.round - 1) * state.turnOrder.length + state.turn + 1;
 }
 
 export function buildTurnDisplay(
@@ -109,10 +114,19 @@ export function buildTurnDisplay(
           ? 'Your Turn'
           : 'Enemy Turn';
 
+  const active = getActiveCombatant(state);
+  const activeTeam =
+    state.winner !== null
+      ? null
+      : active?.team === 'player' || active?.team === 'enemy'
+        ? active.team
+        : null;
+
   return {
     round: state.round,
-    turn: state.turn + 1,
+    turn: getGlobalTurnNumber(state),
     areaName,
     phaseLabel,
+    activeTeam,
   };
 }

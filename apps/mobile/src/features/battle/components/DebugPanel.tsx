@@ -15,6 +15,7 @@ import type { DebugSettings } from '../hooks/useBattle';
 import type { BattleViewMode } from '../state/BattleUIState';
 import type { BattleCommandState } from '../state/BattleCommandState';
 import type { BattleScenario } from '../sandbox/battles';
+import { getGlobalTurnNumber } from '../utils/battleDisplay';
 
 export interface DebugContext {
   restart: () => void;
@@ -267,7 +268,7 @@ export function DebugPanel({
               <Text
                 style={{ color: colors.textMuted, fontSize: typography.fontSize.xs, width: '100%' }}
               >
-                Round {context.battleState.round} · Turn {context.battleState.turn + 1}
+                Round {context.battleState.round} · Turn {getGlobalTurnNumber(context.battleState)}
               </Text>
               <Text
                 style={{ color: colors.textMuted, fontSize: typography.fontSize.xs, width: '100%' }}

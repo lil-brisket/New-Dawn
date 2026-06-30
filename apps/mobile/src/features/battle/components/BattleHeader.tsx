@@ -46,9 +46,19 @@ export function BattleHeader({
           battleTheme.platform.key === 'web' && styles.rowWeb,
         ]}
       >
-        <CombatantPanel team={teamA} alignment="left" battleTheme={battleTheme} />
+        <CombatantPanel
+          team={teamA}
+          alignment="left"
+          battleTheme={battleTheme}
+          isActiveTurn={turn.activeTeam === 'player'}
+        />
         <TurnBanner turn={turn} message={turnBannerMessage} battleTheme={battleTheme} />
-        <CombatantPanel team={teamB} alignment="right" battleTheme={battleTheme} />
+        <CombatantPanel
+          team={teamB}
+          alignment="right"
+          battleTheme={battleTheme}
+          isActiveTurn={turn.activeTeam === 'enemy'}
+        />
       </View>
       {onEndBattle ? (
         <Pressable onPress={onEndBattle} style={styles.endBattle}>

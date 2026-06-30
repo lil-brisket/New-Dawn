@@ -13,6 +13,7 @@ import { createGrid } from '../grid/Grid';
 import { DEFAULT_BATTLE_CONFIG } from '../rules/defaultRules';
 import { startTurn } from '../systems/turn/apply';
 import { createTurnOrder, findNextLivingCombatant } from '../systems/turn/validate';
+import { validateCombatantSpawns } from './validateSpawns';
 
 export interface CreateBattleInput {
   readonly player?: Combatant;
@@ -89,6 +90,12 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
   const createdAt = input.createdAt ?? 0;
   const grid = input.grid ?? createGrid(input.gridSize ?? { width: 8, height: 8 });
   const playerId = party[0]!.id;
+
+  const allCombatants = [...party, ...input.enemies];
+  const spawnValidation = validateCombatantSpawns(grid, allCombatants);
+  if (!spawnValidation.ok) {
+    return { ok: false, error: spawnValidation.error };
+  }
 
   const combatantMap = new Map<string, Combatant>();
   for (const member of party) {

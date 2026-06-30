@@ -139,6 +139,7 @@ export function buildGridLayers(params: {
         cy: t.cy,
         isActive: state.activeCombatantId === c.id,
         isSelected: selectedCombatantId === c.id,
+        isAttackableTarget: attackableUnitIds.has(c.id),
       };
     });
 

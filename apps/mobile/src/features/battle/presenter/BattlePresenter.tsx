@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { HexCoord, BattleEvent } from '@dawn/types';
-import { findPath, getActiveCombatant, getRemainingMoves } from '@dawn/game-core';
+import { findPath, getRemainingMoves } from '@dawn/game-core';
 import { createId } from '@dawn/utils';
 import { Button, useTheme } from '@dawn/ui';
 import { ScreenLayout } from '@/layouts/ScreenLayout';
@@ -161,6 +161,17 @@ export function BattlePresenter() {
     }
   }, [battle.battleState]);
 
+  const battleIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const battleId = battle.battleState?.battleId ?? null;
+    if (!battleId || battleIdRef.current === battleId) return;
+    battleIdRef.current = battleId;
+    setUI({ type: 'set_selected_tile', tile: null });
+    setUI({ type: 'set_hover_tile', tile: null, unitId: null });
+    setUI({ type: 'set_preview_path', path: [] });
+    setInspectUnitId(null);
+  }, [battle.battleState?.battleId, setUI]);
+
   const processDispatchEvents = useCallback(
     (events: readonly BattleEvent[]) => {
       if (!battle.battleState || events.length === 0) return;
@@ -184,13 +195,12 @@ export function BattlePresenter() {
     prevLogLenRef.current = battle.logEntries.length;
   }, [battle.logEntries, battle.battleState, processDispatchEvents]);
 
-  const activeCombatant = battle.battleState ? getActiveCombatant(battle.battleState) : undefined;
-
   const canAct =
     !!battle.battleState &&
     battle.battleState.winner === null &&
     battle.playerTurn &&
-    activeCombatant?.id === battle.selectedCombatantId;
+    !!battle.battleState.activeCombatantId &&
+    battle.battleState.activeCombatantId === battle.selectedCombatantId;
 
   const commandState = deriveCommandState({
     mode: battle.mode,
@@ -267,8 +277,10 @@ export function BattlePresenter() {
 
       setUI({ type: 'set_hover_tile', tile: coord, unitId });
 
-      if (coord && battle.battleState && battle.selectedCombatantId && battle.mode === 'move') {
-        const unit = battle.battleState.combatants.get(battle.selectedCombatantId);
+      if (coord && battle.battleState && battle.mode === 'move') {
+        const activeId = battle.battleState.activeCombatantId;
+        if (!activeId) return;
+        const unit = battle.battleState.combatants.get(activeId);
         if (unit) {
           const path =
             findPath(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Combatant } from '@dawn/types';
 import { createHex } from '../grid/HexCoord';
-import { createGrid } from '../grid/Grid';
+import { createGrid, offsetToCube } from '../grid/Grid';
 import { createCombatant } from '../entities/Combatant';
 import { createBattle } from '../battle/createBattle';
 import { dispatchAction } from '../battle/dispatchAction';
@@ -182,10 +182,10 @@ describe('dispatchAction', () => {
   });
 
   it('supports multi-unit party with correct turn order', () => {
-    const p1 = makeCombatant({ id: 'p1', team: 'player', position: createHex(0, 0) });
-    const p2 = makeCombatant({ id: 'p2', team: 'player', position: createHex(1, 0) });
-    const e1 = makeCombatant({ id: 'e1', team: 'enemy', position: createHex(3, -3) });
-    const e2 = makeCombatant({ id: 'e2', team: 'enemy', position: createHex(4, -4) });
+    const p1 = makeCombatant({ id: 'p1', team: 'player', position: offsetToCube(0, 0) });
+    const p2 = makeCombatant({ id: 'p2', team: 'player', position: offsetToCube(1, 0) });
+    const e1 = makeCombatant({ id: 'e1', team: 'enemy', position: offsetToCube(5, 2) });
+    const e2 = makeCombatant({ id: 'e2', team: 'enemy', position: offsetToCube(6, 3) });
     const battle = createBattle({ party: [p1, p2], enemies: [e1, e2], grid });
     if (!battle.ok) return;
     expect(battle.state.turnOrder).toEqual(['p1', 'p2', 'e1', 'e2']);

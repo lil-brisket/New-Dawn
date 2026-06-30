@@ -10,6 +10,7 @@ export interface UnitSpriteProps {
   hexSize: number;
   isActive: boolean;
   isSelected: boolean;
+  isAttackableTarget?: boolean;
 }
 
 export function UnitSprite({
@@ -20,6 +21,7 @@ export function UnitSprite({
   hexSize,
   isActive,
   isSelected,
+  isAttackableTarget = false,
 }: UnitSpriteProps) {
   const { theme } = useTheme();
   const { colors, border } = theme;
@@ -27,7 +29,13 @@ export function UnitSprite({
   const fontSize = radius * 0.7;
   const avatarStroke = isSelected ? colors.warning : colors.gold;
   const avatarStrokeWidth = isSelected ? border.normal : border.thin;
-  const tileStroke = team === 'player' ? colors.success : colors.error;
+  const tileStroke = isAttackableTarget
+    ? colors.error
+    : team === 'player'
+      ? colors.success
+      : colors.error;
+  const tileStrokeWidth = isAttackableTarget ? 3 : 1.5;
+  const tileStrokeOpacity = isAttackableTarget ? 1 : 0.5;
 
   return (
     <>
@@ -35,8 +43,8 @@ export function UnitSprite({
         points={hexPoints(cx, cy, hexSize)}
         fill="transparent"
         stroke={tileStroke}
-        strokeWidth={1.5}
-        opacity={0.5}
+        strokeWidth={tileStrokeWidth}
+        opacity={tileStrokeOpacity}
       />
       <Circle
         cx={cx}

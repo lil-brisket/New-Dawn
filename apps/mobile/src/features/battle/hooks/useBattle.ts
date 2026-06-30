@@ -198,6 +198,12 @@ export function useBattle(initialBattleId = 'training') {
       if (!battleState) return;
       const unit = battleState.combatants.get(combatantId);
       if (!unit || unit.team !== 'player') return;
+
+      const active = getActiveCombatant(battleState);
+      if (isPlayerTurn(battleState) && active?.team === 'player' && active.id !== combatantId) {
+        return;
+      }
+
       setSelectedCombatantId(combatantId);
       setMode('idle');
     },
@@ -206,34 +212,38 @@ export function useBattle(initialBattleId = 'training') {
 
   const handleTilePress = useCallback(
     (coord: { x: number; y: number; z: number }) => {
-      if (!battleState || !selectedCombatantId || battleState.winner !== null) return;
+      const currentState = battleStateRef.current;
+      if (!currentState || !currentState.activeCombatantId || currentState.winner !== null) {
+        return;
+      }
 
-      const active = getActiveCombatant(battleState);
-      if (!active || active.id !== selectedCombatantId) return;
+      const active = getActiveCombatant(currentState);
+      if (!active || active.id !== currentState.activeCombatantId) return;
+      if (active.team !== 'player') return;
 
       if (mode === 'move') {
-        if (canMoveTo(battleState, selectedCombatantId, coord)) {
+        if (canMoveTo(currentState, active.id, coord)) {
           dispatch({
             type: 'move',
-            combatantId: selectedCombatantId,
+            combatantId: active.id,
             destination: coord,
           });
         }
       } else if (mode === 'attack') {
-        const targets = getAttackableTargets(battleState, selectedCombatantId);
+        const targets = getAttackableTargets(currentState, active.id);
         const target = targets.find(
           (t) => t.position.x === coord.x && t.position.y === coord.y && t.position.z === coord.z,
         );
         if (target) {
           dispatch({
             type: 'attack',
-            combatantId: selectedCombatantId,
+            combatantId: active.id,
             targetId: target.id,
           });
         }
       }
     },
-    [battleState, selectedCombatantId, mode, dispatch],
+    [mode, dispatch],
   );
 
   const endTurn = useCallback(() => {
@@ -290,6 +300,11 @@ export function useBattle(initialBattleId = 'training') {
   const activeCombatant = battleState ? getActiveCombatant(battleState) : undefined;
   const playerTurn = battleState ? isPlayerTurn(battleState) : false;
 
+  const actingPlayerId =
+    playerTurn && battleState?.activeCombatantId
+      ? battleState.activeCombatantId
+      : selectedCombatantId;
+
   useEffect(() => {
     if (!battleState || !playerTurn) return;
     const active = getActiveCombatant(battleState);
@@ -300,26 +315,26 @@ export function useBattle(initialBattleId = 'training') {
   }, [battleState, battleState?.activeCombatantId, playerTurn, selectedCombatantId]);
 
   const reachableTileCosts = useMemo(() => {
-    if (!battleState || !selectedCombatantId) return [];
+    if (!battleState || !actingPlayerId) return [];
     if (mode !== 'move' && !debugSettings.showReachable) return [];
     const id =
-      mode === 'move' && activeCombatant?.id === selectedCombatantId
-        ? selectedCombatantId
+      mode === 'move' && activeCombatant?.id === actingPlayerId
+        ? actingPlayerId
         : debugSettings.showReachable
-          ? (activeCombatant?.id ?? selectedCombatantId)
-          : selectedCombatantId;
+          ? (activeCombatant?.id ?? actingPlayerId)
+          : actingPlayerId;
     return getReachableTileCosts(battleState, id);
-  }, [battleState, selectedCombatantId, mode, debugSettings.showReachable, activeCombatant]);
+  }, [battleState, actingPlayerId, mode, debugSettings.showReachable, activeCombatant]);
 
   const attackableTargets = useMemo(() => {
-    if (!battleState || !selectedCombatantId || mode !== 'attack') return [];
-    return getAttackableTargets(battleState, selectedCombatantId);
-  }, [battleState, selectedCombatantId, mode]);
+    if (!battleState || !actingPlayerId || mode !== 'attack') return [];
+    return getAttackableTargets(battleState, actingPlayerId);
+  }, [battleState, actingPlayerId, mode]);
 
   const attackRangeTiles = useMemo(() => {
-    if (!battleState || !selectedCombatantId || mode !== 'attack') return [];
-    return getAttackRangeTiles(battleState, selectedCombatantId);
-  }, [battleState, selectedCombatantId, mode]);
+    if (!battleState || !actingPlayerId || mode !== 'attack') return [];
+    return getAttackRangeTiles(battleState, actingPlayerId);
+  }, [battleState, actingPlayerId, mode]);
 
   return {
     battleState,

@@ -101,10 +101,9 @@ export function HexTile({
         <Polygon
           points={points}
           fill="transparent"
-          stroke={colors.success}
-          strokeWidth={1.5}
-          strokeDasharray="2,2"
-          opacity={0.75}
+          stroke={colors.error}
+          strokeWidth={3}
+          opacity={1}
         />
       ) : null}
       {showCoords && (

@@ -163,6 +163,7 @@ function UnitLayer({ units, hexSize }: BattleGridLayers['units']) {
           hexSize={hexSize}
           isActive={u.isActive}
           isSelected={u.isSelected}
+          isAttackableTarget={u.isAttackableTarget}
         />
       ))}
     </>

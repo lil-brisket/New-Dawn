@@ -8,9 +8,15 @@ export interface CombatantPanelProps {
   team: TeamDisplay;
   alignment: 'left' | 'right';
   battleTheme: BattleTheme;
+  isActiveTurn?: boolean;
 }
 
-export function CombatantPanel({ team, alignment, battleTheme }: CombatantPanelProps) {
+export function CombatantPanel({
+  team,
+  alignment,
+  battleTheme,
+  isActiveTurn = false,
+}: CombatantPanelProps) {
   const { theme } = useTheme();
   const { colors, spacing, typography, radius, border, shadow } = theme;
   const isLeft = alignment === 'left';
@@ -38,8 +44,8 @@ export function CombatantPanel({ team, alignment, battleTheme }: CombatantPanelP
         !isWeb && battleTheme.panelMaxWidth != null && { maxWidth: battleTheme.panelMaxWidth },
         {
           backgroundColor: colors.surface,
-          borderColor: colors.border,
-          borderWidth: border.thin,
+          borderColor: isActiveTurn ? colors.warning : colors.border,
+          borderWidth: isActiveTurn ? border.normal : border.thin,
           borderRadius: radius.lg,
           padding: cardPadding,
           gap: isWeb ? spacing.sm : spacing.xs,

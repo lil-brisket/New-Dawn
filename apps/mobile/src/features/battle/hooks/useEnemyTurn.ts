@@ -15,6 +15,14 @@ interface UseEnemyTurnOptions {
   enabled: boolean;
 }
 
+function getEnemyTurnKey(state: BattleState): string | null {
+  const active = getActiveCombatant(state);
+  if (!active || active.team !== 'enemy' || state.winner !== null) {
+    return null;
+  }
+  return `${state.round}-${state.turn}-${active.id}`;
+}
+
 export function useEnemyTurn({
   battleState,
   dispatch,
@@ -22,45 +30,79 @@ export function useEnemyTurn({
   strategyId,
   enabled,
 }: UseEnemyTurnOptions) {
-  const runningRef = useRef(false);
-  const turnKeyRef = useRef<string | null>(null);
+  const dispatchRef = useRef(dispatch);
+  dispatchRef.current = dispatch;
+
+  const battleStateRef = useRef(battleState);
+  battleStateRef.current = battleState;
+
+  const completedTurnsRef = useRef(new Set<string>());
+  const battleIdRef = useRef<string | null>(null);
+  const runnerKeyRef = useRef<string | null>(null);
+
+  const enemyTurnKey = battleState ? getEnemyTurnKey(battleState) : null;
 
   useEffect(() => {
-    if (!enabled || !battleState || battleState.winner !== null) {
-      turnKeyRef.current = null;
+    if (!battleState) return;
+    if (battleIdRef.current !== battleState.battleId) {
+      battleIdRef.current = battleState.battleId;
+      completedTurnsRef.current.clear();
+      runnerKeyRef.current = null;
+    }
+  }, [battleState?.battleId]);
+
+  useEffect(() => {
+    if (!enabled || !enemyTurnKey) {
       return;
     }
 
-    const active = getActiveCombatant(battleState);
-    if (!active || active.team !== 'enemy') {
-      turnKeyRef.current = null;
+    if (completedTurnsRef.current.has(enemyTurnKey)) {
       return;
     }
 
-    const turnKey = `${battleState.turn}-${active.id}`;
-    if (turnKeyRef.current === turnKey || runningRef.current) return;
+    if (runnerKeyRef.current === enemyTurnKey) {
+      return;
+    }
 
-    turnKeyRef.current = turnKey;
-    runningRef.current = true;
+    const state = battleStateRef.current;
+    if (!state || getEnemyTurnKey(state) !== enemyTurnKey) {
+      return;
+    }
 
+    runnerKeyRef.current = enemyTurnKey;
     const strategy = getStrategy(strategyId);
-    const actions = planTurn(battleState, strategy);
+    const actions = planTurn(state, strategy);
     let cancelled = false;
 
     void (async () => {
-      for (const action of actions) {
-        if (cancelled) break;
-        if (aiSpeedMs > 0) {
-          await delay(aiSpeedMs);
+      try {
+        for (const action of actions) {
+          if (cancelled) {
+            return;
+          }
+          if (aiSpeedMs > 0) {
+            await delay(aiSpeedMs);
+          }
+          const result = dispatchRef.current(action);
+          if (!result.ok) {
+            return;
+          }
         }
-        const result = dispatch(action);
-        if (!result.ok) break;
+        if (!cancelled) {
+          completedTurnsRef.current.add(enemyTurnKey);
+        }
+      } finally {
+        if (runnerKeyRef.current === enemyTurnKey) {
+          runnerKeyRef.current = null;
+        }
       }
-      runningRef.current = false;
     })();
 
     return () => {
       cancelled = true;
+      if (runnerKeyRef.current === enemyTurnKey) {
+        runnerKeyRef.current = null;
+      }
     };
-  }, [battleState, dispatch, aiSpeedMs, strategyId, enabled]);
+  }, [enabled, enemyTurnKey, aiSpeedMs, strategyId]);
 }
