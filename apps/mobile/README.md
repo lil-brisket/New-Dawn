@@ -27,11 +27,24 @@ Available only in development builds (`__DEV__`). Hidden from the tab bar.
    - **Web** — click **Welcome, Adventurer** (long-press is not supported in the browser).
 2. **Settings** — Profile tab → **Settings** → **Developer Menu** at the bottom.
 
-From the developer menu you can open **UI Showcase**, **Theme Preview**, clear storage, mock login, and inspect feature flags.
+From the developer menu you can open **Dawn Studio** (content editor), **Battle Sandbox**, **Component Playground**, **UI Showcase**, **Theme Preview**, clear storage, mock login, and inspect feature flags.
+
+### Dawn Studio (in-app)
+
+Embeds the web editor at `/(main)/developer/dawn-studio`. Requires the editor dev server:
+
+```bash
+pnpm --filter @dawn/editor dev
+```
+
+See the root [README](../../README.md#dawn-studio-content-editor) for URLs per platform (`EXPO_PUBLIC_EDITOR_URL` on physical devices).
 
 ## Environment
 
-Optional `EXPO_PUBLIC_API_URL` — validated via Zod in `src/config/env.ts`.
+Optional variables (validated via Zod in `src/config/env.ts`):
+
+- `EXPO_PUBLIC_API_URL` — API base URL
+- `EXPO_PUBLIC_EDITOR_URL` — Dawn Studio URL (default: localhost; Android emulator uses `10.0.2.2`)
 
 ## MMKV
 

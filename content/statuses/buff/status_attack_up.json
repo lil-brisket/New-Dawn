@@ -1,0 +1,7 @@
+{
+  "id": "status_attack_up",
+  "name": "Attack Up",
+  "description": "Increased attack power.",
+  "duration": 2,
+  "behaviors": [{ "type": "stat_mod", "stat": "attack", "mode": "percent", "amountPerStack": 20 }]
+}

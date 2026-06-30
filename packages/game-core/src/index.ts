@@ -30,6 +30,7 @@ export type {
   TurnActionState,
 } from '@dawn/types';
 
+export { createCombatant } from './entities/Combatant';
 export { createBattle } from './battle/createBattle';
 export type { CreateBattleInput, CreateBattleResult } from './battle/createBattle';
 export { dispatchAction } from './battle/dispatchAction';
@@ -43,6 +44,10 @@ export {
   sandboxForceHeal,
   sandboxAdvanceTurns,
   sandboxSkipRound,
+  sandboxSetSp,
+  sandboxClearCooldowns,
+  sandboxApplyAllStatuses,
+  sandboxSpawnDummy,
 } from './sandbox';
 export type { SandboxResult } from './sandbox';
 
@@ -63,3 +68,24 @@ export {
   doNothingStrategy,
 } from './ai/planTurn';
 export type { AIStrategy } from './ai/types';
+
+export { simulateSkill, preview } from './systems/skill/simulateSkill';
+export type { SimulateSkillResult } from './systems/skill/simulateSkill';
+
+export {
+  canTarget,
+  getTargetTiles,
+  getAffectedTiles,
+  getValidTargets,
+  resolveSkillTargets,
+  needsUnitTarget,
+  needsTileTarget,
+  isAreaSkill,
+  getAreaAffectedCombatants,
+} from './systems/skill/targeting';
+export type { SkillTargetSelection } from './systems/skill/targeting';
+
+export { getStatusDisplays, getStatusesForCombatant } from './systems/status/queries';
+export type { StatusDisplayInfo } from './systems/status/queries';
+
+export { defaultRegistry } from '@dawn/game-data';

@@ -39,6 +39,10 @@ function combatantFromDefinition(
     movement: 3,
     ap: 30,
     maxAp: 30,
+    powerStat: stats.attack,
+    skillIds: def?.skillIds ?? [],
+    statuses: [],
+    skillCooldowns: {},
   };
 }
 

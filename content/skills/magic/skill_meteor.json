@@ -1,0 +1,13 @@
+{
+  "id": "skill_meteor",
+  "name": "Meteor",
+  "description": "Calls down fire on a tile, scorching all enemies in the blast.",
+  "mpCost": 35,
+  "cooldown": 3,
+  "element": "fire",
+  "effects": [
+    { "type": "damage", "element": "fire", "multiplier": 1.1 },
+    { "type": "apply_status", "statusId": "status_burn", "chance": 0.4 }
+  ],
+  "targeting": { "type": "area", "range": 4, "radius": 1, "filter": "enemy", "center": "tile" }
+}

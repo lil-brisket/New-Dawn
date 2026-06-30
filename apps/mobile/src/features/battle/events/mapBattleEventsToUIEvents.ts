@@ -46,7 +46,7 @@ function mapSingleEvent(event: BattleEvent, state: BattleState | null): BattleUI
           {
             type: 'damage',
             icon: BattleAssets.icons.attack,
-            title: 'Damage',
+            title: event.reason === 'skill' ? 'Skill Damage' : 'Damage',
             description: `${combatantName(state, event.sourceId)} dealt ${event.amount} damage`,
             color: 'error',
             priority: 3,
@@ -54,12 +54,76 @@ function mapSingleEvent(event: BattleEvent, state: BattleState | null): BattleUI
               amount: event.amount,
               sourceId: event.sourceId,
               targetId: event.targetId,
+              skillId: event.skillId,
             },
             duration: MAX_DURATION,
           },
           state,
         ),
       ];
+    case 'heal_applied':
+      return [
+        makeEvent(
+          {
+            type: 'heal',
+            icon: BattleAssets.icons.item,
+            title: 'Heal',
+            description: `${combatantName(state, event.sourceId)} healed ${event.amount} HP`,
+            color: 'success',
+            priority: 2,
+            payload: {
+              amount: event.amount,
+              sourceId: event.sourceId,
+              targetId: event.targetId,
+              skillId: event.skillId,
+            },
+            duration: MAX_DURATION,
+          },
+          state,
+        ),
+      ];
+    case 'skill_used':
+      return [
+        makeEvent(
+          {
+            type: 'skill',
+            icon: BattleAssets.icons.skill,
+            title: 'Skill',
+            description: `${combatantName(state, event.sourceId)} used ${event.skillId}`,
+            color: 'mana',
+            priority: 2,
+            payload: {
+              sourceId: event.sourceId,
+              skillId: event.skillId,
+              targetIds: event.targetIds,
+            },
+            duration: MAX_DURATION,
+          },
+          state,
+        ),
+      ];
+    case 'status_applied':
+      return [
+        makeEvent(
+          {
+            type: 'status',
+            icon: BattleAssets.icons.skill,
+            title: 'Status',
+            description: `${event.statusId} applied (${event.stacks} stacks)`,
+            color: 'warning',
+            priority: 1,
+            payload: {
+              targetId: event.targetId,
+              statusId: event.statusId,
+              stacks: event.stacks,
+            },
+          },
+          state,
+        ),
+      ];
+    case 'status_removed':
+    case 'status_tick':
+      return [];
     case 'combatant_killed':
       return [
         makeEvent(

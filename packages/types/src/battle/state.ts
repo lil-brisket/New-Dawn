@@ -6,7 +6,7 @@ import type { Team } from './team';
 
 export interface TurnActionState {
   readonly movesUsed: number;
-  readonly hasAttacked: boolean;
+  readonly hasUsedPrimaryAction: boolean;
   readonly apSpent: number;
 }
 

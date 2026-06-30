@@ -19,6 +19,11 @@ export interface MoveEffect {
   range: number;
 }
 
+export interface TeleportEffect {
+  type: 'teleport';
+  range: number;
+}
+
 export interface BuffEffect {
   type: 'apply_status';
   statusId: string;
@@ -32,4 +37,5 @@ export interface SummonEffect {
   position?: HexCoord;
 }
 
-export type SkillEffect = DamageEffect | HealEffect | MoveEffect | BuffEffect | SummonEffect;
+export type SkillEffect =
+  DamageEffect | HealEffect | MoveEffect | TeleportEffect | BuffEffect | SummonEffect;

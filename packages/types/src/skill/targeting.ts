@@ -10,10 +10,15 @@ export interface SingleAllyTarget {
   range: number;
 }
 
+export type AreaTeamFilter = 'enemy' | 'ally' | 'all';
+export type AreaCenter = 'unit' | 'tile';
+
 export interface AreaTarget {
   type: 'area';
   range: number;
   radius: number;
+  filter: AreaTeamFilter;
+  center: AreaCenter;
 }
 
 export interface SelfTarget {

@@ -6,6 +6,7 @@ import { getAttackableTargets } from '../../queries/getAttackableTargets';
 import { getReachableTiles } from '../../queries/getReachableTiles';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
 import type { AIStrategy } from '../types';
+import { planStunnedSkip } from '../planStunnedSkip';
 
 function findClosestPlayer(state: BattleState, from: HexCoord) {
   let closest: { id: string; position: HexCoord; dist: number } | null = null;
@@ -72,6 +73,11 @@ export const nearestEnemyStrategy: AIStrategy = {
   id: 'nearest_enemy',
   name: 'Nearest Enemy',
   planTurn(state: BattleState): BattleAction[] {
+    const stunnedSkip = planStunnedSkip(state);
+    if (stunnedSkip) {
+      return stunnedSkip;
+    }
+
     const active = getActiveCombatant(state);
     if (!active || active.team !== 'enemy' || state.winner !== null) {
       return [];

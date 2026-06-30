@@ -25,7 +25,7 @@ export function applyMove(
     combatants: updateMap(state.combatants, action.combatantId, updated),
     turnActionState: {
       movesUsed: state.turnActionState.movesUsed + 1,
-      hasAttacked: state.turnActionState.hasAttacked,
+      hasUsedPrimaryAction: state.turnActionState.hasUsedPrimaryAction,
       apSpent: state.turnActionState.apSpent + calculated.apCost,
     },
   };

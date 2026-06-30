@@ -8,6 +8,9 @@ import { applyAttack } from '../systems/combat/apply';
 import { validateEndTurn } from '../systems/turn/validate';
 import { calculateEndTurn } from '../systems/turn/calculate';
 import { applyEndTurn } from '../systems/turn/apply';
+import { validateSkill } from '../systems/skill/validate';
+import { calculateSkill } from '../systems/skill/calculate';
+import { applySkill } from '../systems/skill/apply';
 import { applyVictory, checkVictory } from '../systems/victory/checkVictory';
 
 function appendHistory(state: BattleState, action: BattleAction): BattleState {
@@ -61,6 +64,14 @@ export function dispatchAction(state: BattleState, action: BattleAction): Action
 
       const calculated = calculateEndTurn(state, action);
       const { state: newState, events } = applyEndTurn(state, action, calculated);
+      return finalizeState(newState, action, events);
+    }
+    case 'skill': {
+      const validation = validateSkill(state, action);
+      if (!validation.ok) return { ok: false, error: validation.error };
+
+      const calculated = calculateSkill(state, action);
+      const { state: newState, events } = applySkill(state, action, calculated);
       return finalizeState(newState, action, events);
     }
     default:

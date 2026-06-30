@@ -1,5 +1,8 @@
+import type { ElementType } from '../common';
 import type { HexCoord } from '../battle/grid';
 import type { Team } from '../battle/team';
+
+export type ActionReason = 'attack' | 'skill' | 'status' | 'environment';
 
 export interface CombatantMovedEvent {
   readonly type: 'combatant_moved';
@@ -13,6 +16,47 @@ export interface DamageDealtEvent {
   readonly sourceId: string;
   readonly targetId: string;
   readonly amount: number;
+  readonly reason?: ActionReason;
+  readonly skillId?: string;
+  readonly element?: ElementType;
+  readonly statusId?: string;
+}
+
+export interface HealAppliedEvent {
+  readonly type: 'heal_applied';
+  readonly sourceId: string;
+  readonly targetId: string;
+  readonly amount: number;
+  readonly reason?: ActionReason;
+  readonly skillId?: string;
+}
+
+export interface SkillUsedEvent {
+  readonly type: 'skill_used';
+  readonly sourceId: string;
+  readonly skillId: string;
+  readonly targetIds: readonly string[];
+}
+
+export interface StatusAppliedEvent {
+  readonly type: 'status_applied';
+  readonly sourceId: string;
+  readonly targetId: string;
+  readonly statusId: string;
+  readonly stacks: number;
+}
+
+export interface StatusRemovedEvent {
+  readonly type: 'status_removed';
+  readonly targetId: string;
+  readonly statusId: string;
+}
+
+export interface StatusTickEvent {
+  readonly type: 'status_tick';
+  readonly targetId: string;
+  readonly statusId: string;
+  readonly damage?: number;
 }
 
 export interface CombatantKilledEvent {
@@ -40,6 +84,11 @@ export interface BattleWonEvent {
 export type BattleEvent =
   | CombatantMovedEvent
   | DamageDealtEvent
+  | HealAppliedEvent
+  | SkillUsedEvent
+  | StatusAppliedEvent
+  | StatusRemovedEvent
+  | StatusTickEvent
   | CombatantKilledEvent
   | TurnStartedEvent
   | TurnEndedEvent

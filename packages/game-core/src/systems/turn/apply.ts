@@ -1,7 +1,9 @@
 import type { BattleEvent, BattleState, EndTurnAction } from '@dawn/types';
+import { defaultRegistry } from '@dawn/game-data';
 import { restoreResources } from './restoreResources';
 import { updateMap } from '../../utils/immutable';
 import type { TurnCalculation } from './calculate';
+import { tickStatuses, decayStatuses, decrementCooldowns } from '../status/tickStatuses';
 
 export interface TurnApplyResult {
   readonly state: BattleState;
@@ -10,7 +12,7 @@ export interface TurnApplyResult {
 
 const INITIAL_TURN_ACTION_STATE = {
   movesUsed: 0,
-  hasAttacked: false,
+  hasUsedPrimaryAction: false,
   apSpent: 0,
 } as const;
 
@@ -21,11 +23,25 @@ export function applyEndTurn(
 ): TurnApplyResult {
   const events: BattleEvent[] = [{ type: 'turn_ended', combatantId: action.combatantId }];
 
-  let combatants = state.combatants;
-  const nextCombatant = state.combatants.get(calculated.nextCombatantId);
+  let currentState = state;
+  const decayResult = decayStatuses(currentState, action.combatantId, defaultRegistry);
+  currentState = decayResult.state;
+  events.push(...decayResult.events);
+
+  currentState = decrementCooldowns(currentState, action.combatantId);
+
+  let combatants = currentState.combatants;
+  const nextCombatant = currentState.combatants.get(calculated.nextCombatantId);
   if (nextCombatant) {
-    const restored = restoreResources(nextCombatant, state.config);
+    const restored = restoreResources(nextCombatant, currentState.config);
     combatants = updateMap(combatants, calculated.nextCombatantId, restored);
+
+    let tickState: BattleState = { ...currentState, combatants };
+    const tickResult = tickStatuses(tickState, calculated.nextCombatantId, defaultRegistry);
+    tickState = tickResult.state;
+    events.push(...tickResult.events);
+    combatants = tickState.combatants;
+
     events.push({
       type: 'turn_started',
       combatantId: calculated.nextCombatantId,
@@ -34,7 +50,7 @@ export function applyEndTurn(
   }
 
   const newState: BattleState = {
-    ...state,
+    ...currentState,
     combatants,
     activeCombatantId: calculated.nextCombatantId,
     turn: calculated.nextTurnIndex,

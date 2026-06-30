@@ -15,6 +15,14 @@ import {
   sandboxForceHeal,
   sandboxForceKill,
   sandboxSkipRound,
+  sandboxSetSp,
+  sandboxClearCooldowns,
+  sandboxApplyAllStatuses,
+  sandboxSpawnDummy,
+  getValidTargets,
+  getTargetTiles,
+  needsTileTarget,
+  defaultRegistry,
   serializeRecording,
   type BattleRecording,
 } from '@dawn/game-core';
@@ -31,7 +39,7 @@ import {
   type BattleLogEntry,
 } from '../sandbox/battleLog';
 
-export type BattleMode = 'idle' | 'move' | 'attack';
+export type BattleMode = 'idle' | 'move' | 'attack' | 'skill';
 
 export interface DebugSettings {
   showCoords: boolean;
@@ -77,6 +85,7 @@ export function useBattle(initialBattleId = 'training') {
   const [recording, setRecording] = useState<BattleRecording | null>(null);
   const [selectedCombatantId, setSelectedCombatantId] = useState<string | null>(null);
   const [mode, setMode] = useState<BattleMode>('idle');
+  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<BattleLogEntry[]>([]);
   const [debugSettings, setDebugSettings] = useState<DebugSettings>(DEFAULT_DEBUG);
   const [lastReplayVerify, setLastReplayVerify] = useState<string | null>(null);
@@ -104,6 +113,7 @@ export function useBattle(initialBattleId = 'training') {
     setRecording(createRecording(result.state));
     setSelectedCombatantId(null);
     setMode('idle');
+    setSelectedSkillId(null);
     setLogEntries(formatEvents(result.events, result.state));
     setBattleDefinitionId(def.id);
     setLastReplayVerify(null);
@@ -142,7 +152,9 @@ export function useBattle(initialBattleId = 'training') {
       setLogEntries,
     );
     setBattleState(next);
+    battleStateRef.current = next;
     setMode('idle');
+    setSelectedSkillId(null);
     return result;
   }, []);
 
@@ -244,9 +256,40 @@ export function useBattle(initialBattleId = 'training') {
             targetId: target.id,
           });
         }
+      } else if (mode === 'skill' && selectedSkillId) {
+        const skill = defaultRegistry.getSkill(selectedSkillId);
+        if (!skill) return;
+
+        if (needsTileTarget(skill)) {
+          dispatch({
+            type: 'skill',
+            combatantId: active.id,
+            skillId: selectedSkillId,
+            destination: coord,
+          });
+        } else {
+          const targets = getValidTargets(currentState, skill, active.id);
+          const target = targets.find((id) => {
+            const unit = currentState.combatants.get(id);
+            return (
+              unit &&
+              unit.position.x === coord.x &&
+              unit.position.y === coord.y &&
+              unit.position.z === coord.z
+            );
+          });
+          if (target) {
+            dispatch({
+              type: 'skill',
+              combatantId: active.id,
+              skillId: selectedSkillId,
+              targetId: target,
+            });
+          }
+        }
       }
     },
-    [mode, dispatch],
+    [mode, dispatch, selectedSkillId],
   );
 
   const endTurn = useCallback(() => {
@@ -274,6 +317,41 @@ export function useBattle(initialBattleId = 'training') {
   const skipRound = useCallback(() => {
     applySandbox((s) => sandboxSkipRound(s));
   }, [applySandbox]);
+
+  const infiniteSp = useCallback(() => {
+    if (!battleState?.activeCombatantId) return;
+    applySandbox((s) => sandboxSetSp(s, battleState.activeCombatantId!));
+  }, [battleState?.activeCombatantId, applySandbox]);
+
+  const clearCooldowns = useCallback(() => {
+    if (!battleState?.activeCombatantId) return;
+    applySandbox((s) => sandboxClearCooldowns(s, battleState.activeCombatantId!));
+  }, [battleState?.activeCombatantId, applySandbox]);
+
+  const applyAllStatuses = useCallback(() => {
+    const id = selectedCombatantId ?? battleState?.activeCombatantId;
+    if (!id) return;
+    applySandbox((s) => sandboxApplyAllStatuses(s, id));
+  }, [selectedCombatantId, battleState?.activeCombatantId, applySandbox]);
+
+  const spawnDummy = useCallback(() => {
+    if (!battleState) return;
+    const active = getActiveCombatant(battleState);
+    const pos = active?.position ?? { x: 0, y: 0, z: 0 };
+    applySandbox((s) => sandboxSpawnDummy(s, pos));
+  }, [battleState, applySandbox]);
+
+  const castSelfSkill = useCallback(
+    (skillId: string) => {
+      if (!battleState?.activeCombatantId) return;
+      dispatch({
+        type: 'skill',
+        combatantId: battleState.activeCombatantId,
+        skillId,
+      });
+    },
+    [battleState?.activeCombatantId, dispatch],
+  );
 
   const exportReplay = useCallback((): string | null => {
     if (!recording) return null;
@@ -339,6 +417,25 @@ export function useBattle(initialBattleId = 'training') {
     return getAttackRangeTiles(battleState, actingPlayerId);
   }, [battleState, actingPlayerId, mode]);
 
+  const skillTargetIds = useMemo(() => {
+    if (!battleState || !actingPlayerId || mode !== 'skill' || !selectedSkillId) return [];
+    const skill = defaultRegistry.getSkill(selectedSkillId);
+    if (!skill) return [];
+    return getValidTargets(battleState, skill, actingPlayerId);
+  }, [battleState, actingPlayerId, mode, selectedSkillId]);
+
+  const skillTargetTiles = useMemo(() => {
+    if (!battleState || !actingPlayerId || mode !== 'skill' || !selectedSkillId) return [];
+    const skill = defaultRegistry.getSkill(selectedSkillId);
+    if (!skill) return [];
+    return getTargetTiles(battleState, skill, actingPlayerId);
+  }, [battleState, actingPlayerId, mode, selectedSkillId]);
+
+  const selectSkill = useCallback((skillId: string | null) => {
+    setSelectedSkillId(skillId);
+    setMode(skillId ? 'skill' : 'idle');
+  }, []);
+
   return {
     battleState,
     loadError,
@@ -355,6 +452,9 @@ export function useBattle(initialBattleId = 'training') {
     setSelectedCombatantId: selectUnit,
     mode,
     setMode,
+    selectedSkillId,
+    selectSkill,
+    castSelfSkill,
     logEntries,
     debugSettings,
     setDebugSettings,
@@ -377,5 +477,11 @@ export function useBattle(initialBattleId = 'training') {
     reachableTileCosts,
     attackableTargets,
     attackRangeTiles,
+    skillTargetIds,
+    skillTargetTiles,
+    infiniteSp,
+    clearCooldowns,
+    applyAllStatuses,
+    spawnDummy,
   };
 }

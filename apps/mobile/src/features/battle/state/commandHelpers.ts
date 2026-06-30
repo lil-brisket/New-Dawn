@@ -7,6 +7,8 @@ export function modeToCommandState(mode: BattleMode): BattleCommandState {
       return 'selecting_move';
     case 'attack':
       return 'selecting_attack';
+    case 'skill':
+      return 'selecting_skill';
     default:
       return 'idle';
   }
@@ -18,6 +20,8 @@ export function commandStateToMode(state: BattleCommandState): BattleMode {
       return 'move';
     case 'selecting_attack':
       return 'attack';
+    case 'selecting_skill':
+      return 'skill';
     default:
       return 'idle';
   }
@@ -26,12 +30,13 @@ export function commandStateToMode(state: BattleCommandState): BattleMode {
 export interface CommandContext {
   commandState: BattleCommandState;
   canAct: boolean;
+  canUsePrimaryAction: boolean;
   playerTurn: boolean;
   battleEnded: boolean;
 }
 
 export function isActionEnabled(ctx: CommandContext, action: BattleActionType): boolean {
-  const { commandState, canAct, playerTurn, battleEnded } = ctx;
+  const { commandState, canAct, canUsePrimaryAction, playerTurn, battleEnded } = ctx;
 
   if (battleEnded) {
     return action === 'end_turn' ? false : false;
@@ -48,8 +53,11 @@ export function isActionEnabled(ctx: CommandContext, action: BattleActionType): 
     case 'end_turn':
       return playerTurn && commandState !== 'victory' && commandState !== 'defeat';
     case 'item':
+      return canAct && commandState !== 'victory' && commandState !== 'defeat';
     case 'skill':
-      return false;
+      return (
+        canAct && canUsePrimaryAction && commandState !== 'victory' && commandState !== 'defeat'
+      );
     default:
       return false;
   }
@@ -85,7 +93,7 @@ export function deriveCommandState(params: {
   if (!playerTurn) return 'enemy_turn';
 
   const base = modeToCommandState(mode);
-  if (base === 'selecting_move' || base === 'selecting_attack') {
+  if (base === 'selecting_move' || base === 'selecting_attack' || base === 'selecting_skill') {
     return base;
   }
   return 'idle';

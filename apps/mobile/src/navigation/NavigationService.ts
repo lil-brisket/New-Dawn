@@ -6,6 +6,7 @@ import { Logger } from '@/services/logger/Logger';
 
 const ROUTE_FLAGS: Partial<Record<string, keyof typeof FeatureFlags>> = {
   [ROUTES.BATTLE_SANDBOX]: 'developerTools',
+  [ROUTES.DEVELOPER_DAWN_STUDIO]: 'developerTools',
   [ROUTES.BATTLE]: 'battle',
   [ROUTES.GUILD]: 'guild',
   [ROUTES.SHOP]: 'shop',

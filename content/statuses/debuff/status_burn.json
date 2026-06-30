@@ -1,0 +1,9 @@
+{
+  "id": "status_burn",
+  "name": "Burn",
+  "description": "Takes fire damage each turn.",
+  "duration": 3,
+  "stackable": true,
+  "maxStacks": 3,
+  "behaviors": [{ "type": "dot", "element": "fire", "damagePerStack": 5 }]
+}

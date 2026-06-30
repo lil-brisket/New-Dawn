@@ -1,6 +1,6 @@
 import type { CreateBattleInput } from '@dawn/game-core';
 import { createBattle, createGrid } from '@dawn/game-core';
-import { createGoblin, createKnight } from './units';
+import { createGoblin, createKnight, createSkillLabKnight, createSkillLabAlly } from './units';
 import { getBattleScene, type BattleScene } from './scenes';
 import { enemyLine, enemyWedge, gridTile, playerLine, playerWedge } from './spawns';
 
@@ -26,6 +26,22 @@ function scenario(def: BattleDefinition): BattleScenario {
     scene: getBattleScene(def.sceneId),
   };
 }
+
+const ALL_SKILL_IDS = [
+  'skill_slash',
+  'skill_fireball',
+  'skill_shield_bash',
+  'skill_mend',
+  'skill_second_wind',
+  'skill_war_cry',
+  'skill_fortify',
+  'skill_poison_dart',
+  'skill_blink',
+  'skill_charge',
+  'skill_arcane_burst',
+  'skill_meteor',
+  'skill_healing_rain',
+] as const;
 
 const DEFINITIONS: readonly BattleDefinition[] = [
   {
@@ -93,6 +109,36 @@ const DEFINITIONS: readonly BattleDefinition[] = [
           createGoblin('goblin-1', enemySpawns[0]!),
           createGoblin('goblin-2', enemySpawns[1]!),
           createGoblin('goblin-3', enemySpawns[2]!),
+        ],
+        grid,
+      };
+    },
+  },
+  {
+    id: 'skill_lab',
+    name: 'Skill Lab',
+    description: 'Test all skills and status effects',
+    difficulty: 'easy',
+    tags: ['skills', 'status', 'regression'],
+    defaultEnemyStrategy: 'passive',
+    sceneId: 'training_field',
+    build: () => {
+      const grid = createGrid({ width: 10, height: 8 });
+      return {
+        party: [
+          createSkillLabKnight('lab-knight', gridTile(2, 3), ALL_SKILL_IDS),
+          createSkillLabAlly('lab-ally', gridTile(2, 5)),
+        ],
+        enemies: [
+          createGoblin('dummy-1', gridTile(7, 4), {
+            name: 'Training Dummy',
+            hp: 500,
+            maxHp: 500,
+            attack: 1,
+            defense: 2,
+            sp: 0,
+            maxSp: 0,
+          }),
         ],
         grid,
       };

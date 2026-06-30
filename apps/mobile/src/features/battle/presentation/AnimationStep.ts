@@ -30,6 +30,25 @@ export function battleEventToAnimationSteps(event: BattleEvent): AnimationStep[]
           payload: { amount: event.amount, sourceId: event.sourceId },
         },
       ];
+    case 'heal_applied':
+      return [
+        {
+          type: 'heal',
+          duration: DEFAULT_DURATION,
+          entityId: event.targetId,
+          payload: { amount: event.amount, sourceId: event.sourceId, skillId: event.skillId },
+        },
+      ];
+    case 'skill_used':
+      return [
+        {
+          type: 'skill',
+          duration: DEFAULT_DURATION,
+          entityId: event.sourceId,
+          animationKey: event.skillId,
+          payload: { skillId: event.skillId, targetIds: event.targetIds },
+        },
+      ];
     case 'combatant_killed':
       return [
         {

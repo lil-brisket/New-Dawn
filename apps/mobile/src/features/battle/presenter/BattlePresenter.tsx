@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { HexCoord, BattleEvent } from '@dawn/types';
-import { findPath, getRemainingMoves } from '@dawn/game-core';
+import { findPath, getRemainingMoves, getAffectedTiles, defaultRegistry } from '@dawn/game-core';
 import { createId } from '@dawn/utils';
 import { Button, useTheme } from '@dawn/ui';
 import { ScreenLayout } from '@/layouts/ScreenLayout';
@@ -30,8 +30,13 @@ import { getBattleScenario, BATTLE_SCENARIOS } from '../sandbox/battles';
 import { cubeToPixel } from '../utils/hexLayout';
 import type { BattleCommandState } from '../state/BattleCommandState';
 import type { BattleViewMode } from '../state/BattleUIState';
+import { SkillPickerBar } from '../components/SkillPickerBar';
+import { ItemPickerBar } from '../components/ItemPickerBar';
+import { mockInventory } from '@/mocks/inventory';
 
 const VIEW_MODES: BattleViewMode[] = ['play', 'developer', 'debug'];
+
+type ActionBarPanel = 'main' | 'skills' | 'items';
 
 function commandHintFor(
   state: BattleCommandState,
@@ -46,6 +51,8 @@ function commandHintFor(
       return 'Select destination';
     case 'selecting_attack':
       return 'Select an enemy';
+    case 'selecting_skill':
+      return 'Select skill target';
     default:
       return null;
   }
@@ -63,6 +70,7 @@ export function BattlePresenter() {
   const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [animationLocked, setAnimationLocked] = useState(false);
+  const [actionBarPanel, setActionBarPanel] = useState<ActionBarPanel>('main');
 
   const busRef = useRef(createBattleEventBus());
   const queueRef = useRef(createBattleUIEventQueue());
@@ -114,6 +122,32 @@ export function BattlePresenter() {
       onTurnBanner: (event) => {
         setUI({ type: 'set_turn_banner', message: event.title });
         setTimeout(() => setUI({ type: 'set_turn_banner', message: null }), 1500);
+      },
+      onHeal: (event) => {
+        const targetId = event.payload.targetId as string | undefined;
+        const amount = event.payload.amount as number | undefined;
+        if (!targetId || !battle.battleState) return;
+        const target = battle.battleState.combatants.get(targetId);
+        if (!target) return;
+        const { cx, cy } = cubeToPixel(
+          target.position,
+          hexSize,
+          battleTheme.gridPadding,
+          gridLayoutOptions,
+        );
+        const id = createId('float');
+        setUI({
+          type: 'add_floating_text',
+          item: {
+            id,
+            text: `+${amount}`,
+            cx,
+            cy,
+            color: 'success',
+            createdAt: Date.now(),
+          },
+        });
+        setTimeout(() => setUI({ type: 'remove_floating_text', id }), 250);
       },
       onDamage: (event) => {
         const targetId = event.payload.targetId as string | undefined;
@@ -167,7 +201,14 @@ export function BattlePresenter() {
     setUI({ type: 'set_hover_tile', tile: null, unitId: null });
     setUI({ type: 'set_preview_path', path: [] });
     setInspectUnitId(null);
+    setActionBarPanel('main');
   }, [battle.battleState?.battleId, setUI]);
+
+  useEffect(() => {
+    if (!battle.playerTurn || battle.battleState?.winner !== null) {
+      setActionBarPanel('main');
+    }
+  }, [battle.playerTurn, battle.battleState?.winner]);
 
   const processDispatchEvents = useCallback(
     (events: readonly BattleEvent[]) => {
@@ -209,6 +250,7 @@ export function BattlePresenter() {
   const commandContext: CommandContext = {
     commandState,
     canAct,
+    canUsePrimaryAction: !battle.battleState?.turnActionState.hasUsedPrimaryAction,
     playerTurn: battle.playerTurn,
     battleEnded: battle.battleState?.winner !== null && battle.battleState?.winner !== undefined,
   };
@@ -242,6 +284,62 @@ export function BattlePresenter() {
       reachableCosts.map((entry) => `${entry.coord.x},${entry.coord.y},${entry.coord.z}`),
     );
   }, [reachableCosts]);
+
+  const skillTargetCoordKeys = useMemo(() => {
+    return new Set(battle.skillTargetTiles.map((c) => `${c.x},${c.y},${c.z}`));
+  }, [battle.skillTargetTiles]);
+
+  const skillTargetUnitIds = useMemo(() => new Set(battle.skillTargetIds), [battle.skillTargetIds]);
+
+  const aoePreviewCoordKeys = useMemo(() => {
+    if (
+      battle.mode !== 'skill' ||
+      !battle.selectedSkillId ||
+      !battle.battleState ||
+      !uiState.hoverTile
+    ) {
+      return new Set<string>();
+    }
+
+    const skill = defaultRegistry.getSkill(battle.selectedSkillId);
+    if (!skill || skill.targeting.type !== 'area') return new Set<string>();
+
+    const activeId = battle.battleState.activeCombatantId;
+    if (!activeId) return new Set<string>();
+
+    const hover = uiState.hoverTile;
+    const hoverKey = `${hover.x},${hover.y},${hover.z}`;
+    if (!skillTargetCoordKeys.has(hoverKey)) return new Set<string>();
+
+    let selection: { targetId?: string; destination?: typeof hover } = {};
+    if (skill.targeting.center === 'tile') {
+      selection = { destination: hover };
+    } else {
+      const targetId = battle.skillTargetIds.find((id) => {
+        const unit = battle.battleState!.combatants.get(id);
+        return (
+          unit &&
+          unit.position.x === hover.x &&
+          unit.position.y === hover.y &&
+          unit.position.z === hover.z
+        );
+      });
+      if (!targetId) return new Set<string>();
+      selection = { targetId };
+    }
+
+    const tiles = getAffectedTiles(battle.battleState, skill, activeId, selection);
+    return new Set(
+      tiles.filter((t) => `${t.x},${t.y},${t.z}` !== hoverKey).map((t) => `${t.x},${t.y},${t.z}`),
+    );
+  }, [
+    battle.mode,
+    battle.selectedSkillId,
+    battle.battleState,
+    battle.skillTargetIds,
+    uiState.hoverTile,
+    skillTargetCoordKeys,
+  ]);
 
   const handleEndBattle = useCallback(() => {
     router.replace(ROUTES.DEVELOPER);
@@ -278,6 +376,15 @@ export function BattlePresenter() {
         return;
       }
 
+      if (
+        coord &&
+        battle.mode === 'skill' &&
+        !skillTargetCoordKeys.has(`${coord.x},${coord.y},${coord.z}`)
+      ) {
+        setUI({ type: 'set_hover_tile', tile: null, unitId: null });
+        return;
+      }
+
       setUI({ type: 'set_hover_tile', tile: coord, unitId });
 
       if (coord && battle.battleState && battle.mode === 'move') {
@@ -298,7 +405,14 @@ export function BattlePresenter() {
         setUI({ type: 'set_preview_path', path: [] });
       }
     },
-    [battle.battleState, battle.selectedCombatantId, battle.mode, attackableCoordKeys, setUI],
+    [
+      battle.battleState,
+      battle.selectedCombatantId,
+      battle.mode,
+      attackableCoordKeys,
+      skillTargetCoordKeys,
+      setUI,
+    ],
   );
 
   const handleTilePress = useCallback(
@@ -310,10 +424,17 @@ export function BattlePresenter() {
           return;
         }
       }
+      if (battle.mode === 'skill') {
+        const key = `${coord.x},${coord.y},${coord.z}`;
+        if (!skillTargetCoordKeys.has(key)) {
+          showInvalidAttackTarget(coord);
+          return;
+        }
+      }
       setUI({ type: 'set_selected_tile', tile: coord });
       battle.handleTilePress(coord);
     },
-    [attackableCoordKeys, battle, setUI, showInvalidAttackTarget],
+    [attackableCoordKeys, skillTargetCoordKeys, battle, setUI, showInvalidAttackTarget],
   );
 
   const handleInvalidAttackTarget = useCallback(
@@ -335,13 +456,23 @@ export function BattlePresenter() {
         if (unit) battle.handleTilePress(unit.position);
         return;
       }
+      if (battle.mode === 'skill') {
+        if (!skillTargetUnitIds.has(combatantId)) {
+          const unit = battle.battleState?.combatants.get(combatantId);
+          if (unit) showInvalidAttackTarget(unit.position);
+          return;
+        }
+        const unit = battle.battleState?.combatants.get(combatantId);
+        if (unit) battle.handleTilePress(unit.position);
+        return;
+      }
       battle.setSelectedCombatantId(combatantId);
       const unit = battle.battleState?.combatants.get(combatantId);
       if (unit) {
         setUI({ type: 'set_selected_tile', tile: unit.position });
       }
     },
-    [battle, setUI, attackableIds, showInvalidAttackTarget],
+    [battle, setUI, attackableIds, skillTargetUnitIds, showInvalidAttackTarget],
   );
 
   const cycleViewMode = useCallback(() => {
@@ -382,30 +513,91 @@ export function BattlePresenter() {
   const commandHandlers = useMemo(() => {
     const cancelActionMode = () => {
       battle.setMode('idle');
+      battle.selectSkill(null);
       setUI({ type: 'set_preview_path', path: [] });
       setUI({ type: 'set_hover_tile', tile: null, unitId: null });
     };
 
     return {
       attack: () => {
+        setActionBarPanel('main');
         if (battle.mode === 'attack') {
           cancelActionMode();
           return;
         }
+        battle.selectSkill(null);
         battle.setMode('attack');
       },
-      item: () => {},
+      item: () => {
+        if (actionBarPanel === 'items') {
+          setActionBarPanel('main');
+          return;
+        }
+        cancelActionMode();
+        setActionBarPanel('items');
+      },
       move: () => {
+        setActionBarPanel('main');
         if (battle.mode === 'move') {
           cancelActionMode();
           return;
         }
+        battle.selectSkill(null);
         battle.setMode('move');
       },
-      skill: () => {},
-      end_turn: () => battle.endTurn(),
+      skill: () => {
+        if (battle.mode === 'skill') {
+          cancelActionMode();
+          return;
+        }
+        cancelActionMode();
+        setActionBarPanel('skills');
+      },
+      end_turn: () => {
+        setActionBarPanel('main');
+        battle.endTurn();
+      },
     };
-  }, [battle, setUI]);
+  }, [battle, setUI, actionBarPanel]);
+
+  const handleSkillSelect = useCallback(
+    (skillId: string) => {
+      const skill = defaultRegistry.getSkill(skillId);
+      if (!skill) return;
+      if (skill.targeting.type === 'self') {
+        battle.castSelfSkill(skillId);
+        battle.selectSkill(null);
+        return;
+      }
+      battle.selectSkill(skillId);
+    },
+    [battle],
+  );
+
+  const handleBackFromSubPanel = useCallback(() => {
+    if (actionBarPanel === 'skills') {
+      battle.setMode('idle');
+      battle.selectSkill(null);
+      setUI({ type: 'set_preview_path', path: [] });
+      setUI({ type: 'set_hover_tile', tile: null, unitId: null });
+    }
+    setActionBarPanel('main');
+  }, [actionBarPanel, battle, setUI]);
+
+  const skillDebugActions = useMemo(
+    () => [
+      { id: 'infiniteSp', label: 'Infinite SP', onPress: () => battle.infiniteSp() },
+      { id: 'skipCd', label: 'Skip Cooldowns', onPress: () => battle.clearCooldowns() },
+      {
+        id: 'applyStatuses',
+        label: 'Apply Every Status',
+        onPress: () => battle.applyAllStatuses(),
+      },
+      { id: 'spawnDummy', label: 'Spawn Dummy', onPress: () => battle.spawnDummy() },
+      { id: 'resetBattle', label: 'Reset Battle', onPress: () => battle.restart() },
+    ],
+    [battle],
+  );
 
   if (!battle.battleState) {
     return (
@@ -460,6 +652,8 @@ export function BattlePresenter() {
     attackableCoordKeys,
     attackRangeCoordKeys,
     reachableCoordKeys,
+    skillTargetCoordKeys,
+    aoePreviewCoordKeys,
     selectedCombatantId: battle.selectedCombatantId,
     targetingMode: battle.mode,
     showGrid,
@@ -509,13 +703,36 @@ export function BattlePresenter() {
           }
           log={<BattleLog entries={logCards} viewMode={uiState.viewMode} />}
           actionBar={
-            <BattleActionBar
-              commandState={commandState}
-              commandContext={commandContext}
-              handlers={commandHandlers}
+            actionBarPanel === 'skills' ? (
+              <SkillPickerBar
+                combatant={
+                  battle.activeCombatant?.team === 'player' ? battle.activeCombatant : null
+                }
+                selectedSkillId={battle.selectedSkillId}
+                onSelect={handleSkillSelect}
+                onBack={handleBackFromSubPanel}
+              />
+            ) : actionBarPanel === 'items' ? (
+              <ItemPickerBar
+                items={mockInventory}
+                onSelect={() => {}}
+                onBack={handleBackFromSubPanel}
+              />
+            ) : (
+              <BattleActionBar
+                commandState={commandState}
+                commandContext={commandContext}
+                handlers={commandHandlers}
+              />
+            )
+          }
+          debug={
+            <DebugPanel
+              context={debugContext}
+              extraActions={skillDebugActions}
+              collapsed={uiState.viewMode === 'play'}
             />
           }
-          debug={<DebugPanel context={debugContext} collapsed={uiState.viewMode === 'play'} />}
           overlays={
             <>
               <UnitInspector

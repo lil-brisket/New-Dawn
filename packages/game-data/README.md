@@ -1,13 +1,17 @@
 # @dawn/game-data
 
-Static game content definitions. Will become one of the largest packages over time.
+Static game content definitions loaded from repo-root `content/` JSON via the content pipeline.
+
+## Workflow
+
+1. Edit JSON in `content/` (or use Dawn Studio at `tools/editor`)
+2. Run `pnpm content:codegen` (auto-runs before `game-data` typecheck)
+3. Generated output lands in `src/generated/`
 
 ## Adding content
 
-1. Create a definition file in the appropriate folder (e.g. `skills/my_skill.ts`)
-2. Export from the folder's `index.ts`
-3. Registry auto-loads via `createDefinitionRegistry()`
+1. Add a JSON file under `content/{domain}/**/` (e.g. `content/skills/magic/skill_my_skill.json`)
+2. Run `pnpm content:codegen`
+3. `DefinitionRegistry` picks it up automatically
 
-## Migration path
-
-Start with TypeScript files. Later migrate to JSON with the same `DefinitionRegistry` loader API.
+Characters, items, equipment, and other domains still live as TypeScript until migrated.

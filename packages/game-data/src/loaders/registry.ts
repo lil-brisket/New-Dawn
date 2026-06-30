@@ -8,15 +8,13 @@ import type {
   MapData,
 } from '@dawn/types';
 import * as characters from '../characters';
-import * as skills from '../skills';
 import * as equipment from '../equipment';
 import * as items from '../items';
-import * as enemies from '../enemies';
-import * as status from '../status';
 import * as maps from '../maps';
 import * as loot from '../loot';
 import * as professions from '../professions';
 import * as masteries from '../masteries';
+import { skills, statuses, enemies } from '../generated/content';
 
 export interface DefinitionRegistry {
   getCharacter(id: string): CharacterDefinition | undefined;
@@ -29,6 +27,9 @@ export interface DefinitionRegistry {
   getLootTable(id: string): loot.LootTable | undefined;
   getProfession(id: string): professions.ProfessionDefinition | undefined;
   getMastery(id: string): masteries.MasteryDefinition | undefined;
+  getAllSkills(): SkillDefinition[];
+  getAllStatuses(): StatusDefinition[];
+  getAllEnemies(): EnemyDefinition[];
 }
 
 function buildRegistry<T extends { id: string }>(items: T[]): Map<string, T> {
@@ -37,11 +38,11 @@ function buildRegistry<T extends { id: string }>(items: T[]): Map<string, T> {
 
 export function createDefinitionRegistry(): DefinitionRegistry {
   const characterMap = buildRegistry(Object.values(characters));
-  const skillMap = buildRegistry(Object.values(skills));
+  const skillMap = buildRegistry(skills);
   const equipmentMap = buildRegistry(Object.values(equipment));
   const itemMap = buildRegistry(Object.values(items));
-  const enemyMap = buildRegistry(Object.values(enemies));
-  const statusMap = buildRegistry(Object.values(status));
+  const enemyMap = buildRegistry(enemies);
+  const statusMap = buildRegistry(statuses);
   const mapMap = buildRegistry(Object.values(maps));
   const lootMap = buildRegistry(Object.values(loot));
   const professionMap = buildRegistry(Object.values(professions));
@@ -58,6 +59,9 @@ export function createDefinitionRegistry(): DefinitionRegistry {
     getLootTable: (id) => lootMap.get(id),
     getProfession: (id) => professionMap.get(id),
     getMastery: (id) => masteryMap.get(id),
+    getAllSkills: () => skills,
+    getAllStatuses: () => statuses,
+    getAllEnemies: () => enemies,
   };
 }
 

@@ -119,7 +119,7 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
       grid,
       config,
       turnOrder,
-      turnActionState: { movesUsed: 0, hasAttacked: false, apSpent: 0 },
+      turnActionState: { movesUsed: 0, hasUsedPrimaryAction: false, apSpent: 0 },
       winner: null,
       history: [],
     },
@@ -138,7 +138,7 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
     grid,
     config,
     turnOrder,
-    turnActionState: { movesUsed: 0, hasAttacked: false, apSpent: 0 },
+    turnActionState: { movesUsed: 0, hasUsedPrimaryAction: false, apSpent: 0 },
     winner: null,
     history: [],
   };

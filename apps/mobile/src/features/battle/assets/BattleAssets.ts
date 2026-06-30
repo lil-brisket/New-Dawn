@@ -32,6 +32,8 @@ export const BattleAssets = {
     regen: '💚',
     burn: '🔥',
     stun: '⚡',
+    attackUp: '⬆',
+    defenseUp: '🛡',
   },
   portraits: {
     placeholder: 'portrait_placeholder',

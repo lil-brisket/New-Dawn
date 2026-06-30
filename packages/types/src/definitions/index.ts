@@ -2,6 +2,17 @@ import type { ElementType, EquipmentSlot, ItemRarity } from '../common';
 import type { SkillEffect } from '../skill/effects';
 import type { TargetSelector } from '../skill/targeting';
 
+/** Authoring metadata — normalized into definitions; engine may ignore until used. */
+export interface ContentMetadata {
+  category?: string;
+  element?: ElementType;
+  weaponType?: string;
+  job?: string;
+  rarity?: ItemRarity;
+  tags?: string[];
+  unlockLevel?: number;
+}
+
 export interface BaseStats {
   hp: number;
   maxHp: number;
@@ -25,7 +36,7 @@ export interface CharacterDefinition {
   rarity: ItemRarity;
 }
 
-export interface SkillDefinition {
+export interface SkillDefinition extends ContentMetadata {
   id: string;
   name: string;
   description: string;
@@ -33,7 +44,12 @@ export interface SkillDefinition {
   cooldown: number;
   effects: SkillEffect[];
   targeting: TargetSelector;
+  iconId: string;
+  vfxId: string;
+  sfxId: string;
+  /** Engine/display compat — set from vfxId during normalization */
   animationKey: string;
+  /** Engine/display compat — set from sfxId during normalization */
   soundKey: string;
 }
 
@@ -57,11 +73,12 @@ export interface ItemDefinition {
   iconId: string;
 }
 
-export interface EnemyDefinition {
+export interface EnemyDefinition extends ContentMetadata {
   id: string;
   name: string;
   description: string;
   portraitId: string;
+  spriteId: string;
   baseStats: BaseStats;
   skillIds: string[];
   aiProfileId: string;
@@ -69,7 +86,24 @@ export interface EnemyDefinition {
   element: ElementType;
 }
 
-export interface StatusDefinition {
+export type StatModMode = 'flat' | 'percent';
+
+export type StatusBehavior =
+  | { type: 'dot'; element: ElementType; damagePerStack: number }
+  | { type: 'control'; effect: 'stun' }
+  | {
+      type: 'stat_mod';
+      stat: 'attack' | 'defense';
+      mode: StatModMode;
+      amountPerStack: number;
+    }
+  | {
+      type: 'trigger';
+      event: 'on_hit' | 'on_damaged' | 'on_turn_start';
+      effect: SkillEffect;
+    };
+
+export interface StatusDefinition extends ContentMetadata {
   id: string;
   name: string;
   description: string;
@@ -77,4 +111,5 @@ export interface StatusDefinition {
   stackable: boolean;
   maxStacks: number;
   iconId: string;
+  behaviors: StatusBehavior[];
 }

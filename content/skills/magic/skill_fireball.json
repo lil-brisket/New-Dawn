@@ -1,0 +1,13 @@
+{
+  "id": "skill_fireball",
+  "name": "Fireball",
+  "description": "Hurls a ball of flame at a distant foe.",
+  "mpCost": 25,
+  "cooldown": 2,
+  "element": "fire",
+  "effects": [
+    { "type": "damage", "element": "fire", "multiplier": 1.4 },
+    { "type": "apply_status", "statusId": "status_burn", "chance": 0.3 }
+  ],
+  "targeting": { "type": "single_enemy", "range": 3 }
+}

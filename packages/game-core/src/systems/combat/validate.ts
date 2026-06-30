@@ -1,10 +1,12 @@
 import type { AttackAction, BattleError, BattleState } from '@dawn/types';
 import type { Result } from '@dawn/utils';
 import { err, ok } from '@dawn/utils';
+import { defaultRegistry } from '@dawn/game-data';
 import { distance } from '../../grid/HexMath';
 import { isEnemy } from '../../entities/Team';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
+import { isStunned } from '../status/hasControlEffect';
 
 export function validateAttack(
   state: BattleState,
@@ -27,7 +29,11 @@ export function validateAttack(
     return err({ code: 'DeadCombatant' });
   }
 
-  if (state.turnActionState.hasAttacked) {
+  if (isStunned(combatant, defaultRegistry)) {
+    return err({ code: 'Stunned' });
+  }
+
+  if (state.turnActionState.hasUsedPrimaryAction) {
     return err({ code: 'AlreadyAttacked' });
   }
 

@@ -1,0 +1,18 @@
+export const NAV_ITEMS: { path: string; label: string; placeholder?: boolean }[] = [
+  { path: '/', label: 'Dashboard' },
+  { path: '/skills', label: 'Skills' },
+  { path: '/statuses', label: 'Statuses' },
+  { path: '/enemies', label: 'Enemies' },
+  { path: '/characters', label: 'Characters', placeholder: true },
+  { path: '/items', label: 'Items', placeholder: true },
+  { path: '/equipment', label: 'Equipment', placeholder: true },
+  { path: '/ai', label: 'AI', placeholder: true },
+  { path: '/maps', label: 'Maps', placeholder: true },
+  { path: '/quests', label: 'Quests', placeholder: true },
+  { path: '/dialogue', label: 'Dialogue', placeholder: true },
+  { path: '/guilds', label: 'Guilds', placeholder: true },
+  { path: '/balance', label: 'Balance', placeholder: true },
+  { path: '/analytics', label: 'Analytics', placeholder: true },
+  { path: '/testing', label: 'Testing' },
+  { path: '/settings', label: 'Settings' },
+];

@@ -59,6 +59,11 @@ export function DeveloperScreen() {
         </View>
 
         <Button
+          title="Dawn Studio"
+          onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_DAWN_STUDIO)}
+          accessibilityLabel="Open Dawn Studio content editor"
+        />
+        <Button
           title="Battle Sandbox"
           onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_BATTLE_SANDBOX)}
           accessibilityLabel="Open battle sandbox"

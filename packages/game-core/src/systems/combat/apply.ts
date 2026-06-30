@@ -28,6 +28,7 @@ export function applyAttack(
       sourceId: action.combatantId,
       targetId: action.targetId,
       amount: calculated.damage,
+      reason: 'attack',
     },
   ];
 
@@ -47,7 +48,7 @@ export function applyAttack(
     combatants,
     turnActionState: {
       movesUsed: state.turnActionState.movesUsed,
-      hasAttacked: true,
+      hasUsedPrimaryAction: true,
       apSpent: state.turnActionState.apSpent + calculated.apCost,
     },
   };

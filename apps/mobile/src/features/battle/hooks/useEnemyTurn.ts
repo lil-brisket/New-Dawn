@@ -83,10 +83,7 @@ export function useEnemyTurn({
           if (aiSpeedMs > 0) {
             await delay(aiSpeedMs);
           }
-          const result = dispatchRef.current(action);
-          if (!result.ok) {
-            return;
-          }
+          dispatchRef.current(action);
         }
         if (!cancelled) {
           completedTurnsRef.current.add(enemyTurnKey);

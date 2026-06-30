@@ -1,11 +1,18 @@
-import type { Combatant, BattleState, Team } from '@dawn/types';
-import { getActiveCombatant, isCombatantAlive } from '@dawn/game-core';
+import type { BattleState, Combatant, Team } from '@dawn/types';
+import {
+  getActiveCombatant,
+  isCombatantAlive,
+  defaultRegistry,
+  getStatusDisplays,
+} from '@dawn/game-core';
+import { resolveStatusIcon } from '../assets/resolveStatusIcon';
 
 export interface StatusDisplayItem {
   readonly id: string;
   readonly name: string;
   readonly icon: string;
   readonly remainingTurns: number;
+  readonly stacks: number;
 }
 
 export interface CombatantDisplay {
@@ -38,11 +45,19 @@ export function getCombatantAvatarLabel(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-export function combatantToDisplay(
-  combatant: Combatant,
-  statusEffects: StatusDisplayItem[] = [],
-): CombatantDisplay {
+export function combatantToDisplay(combatant: Combatant, state?: BattleState): CombatantDisplay {
   const extended = combatant as Combatant & { level?: number };
+  const statusEffects: StatusDisplayItem[] =
+    state !== undefined
+      ? getStatusDisplays(state, combatant.id, defaultRegistry).map((s) => ({
+          id: s.id,
+          name: s.name,
+          icon: resolveStatusIcon(s.iconId),
+          remainingTurns: s.remainingTurns,
+          stacks: s.stacks,
+        }))
+      : [];
+
   return {
     id: combatant.id,
     name: combatant.name,
@@ -83,7 +98,7 @@ export function buildTeamDisplay(state: BattleState, team: Team): TeamDisplay {
   return {
     id: team,
     label: TEAM_LABELS[team],
-    representative: rep ? combatantToDisplay(rep) : null,
+    representative: rep ? combatantToDisplay(rep, state) : null,
     rosterCount: alive.length,
   };
 }

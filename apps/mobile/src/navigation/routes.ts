@@ -17,6 +17,7 @@ export const ROUTES = {
   DEVELOPER_UI_SHOWCASE: '/(main)/developer/ui-showcase',
   DEVELOPER_COMPONENT_PLAYGROUND: '/(main)/developer/component-playground',
   DEVELOPER_THEME_PREVIEW: '/(main)/developer/theme-preview',
+  DEVELOPER_DAWN_STUDIO: '/(main)/developer/dawn-studio',
   DEVELOPER_BATTLE_SANDBOX: '/battle/sandbox',
 } as const;
 

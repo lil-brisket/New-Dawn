@@ -19,7 +19,15 @@ export interface EndTurnAction {
   readonly combatantId: string;
 }
 
-export type BattleAction = MoveAction | AttackAction | EndTurnAction;
+export interface SkillAction {
+  readonly type: 'skill';
+  readonly combatantId: string;
+  readonly skillId: string;
+  readonly targetId?: string;
+  readonly destination?: HexCoord;
+}
+
+export type BattleAction = MoveAction | AttackAction | EndTurnAction | SkillAction;
 
 export type BattleError =
   | { readonly code: 'OutOfRange' }
@@ -36,7 +44,13 @@ export type BattleError =
   | { readonly code: 'BattleOver' }
   | { readonly code: 'MaxMovesReached' }
   | { readonly code: 'InvalidBattleSetup' }
-  | { readonly code: 'UnknownAction' };
+  | { readonly code: 'UnknownAction' }
+  | { readonly code: 'InsufficientSp' }
+  | { readonly code: 'SkillOnCooldown' }
+  | { readonly code: 'InvalidSkillTarget' }
+  | { readonly code: 'SkillNotFound' }
+  | { readonly code: 'Stunned' }
+  | { readonly code: 'PrimaryActionUsed' };
 
 export type ActionResult =
   | { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] }

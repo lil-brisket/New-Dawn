@@ -13,6 +13,7 @@ export * from './events/ui';
 export * from './battleLog';
 export * from './skill/effects';
 export * from './skill/targeting';
+export * from './skill/simulation';
 export * from './equipment';
 export * from './inventory';
 export * from './status';

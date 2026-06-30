@@ -6,11 +6,19 @@ export interface SkillCardProps {
   name: string;
   mpCost: number;
   cooldown: number;
+  aoeLabel?: string;
   selected?: boolean;
   testID?: string;
 }
 
-function SkillCardComponent({ name, mpCost, cooldown, selected, testID }: SkillCardProps) {
+function SkillCardComponent({
+  name,
+  mpCost,
+  cooldown,
+  aoeLabel,
+  selected,
+  testID,
+}: SkillCardProps) {
   const { theme } = useTheme();
   const { colors, radius, spacing, typography, border } = theme;
 
@@ -37,6 +45,9 @@ function SkillCardComponent({ name, mpCost, cooldown, selected, testID }: SkillC
         <Text style={{ color: colors.textMuted, fontSize: typography.fontSize.xs }}>
           CD {cooldown}
         </Text>
+      ) : null}
+      {aoeLabel ? (
+        <Text style={{ color: colors.warning, fontSize: typography.fontSize.xs }}>{aoeLabel}</Text>
       ) : null}
     </View>
   );

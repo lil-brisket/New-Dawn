@@ -12,7 +12,7 @@ export function getAttackableTargets(state: BattleState, combatantId: string): C
 
   if (state.activeCombatantId !== combatantId) return [];
 
-  if (state.turnActionState.hasAttacked) return [];
+  if (state.turnActionState.hasUsedPrimaryAction) return [];
 
   const { config } = state;
   if (combatant.ap < config.attackCost) return [];

@@ -1,0 +1,7 @@
+{
+  "id": "status_defense_up",
+  "name": "Defense Up",
+  "description": "Increased defense.",
+  "duration": 2,
+  "behaviors": [{ "type": "stat_mod", "stat": "defense", "mode": "percent", "amountPerStack": 20 }]
+}

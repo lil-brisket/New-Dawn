@@ -1,0 +1,9 @@
+{
+  "id": "skill_healing_rain",
+  "name": "Healing Rain",
+  "description": "Restores HP to allies around the target.",
+  "mpCost": 25,
+  "cooldown": 2,
+  "effects": [{ "type": "heal", "multiplier": 0.7 }],
+  "targeting": { "type": "area", "range": 2, "radius": 1, "filter": "ally", "center": "unit" }
+}

@@ -1,0 +1,42 @@
+import { Routes, Route } from 'react-router-dom';
+import { AppShell } from './shell/AppShell';
+import { DashboardPage } from './pages/DashboardPage';
+import { SkillsPage } from './pages/SkillsPage';
+import { StatusesPage } from './pages/StatusesPage';
+import { EnemiesPage } from './pages/EnemiesPage';
+import { PlaceholderPage } from './pages/PlaceholderPage';
+import { TestingPage } from './pages/TestingPage';
+import { SettingsPage } from './pages/SettingsPage';
+
+export function App() {
+  return (
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route index element={<DashboardPage />} />
+        <Route path="skills" element={<SkillsPage />} />
+        <Route path="statuses" element={<StatusesPage />} />
+        <Route path="enemies" element={<EnemiesPage />} />
+        <Route path="characters" element={<PlaceholderPage title="Characters" />} />
+        <Route path="items" element={<PlaceholderPage title="Items" />} />
+        <Route path="equipment" element={<PlaceholderPage title="Equipment" />} />
+        <Route path="ai" element={<PlaceholderPage title="AI Profiles" />} />
+        <Route path="maps" element={<PlaceholderPage title="Maps" />} />
+        <Route path="quests" element={<PlaceholderPage title="Quests" />} />
+        <Route path="dialogue" element={<PlaceholderPage title="Dialogue" />} />
+        <Route path="guilds" element={<PlaceholderPage title="Guilds" />} />
+        <Route
+          path="balance"
+          element={
+            <PlaceholderPage
+              title="Balance Mode"
+              description="Run batch simulations — coming soon."
+            />
+          }
+        />
+        <Route path="analytics" element={<PlaceholderPage title="Analytics" />} />
+        <Route path="testing" element={<TestingPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
+  );
+}

@@ -1,0 +1,9 @@
+{
+  "id": "status_poison",
+  "name": "Poison",
+  "description": "Takes physical damage each turn.",
+  "duration": 3,
+  "stackable": true,
+  "maxStacks": 3,
+  "behaviors": [{ "type": "dot", "element": "physical", "damagePerStack": 4 }]
+}

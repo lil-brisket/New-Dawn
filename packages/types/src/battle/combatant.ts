@@ -1,5 +1,6 @@
 import type { HexCoord } from './grid';
 import type { Team } from './team';
+import type { StatusInstance } from '../status';
 
 export interface Combatant {
   readonly id: string;
@@ -15,4 +16,8 @@ export interface Combatant {
   readonly movement: number;
   readonly ap: number;
   readonly maxAp: number;
+  readonly powerStat: number;
+  readonly skillIds: readonly string[];
+  readonly statuses: readonly StatusInstance[];
+  readonly skillCooldowns: Readonly<Record<string, number>>;
 }

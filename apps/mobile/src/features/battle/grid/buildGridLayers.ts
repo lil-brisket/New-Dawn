@@ -24,7 +24,9 @@ export function buildGridLayers(params: {
   attackRangeCoordKeys: Set<string>;
   reachableCoordKeys: Set<string>;
   selectedCombatantId: string | null;
-  targetingMode: 'idle' | 'move' | 'attack';
+  skillTargetCoordKeys?: Set<string>;
+  aoePreviewCoordKeys?: Set<string>;
+  targetingMode: 'idle' | 'move' | 'attack' | 'skill';
   showGrid: boolean;
   showAxisLabels: boolean;
   showCoords: boolean;
@@ -45,6 +47,8 @@ export function buildGridLayers(params: {
     attackableCoordKeys,
     attackRangeCoordKeys,
     reachableCoordKeys,
+    skillTargetCoordKeys = new Set<string>(),
+    aoePreviewCoordKeys = new Set<string>(),
     selectedCombatantId,
     targetingMode,
     showGrid,
@@ -99,8 +103,10 @@ export function buildGridLayers(params: {
       highlight = 'selected';
     } else if (isHover) {
       highlight = 'hover';
-    } else if (attackCoords.has(key)) {
+    } else if (attackCoords.has(key) || skillTargetCoordKeys.has(key)) {
       highlight = 'attackable';
+    } else if (aoePreviewCoordKeys.has(key)) {
+      highlight = 'attack_range';
     } else if (attackRangeCoordKeys.has(key)) {
       highlight = 'attack_range';
     } else if (reachable) {

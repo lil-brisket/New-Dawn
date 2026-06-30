@@ -8,15 +8,19 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "content:codegen": "tsx scripts/codegen-content.ts",
+    "pretypecheck": "pnpm content:codegen",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/"
   },
   "dependencies": {
+    "@dawn/content-pipeline": "workspace:*",
     "@dawn/types": "workspace:*"
   },
   "devDependencies": {
     "@dawn/config": "workspace:*",
     "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }

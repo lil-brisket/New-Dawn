@@ -5,6 +5,9 @@ import { createGrid, offsetToCube } from '../../grid/Grid';
 import { createCombatant } from '../../entities/Combatant';
 import { createBattle } from '../../battle/createBattle';
 import { dispatchAction } from '../../battle/dispatchAction';
+import { applyStatus } from '../../systems/status/applyStatus';
+import { defaultRegistry } from '@dawn/game-data';
+import { createSeededRandom } from '@dawn/utils';
 import { nearestEnemyStrategy } from './nearestEnemy';
 
 function makeCombatant(
@@ -106,5 +109,35 @@ describe('nearestEnemyStrategy', () => {
 
     expect(state.activeCombatantId).toBe('knight-1');
     expect(state.round).toBe(2);
+  });
+
+  it('skips turn when stunned', () => {
+    const player = makeCombatant({ id: 'player', team: 'player', position: createHex(0, 0) });
+    const enemy = makeCombatant({ id: 'e1', team: 'enemy', position: createHex(1, -1) });
+    const battle = createBattle({ player, enemies: [enemy], grid });
+    if (!battle.ok) return;
+
+    let state = battle.state;
+    const stunned = applyStatus({
+      state,
+      sourceId: 'player',
+      targetId: 'e1',
+      statusId: 'status_stun',
+      chance: 1,
+      registry: defaultRegistry,
+      rng: createSeededRandom(1),
+    });
+    state = stunned.state;
+
+    const afterPlayer = dispatchAction(state, { type: 'end_turn', combatantId: 'player' });
+    if (!afterPlayer.ok) return;
+
+    const actions = nearestEnemyStrategy.planTurn(afterPlayer.state);
+    expect(actions).toEqual([{ type: 'end_turn', combatantId: 'e1' }]);
+
+    const endEnemy = dispatchAction(afterPlayer.state, actions[0]!);
+    expect(endEnemy.ok).toBe(true);
+    if (!endEnemy.ok) return;
+    expect(endEnemy.state.activeCombatantId).toBe('player');
   });
 });
