@@ -181,6 +181,25 @@ describe('dispatchAction', () => {
     expect(result.error.code).toBe('InvalidBattleSetup');
   });
 
+  it('supports multi-unit party with correct turn order', () => {
+    const p1 = makeCombatant({ id: 'p1', team: 'player', position: createHex(0, 0) });
+    const p2 = makeCombatant({ id: 'p2', team: 'player', position: createHex(1, 0) });
+    const e1 = makeCombatant({ id: 'e1', team: 'enemy', position: createHex(3, -3) });
+    const e2 = makeCombatant({ id: 'e2', team: 'enemy', position: createHex(4, -4) });
+    const battle = createBattle({ party: [p1, p2], enemies: [e1, e2], grid });
+    if (!battle.ok) return;
+    expect(battle.state.turnOrder).toEqual(['p1', 'p2', 'e1', 'e2']);
+    expect(battle.state.playerId).toBe('p1');
+
+    const endP1 = dispatchAction(battle.state, { type: 'end_turn', combatantId: 'p1' });
+    if (!endP1.ok) return;
+    expect(endP1.state.activeCombatantId).toBe('p2');
+
+    const endP2 = dispatchAction(endP1.state, { type: 'end_turn', combatantId: 'p2' });
+    if (!endP2.ok) return;
+    expect(endP2.state.activeCombatantId).toBe('e1');
+  });
+
   it('respects custom moveCost in config', () => {
     const player = makeCombatant({
       id: 'player',

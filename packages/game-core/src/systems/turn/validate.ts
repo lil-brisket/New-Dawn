@@ -28,9 +28,12 @@ export function validateEndTurn(
   return ok(undefined);
 }
 
-/** Player first, then enemies in order. */
-export function createTurnOrder(player: Combatant, enemies: readonly Combatant[]): string[] {
-  return [player.id, ...enemies.map((e) => e.id)];
+/** Party members first, then enemies in order. */
+export function createTurnOrder(
+  party: readonly Combatant[],
+  enemies: readonly Combatant[],
+): string[] {
+  return [...party.map((p) => p.id), ...enemies.map((e) => e.id)];
 }
 
 export function findNextLivingCombatant(

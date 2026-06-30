@@ -10,5 +10,6 @@ export function getActiveCombatant(state: BattleState): Combatant | undefined {
 }
 
 export function isPlayerTurn(state: BattleState): boolean {
-  return state.activeCombatantId === state.playerId;
+  const active = getActiveCombatant(state);
+  return active?.team === 'player';
 }

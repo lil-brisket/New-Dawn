@@ -28,6 +28,7 @@ function RootStack() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(main)" />
       <Stack.Screen name="battle/[id]" options={{ presentation: 'fullScreenModal' }} />
+      <Stack.Screen name="battle/sandbox" options={{ presentation: 'fullScreenModal' }} />
     </Stack>
   );
 }

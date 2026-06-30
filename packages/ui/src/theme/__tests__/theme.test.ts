@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createTheme, themes } from '../createTheme';
 import { resolveShadow } from '../tokens/shadows';
-import { game } from '../tokens/game';
 import { darkPalette } from '../tokens/colors';
 import { createButtonVariants } from '../components/button';
 
@@ -43,9 +42,17 @@ describe('button variants', () => {
 });
 
 describe('game token shape', () => {
-  it('has all required domains', () => {
-    expect(Object.keys(game)).toEqual(
+  it('has all required domains on resolved theme', () => {
+    expect(Object.keys(themes.dark.game)).toEqual(
       expect.arrayContaining(['battle', 'inventory', 'guild', 'world', 'effects']),
     );
+  });
+
+  it('exposes semantic battle tile and command tokens', () => {
+    const { battle } = themes.dark.game;
+    expect(battle.tile.default).toBeTruthy();
+    expect(battle.tile.variant0).toBeTruthy();
+    expect(battle.command.primary).toBeTruthy();
+    expect(battle.layout.hexSizeMin).toBe(12);
   });
 });

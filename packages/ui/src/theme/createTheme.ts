@@ -12,6 +12,7 @@ import {
   zIndex,
   game,
   getPalette,
+  createBattleTokens,
   type ThemeMode,
 } from './tokens';
 import { createShadowTokens } from './tokens/shadows';
@@ -20,6 +21,7 @@ export type { ThemeMode, ThemePreference, ColorPalette } from './tokens/colors';
 
 export function createTheme(mode: ThemeMode) {
   const colors = getPalette(mode);
+  const battleTokens = createBattleTokens(colors);
 
   return {
     mode,
@@ -36,7 +38,10 @@ export function createTheme(mode: ThemeMode) {
     shadow: createShadowTokens(colors),
     animation,
     zIndex,
-    game,
+    game: {
+      ...game,
+      battle: battleTokens,
+    },
     /** @deprecated Remove after Phase 7 — use `shadow` */
     shadows: createShadowTokens(colors),
     /** @deprecated Remove after Phase 7 — use `animation` */

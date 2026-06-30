@@ -11,6 +11,49 @@ interface BfsNode {
   parent: HexCoord | null;
 }
 
+export function findReachableTilesWithCosts(
+  state: BattleState,
+  start: HexCoord,
+  maxCost: number,
+): ReadonlyMap<string, number> {
+  const { grid } = state;
+  const visited = new Map<string, number>();
+  const queue: BfsNode[] = [{ coord: start, cost: 0, parent: null }];
+
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+    const key = coordToKey(node.coord);
+
+    const prev = visited.get(key);
+    if (prev !== undefined && prev <= node.cost) continue;
+    visited.set(key, node.cost);
+
+    if (node.cost >= maxCost) continue;
+
+    for (const next of neighbors(node.coord)) {
+      if (!contains(grid, next)) continue;
+      const tile = getTile(grid, next);
+      if (!tile?.walkable) continue;
+
+      const occupant = getCombatantAt(state, next);
+      if (occupant && isCombatantAlive(occupant) && !equals(next, start)) continue;
+
+      const nextCost = node.cost + 1;
+      if (nextCost > maxCost) continue;
+
+      queue.push({ coord: next, cost: nextCost, parent: node.coord });
+    }
+  }
+
+  const costs = new Map<string, number>();
+  for (const [key, cost] of visited) {
+    if (cost > 0) {
+      costs.set(key, cost);
+    }
+  }
+  return costs;
+}
+
 export function findReachableTiles(
   state: BattleState,
   start: HexCoord,

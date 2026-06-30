@@ -15,7 +15,8 @@ import { startTurn } from '../systems/turn/apply';
 import { createTurnOrder, findNextLivingCombatant } from '../systems/turn/validate';
 
 export interface CreateBattleInput {
-  readonly player: Combatant;
+  readonly player?: Combatant;
+  readonly party?: readonly Combatant[];
   readonly enemies: readonly Combatant[];
   readonly grid?: Grid;
   readonly gridSize?: { readonly width: number; readonly height: number };
@@ -29,11 +30,21 @@ export type CreateBattleResult =
   | { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] }
   | { readonly ok: false; readonly error: BattleError };
 
+function resolveParty(input: CreateBattleInput): Combatant[] {
+  if (input.party && input.party.length > 0) {
+    return [...input.party];
+  }
+  if (input.player) {
+    return [input.player];
+  }
+  return [];
+}
+
 function validateBattleSetup(
-  player: Combatant,
+  party: readonly Combatant[],
   enemies: readonly Combatant[],
 ): Result<void, BattleError> {
-  if (player.team !== 'player') {
+  if (party.length === 0) {
     return err({ code: 'InvalidBattleSetup' });
   }
 
@@ -41,7 +52,17 @@ function validateBattleSetup(
     return err({ code: 'InvalidBattleSetup' });
   }
 
-  const ids = new Set<string>([player.id]);
+  const ids = new Set<string>();
+  for (const member of party) {
+    if (member.team !== 'player') {
+      return err({ code: 'InvalidBattleSetup' });
+    }
+    if (ids.has(member.id)) {
+      return err({ code: 'InvalidBattleSetup' });
+    }
+    ids.add(member.id);
+  }
+
   for (const enemy of enemies) {
     if (enemy.team !== 'enemy') {
       return err({ code: 'InvalidBattleSetup' });
@@ -56,7 +77,8 @@ function validateBattleSetup(
 }
 
 export function createBattle(input: CreateBattleInput): CreateBattleResult {
-  const validation = validateBattleSetup(input.player, input.enemies);
+  const party = resolveParty(input);
+  const validation = validateBattleSetup(party, input.enemies);
   if (!validation.ok) {
     return { ok: false, error: validation.error };
   }
@@ -66,14 +88,17 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
   const seed = input.seed ?? 0;
   const createdAt = input.createdAt ?? 0;
   const grid = input.grid ?? createGrid(input.gridSize ?? { width: 8, height: 8 });
+  const playerId = party[0]!.id;
 
   const combatantMap = new Map<string, Combatant>();
-  combatantMap.set(input.player.id, input.player);
+  for (const member of party) {
+    combatantMap.set(member.id, member);
+  }
   for (const enemy of input.enemies) {
     combatantMap.set(enemy.id, enemy);
   }
 
-  const turnOrder = createTurnOrder(input.player, input.enemies);
+  const turnOrder = createTurnOrder(party, input.enemies);
   const first = findNextLivingCombatant(
     {
       battleId,
@@ -81,7 +106,7 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
       turn: 0,
       seed,
       createdAt,
-      playerId: input.player.id,
+      playerId,
       activeCombatantId: null,
       combatants: combatantMap,
       grid,
@@ -100,7 +125,7 @@ export function createBattle(input: CreateBattleInput): CreateBattleResult {
     turn: first?.turnIndex ?? 0,
     seed,
     createdAt,
-    playerId: input.player.id,
+    playerId,
     activeCombatantId: first?.combatantId ?? null,
     combatants: combatantMap,
     grid,

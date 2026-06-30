@@ -12,3 +12,4 @@ export * from './shadows';
 export * from './animation';
 export * from './zIndex';
 export * from './game';
+export * from './battle';

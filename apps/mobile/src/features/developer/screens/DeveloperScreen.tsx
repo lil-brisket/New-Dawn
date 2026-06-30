@@ -59,6 +59,11 @@ export function DeveloperScreen() {
         </View>
 
         <Button
+          title="Battle Sandbox"
+          onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_BATTLE_SANDBOX)}
+          accessibilityLabel="Open battle sandbox"
+        />
+        <Button
           title="Component Playground"
           onPress={() => NavigationService.navigate(ROUTES.DEVELOPER_COMPONENT_PLAYGROUND)}
           accessibilityLabel="Open component playground"

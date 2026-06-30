@@ -1,21 +1,8 @@
 import { spacing } from './spacing';
 import { sizes } from './sizes';
-import { icons } from './icons';
 
 /** RPG domain tokens — separate from generic design system */
 export const game = {
-  battle: {
-    hexSize: 18,
-    gridSpacing: spacing.sm,
-    movementRangeOpacity: 0.32,
-    attackRangeOpacity: 0.48,
-    floatingDamageOffset: { x: 0, y: -12 },
-    actionBarHeight: sizes.bottomNav,
-    healthBarHeight: sizes.progressBar.sm,
-    healthBarHeightLg: sizes.progressBar.md,
-    statusEffectIconSize: icons.sm,
-    floatingCombatTextSize: 14,
-  },
   inventory: {
     slotSize: sizes.inventorySlot,
     equipmentSlotSize: 80,
