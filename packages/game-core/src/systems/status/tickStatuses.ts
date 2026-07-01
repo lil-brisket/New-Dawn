@@ -1,6 +1,7 @@
 import type { DefinitionRegistry } from '@dawn/game-data';
 import type { BattleEvent, BattleState, StatusInstance } from '@dawn/types';
-import { withHp, withStatuses } from '../../entities/Combatant';
+import { withStatuses } from '../../entities/Combatant';
+import { applyIncomingDamage } from '../combat/resolveIncomingDamage';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
 import { updateMap } from '../../utils/immutable';
@@ -56,25 +57,38 @@ export function tickStatuses(
       const damage = perStack * instance.stacks;
       if (damage <= 0) continue;
 
-      const newHp = current.hp - damage;
-      current = withHp(current, newHp);
+      const result = applyIncomingDamage(current, damage, false);
+      current = result.combatant;
 
       events.push({
         type: 'status_tick',
         targetId: combatantId,
         statusId: instance.statusDefinitionId,
-        damage,
+        damage: result.hpDamage + result.shieldDamage,
       });
 
-      events.push({
-        type: 'damage_dealt',
-        sourceId: instance.sourceId,
-        targetId: combatantId,
-        amount: damage,
-        reason: 'status',
-        statusId: instance.statusDefinitionId,
-        element: behavior.element,
-      });
+      if (result.hpDamage > 0) {
+        events.push({
+          type: 'damage_dealt',
+          sourceId: instance.sourceId,
+          targetId: combatantId,
+          amount: result.hpDamage,
+          reason: 'status',
+          statusId: instance.statusDefinitionId,
+          element: behavior.element,
+        });
+      }
+
+      if (result.shieldDamage > 0) {
+        events.push({
+          type: 'damage_dealt',
+          sourceId: instance.sourceId,
+          targetId: combatantId,
+          amount: result.shieldDamage,
+          reason: 'shield',
+          statusId: instance.statusDefinitionId,
+        });
+      }
 
       if (!isCombatantAlive(current)) {
         break;

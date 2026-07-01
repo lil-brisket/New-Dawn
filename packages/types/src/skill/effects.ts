@@ -6,6 +6,8 @@ export interface DamageEffect {
   type: 'damage';
   element: ElementType;
   value: StatFormula;
+  /** Pure damage that ignores mitigation and breaks shields. */
+  pierce?: boolean;
 }
 
 export interface HealEffect {
@@ -34,6 +36,13 @@ export interface BuffEffect {
   applicationFormula?: ApplicationFormula;
 }
 
+export interface ShieldEffect {
+  type: 'shield';
+  value: StatFormula;
+  /** Turns the shield lasts (max 2). */
+  duration?: number;
+}
+
 export interface SummonEffect {
   type: 'summon';
   entityDefinitionId: string;
@@ -41,6 +50,12 @@ export interface SummonEffect {
 }
 
 export type SkillEffect =
-  DamageEffect | HealEffect | MoveEffect | TeleportEffect | BuffEffect | SummonEffect;
+  | DamageEffect
+  | HealEffect
+  | MoveEffect
+  | TeleportEffect
+  | BuffEffect
+  | ShieldEffect
+  | SummonEffect;
 
 export type { CombatStatId, StatFormula, DurationFormula, ApplicationFormula };

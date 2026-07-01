@@ -1,6 +1,6 @@
 import type { ElementType, EquipmentSlot, ItemRarity } from '../common';
 import type { SkillEffect } from '../skill/effects';
-import type { TargetSelector } from '../skill/targeting';
+import type { TargetSelector, SkillShapeType } from '../skill/targeting';
 import type { ApplicationFormula, CombatStatId, DurationFormula, StatFormula } from '../scaling';
 
 export type StatModMode = 'flat' | 'percent';
@@ -49,6 +49,7 @@ export interface SkillDefinition extends ContentMetadata {
   cooldown: number;
   effects: SkillEffect[];
   targeting: TargetSelector;
+  shapeType?: SkillShapeType;
   iconId: string;
   vfxId: string;
   sfxId: string;
@@ -95,7 +96,7 @@ export interface EnemyDefinition extends ContentMetadata {
 
 export type StatusBehavior =
   | { type: 'dot'; element: ElementType; damagePerTurn: StatFormula }
-  | { type: 'control'; effect: 'stun' }
+  | { type: 'control'; effect: 'stun' | 'bind' }
   | {
       type: 'stat_mod';
       stat: CombatStatId;
@@ -104,7 +105,7 @@ export type StatusBehavior =
     }
   | {
       type: 'trigger';
-      event: 'on_hit' | 'on_damaged' | 'on_turn_start';
+      event: 'on_hit' | 'on_damaged' | 'on_turn_start' | 'on_move' | 'on_attack';
       effect: SkillEffect;
     };
 

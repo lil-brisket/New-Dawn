@@ -1,48 +1,43 @@
 import type { ElementType } from '@dawn/types';
 
-export const ELEMENTS: ElementType[] = [
-  'physical',
-  'fire',
-  'ice',
-  'lightning',
-  'wind',
-  'earth',
-  'light',
-  'dark',
+/** Elements shown in skill/status metadata editors. */
+export const EDITOR_ELEMENTS: { value: ElementType; label: string }[] = [
+  { value: 'fire', label: 'Fire' },
+  { value: 'ice', label: 'Water' },
+  { value: 'wind', label: 'Wind' },
+  { value: 'earth', label: 'Earth' },
+  { value: 'lightning', label: 'Lightning' },
 ];
 
-export const ELEMENT_EMOJI: Record<ElementType, string> = {
-  physical: '⚔',
+export const ELEMENTS: ElementType[] = EDITOR_ELEMENTS.map((e) => e.value);
+
+/** Elements for damage/DOT effects, including no element. */
+export const EFFECT_ELEMENT_OPTIONS: { value: ElementType | ''; label: string }[] = [
+  { value: '', label: 'None' },
+  ...EDITOR_ELEMENTS,
+];
+
+export const ELEMENT_EMOJI: Partial<Record<ElementType, string>> = {
   fire: '🔥',
-  ice: '❄',
-  lightning: '⚡',
+  ice: '💧',
   wind: '💨',
   earth: '🪨',
-  light: '✨',
-  dark: '☠',
+  lightning: '⚡',
 };
 
-export const RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
-
-export const SKILL_CATEGORIES = ['physical', 'magic', 'support', 'misc'] as const;
-
-export const AREA_FILTERS = [
-  { value: 'enemy', label: 'Enemy Only' },
-  { value: 'ally', label: 'Ally Only' },
-  { value: 'all', label: 'All' },
+export const SHAPE_TYPES = [
+  { value: 'line', label: 'Line' },
+  { value: 'aoe', label: 'AoE' },
+  { value: 'cone', label: 'Cone' },
 ] as const;
 
-export const AREA_CENTERS = [
-  { value: 'unit', label: 'Target Unit' },
-  { value: 'tile', label: 'Target Tile' },
-] as const;
+export type ShapeType = (typeof SHAPE_TYPES)[number]['value'];
 
 export const TARGET_TYPES = [
   { value: 'single_enemy', label: 'Single Enemy' },
   { value: 'single_ally', label: 'Single Ally' },
   { value: 'self', label: 'Self' },
   { value: 'tile', label: 'Tile' },
-  { value: 'area', label: 'Area' },
 ] as const;
 
 export const STAT_MOD_MODES = [
@@ -54,33 +49,25 @@ export const TRIGGER_EVENTS = [
   { value: 'on_hit', label: 'On Hit' },
   { value: 'on_damaged', label: 'On Damaged' },
   { value: 'on_turn_start', label: 'On Turn Start' },
+  { value: 'on_move', label: 'On Move' },
+  { value: 'on_attack', label: 'On Attack' },
 ] as const;
 
 export const EFFECT_TYPES = [
-  'damage',
-  'heal',
-  'apply_status',
-  'move',
-  'teleport',
-  'summon',
+  { value: 'damage', label: 'Damage' },
+  { value: 'heal', label: 'Heal' },
+  { value: 'apply_status', label: 'Status' },
+  { value: 'shield', label: 'Shield' },
+  { value: 'move', label: 'Move' },
+  { value: 'summon', label: 'Summon' },
 ] as const;
 
-export const BEHAVIOR_TYPES = ['dot', 'stat_mod', 'control', 'trigger'] as const;
-
-export const COMMON_TAGS: { tag: string; color: string }[] = [
-  { tag: 'movement', color: '#5b9bd5' },
-  { tag: 'aoe', color: '#e67e22' },
-  { tag: 'fire', color: '#e74c3c' },
-  { tag: 'debuff', color: '#9b59b6' },
-  { tag: 'buff', color: '#2ecc71' },
-  { tag: 'boss', color: '#f1c40f' },
-  { tag: 'heal', color: '#1abc9c' },
-  { tag: 'control', color: '#95a5a6' },
-];
-
-export const TAG_COLORS: Record<string, string> = Object.fromEntries(
-  COMMON_TAGS.map(({ tag, color }) => [tag, color]),
-);
+export const BEHAVIOR_TYPES = [
+  { value: 'dot', label: 'DoT' },
+  { value: 'stat_mod', label: 'Stat Mod' },
+  { value: 'control', label: 'Control' },
+  { value: 'trigger', label: 'Trigger' },
+] as const;
 
 export const RESOURCE_TYPES = [
   { value: 'hp', label: 'HP' },
@@ -90,4 +77,12 @@ export const RESOURCE_TYPES = [
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number]['value'];
 
-export const SKILL_MINIMUM_HP_AFTER_COST = 1;
+export const ID_PATTERNS: Record<'skills' | 'statuses', RegExp> = {
+  skills: /^skill_[a-z0-9_]+$/,
+  statuses: /^status_[a-z0-9_]+$/,
+};
+
+export const ID_PATTERN_HINTS: Record<'skills' | 'statuses', string> = {
+  skills: 'skill_snake_case (e.g. skill_fireball)',
+  statuses: 'status_snake_case (e.g. status_burn)',
+};

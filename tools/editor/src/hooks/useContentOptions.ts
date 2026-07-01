@@ -18,10 +18,12 @@ export function useStatusOptions(): ContentRefOption[] {
     listContent('statuses')
       .then((list) =>
         setStatuses(
-          list.map((s) => ({
-            id: s.id,
-            name: s.name,
-          })),
+          list
+            .map((s) => ({
+              id: s.id,
+              name: s.name,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name)),
         ),
       )
       .catch(console.error);

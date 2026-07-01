@@ -13,7 +13,14 @@ import type { Plugin, ViteDevServer } from 'vite';
 import {
   computeDashboardStats,
   enemyToAuthoringJson,
+  migrateContent,
+  normalizeEnemy,
+  normalizeSkill,
+  normalizeStatus,
   processContent,
+  rawEnemySchema,
+  rawSkillSchema,
+  rawStatusSchema,
   skillToAuthoringJson,
   statusToAuthoringJson,
   type ContentDomain,
@@ -155,9 +162,18 @@ export function contentApiPlugin(repoRoot: string): Plugin {
                   : processed.enemies;
             const list = files.map((f) => {
               const norm = normalized.find((n) => n.id === f.id);
+              let name = norm?.name;
+              if (!name) {
+                try {
+                  const raw = JSON.parse(readFileSync(f.filePath, 'utf-8')) as { name?: string };
+                  name = raw.name;
+                } catch {
+                  /* use id fallback */
+                }
+              }
               return {
                 ...f,
-                name: norm?.name ?? f.id,
+                name: name ?? f.id,
                 category: (norm as { category?: string })?.category,
               };
             });
@@ -232,30 +248,50 @@ export function contentApiPlugin(repoRoot: string): Plugin {
             domain: ContentDomain;
             data: Record<string, unknown>;
           };
-          const processed = processContent(contentRoot);
+          const migrated = migrateContent(data);
           if (domain === 'skills') {
-            const norm = processed.skills.find((s) => s.id === data.id);
-            if (!norm) throw new Error('Skill not found');
+            const raw = rawSkillSchema.parse(migrated);
+            const normalized = normalizeSkill(raw);
             res.setHeader('Content-Type', 'application/json');
-            res.end(skillToAuthoringJson(norm, data as never));
+            res.end(skillToAuthoringJson(normalized, raw));
             return;
           }
           if (domain === 'statuses') {
-            const norm = processed.statuses.find((s) => s.id === data.id);
-            if (!norm) throw new Error('Status not found');
+            const raw = rawStatusSchema.parse(migrated);
+            const normalized = normalizeStatus(raw);
             res.setHeader('Content-Type', 'application/json');
-            res.end(statusToAuthoringJson(norm));
+            res.end(statusToAuthoringJson(normalized));
             return;
           }
-          const norm = processed.enemies.find((e) => e.id === data.id);
-          if (!norm) throw new Error('Enemy not found');
+          const raw = rawEnemySchema.parse(migrated);
+          const normalized = normalizeEnemy(raw);
           res.setHeader('Content-Type', 'application/json');
-          res.end(enemyToAuthoringJson(norm));
+          res.end(enemyToAuthoringJson(normalized));
           return;
         }
 
         if (parts[0] === 'api' && parts[1] === 'assets') {
           const type = parts[2];
+          if (!type) {
+            res.statusCode = 404;
+            res.end();
+            return;
+          }
+
+          if (parts[3] === 'list') {
+            const dir = join(assetsRoot, type);
+            const ids: string[] = [];
+            if (existsSync(dir)) {
+              for (const entry of readdirSync(dir)) {
+                const match = entry.match(/^(.+)\.(png|webp|svg|jpg|jpeg)$/i);
+                if (match) ids.push(match[1]!);
+              }
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(ids.sort()));
+            return;
+          }
+
           const id = parts[3];
           if (!type || !id) {
             res.statusCode = 404;

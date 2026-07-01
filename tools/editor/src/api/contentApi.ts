@@ -86,3 +86,9 @@ export async function stripDefaults(
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
+export async function listAssets(type: string): Promise<string[]> {
+  const res = await fetch(`/api/assets/${type}/list`);
+  if (!res.ok) return [];
+  return res.json();
+}

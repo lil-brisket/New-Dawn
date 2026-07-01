@@ -1,9 +1,8 @@
-import type { StatFormula, FormulaTerm } from '@dawn/types';
-import { NumberField } from './NumberField';
-import { EnumSelect } from './EnumSelect';
+import type { StatFormula } from '@dawn/types';
 import { useCombatStatOptions } from '../../hooks/useCombatStats';
-
-const TERM_SOURCES = ['stat', 'stacks', 'level', 'missing_hp', 'hp_percent', 'distance'] as const;
+import { EnumSelect } from './EnumSelect';
+import { NumberField } from './NumberField';
+import { btnGhost, field, fieldGrid, sectionTitle } from './styles';
 
 const DEFAULT_FORMULA: StatFormula = {
   base: 0,
@@ -22,16 +21,16 @@ export function FormulaEditor({
   const formula = value ?? DEFAULT_FORMULA;
   const statOptions = useCombatStatOptions();
 
-  const updateTerm = (index: number, term: FormulaTerm) => {
+  const updateTerm = (index: number, key: string) => {
     const terms = [...formula.terms];
-    terms[index] = term;
+    terms[index] = { source: 'stat', key, ratio: 1 };
     onChange({ ...formula, terms });
   };
 
   const addTerm = () => {
     onChange({
       ...formula,
-      terms: [...formula.terms, { source: 'stat', key: statOptions[0] ?? 'attack', ratio: 0 }],
+      terms: [...formula.terms, { source: 'stat', key: statOptions[0] ?? 'attack', ratio: 1 }],
     });
   };
 
@@ -40,63 +39,36 @@ export function FormulaEditor({
   };
 
   return (
-    <fieldset style={{ border: '1px solid #333', borderRadius: 6, padding: 12, marginTop: 8 }}>
-      <legend>{label}</legend>
+    <div style={{ marginTop: 8 }}>
+      <h4 style={{ ...sectionTitle, marginBottom: 8 }}>{label}</h4>
       <NumberField
         label="Base"
         value={formula.base}
         step={1}
         onChange={(base) => onChange({ ...formula, base })}
       />
-      <div style={{ marginTop: 8 }}>
-        <strong style={{ fontSize: 13 }}>Terms</strong>
+      <div style={{ marginTop: 12 }}>
+        <span style={{ fontSize: 12, color: '#9aa0b4' }}>Stat terms</span>
         {formula.terms.map((term, index) => (
-          <div
-            key={index}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr auto',
-              gap: 8,
-              marginTop: 8,
-              alignItems: 'end',
-            }}
-          >
-            <label style={{ fontSize: 13 }}>
-              Source
+          <div key={index} style={{ ...fieldGrid, marginTop: 8, alignItems: 'end' }}>
+            <label style={field}>
+              Stat
               <EnumSelect
-                value={term.source}
-                options={[...TERM_SOURCES]}
-                onChange={(v) => v && updateTerm(index, { ...term, source: v })}
+                value={term.key}
+                options={statOptions}
+                onChange={(v) => v && updateTerm(index, v)}
               />
             </label>
-            <label style={{ fontSize: 13 }}>
-              Key
-              {term.source === 'stat' ? (
-                <EnumSelect
-                  value={term.key}
-                  options={statOptions}
-                  onChange={(v) => v && updateTerm(index, { ...term, key: v })}
-                />
-              ) : (
-                <input value={term.key} disabled style={{ opacity: 0.5 }} />
-              )}
-            </label>
-            <NumberField
-              label="Ratio"
-              value={term.ratio}
-              step={0.05}
-              onChange={(ratio) => updateTerm(index, { ...term, ratio })}
-            />
-            <button type="button" onClick={() => removeTerm(index)}>
-              ×
+            <button type="button" style={btnGhost} onClick={() => removeTerm(index)}>
+              Remove
             </button>
           </div>
         ))}
-        <button type="button" style={{ marginTop: 8 }} onClick={addTerm}>
-          + Add term
+        <button type="button" style={{ ...btnGhost, marginTop: 8 }} onClick={addTerm}>
+          + Add stat
         </button>
       </div>
-    </fieldset>
+    </div>
   );
 }
 
@@ -113,26 +85,24 @@ export function DurationFormulaEditor({
   const enabled = value !== undefined;
 
   return (
-    <fieldset style={{ border: '1px solid #333', borderRadius: 6, padding: 12, marginTop: 8 }}>
-      <legend>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(e) => {
-              if (e.target.checked) {
-                onChange({ stat: statOptions[0] ?? 'willpower', ratio: 0.01 });
-              } else {
-                onClear?.();
-              }
-            }}
-          />
-          Duration scaling
-        </label>
-      </legend>
+    <div style={{ marginTop: 12 }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => {
+            if (e.target.checked) {
+              onChange({ stat: statOptions[0] ?? 'willpower', ratio: 0.01 });
+            } else {
+              onClear?.();
+            }
+          }}
+        />
+        Duration scaling
+      </label>
       {enabled && value && (
-        <>
-          <label style={{ fontSize: 13 }}>
+        <div style={fieldGrid}>
+          <label style={field}>
             Stat
             <EnumSelect
               value={value.stat}
@@ -141,19 +111,14 @@ export function DurationFormulaEditor({
             />
           </label>
           <NumberField
-            label="Ratio"
-            value={value.ratio}
-            step={0.01}
-            onChange={(ratio) => onChange({ ...value, ratio })}
-          />
-          <NumberField
-            label="Max bonus (optional)"
+            label="Max bonus turns (optional)"
             value={value.maxBonus ?? 0}
             step={1}
+            min={0}
             onChange={(maxBonus) => onChange({ ...value, maxBonus: maxBonus || undefined })}
           />
-        </>
+        </div>
       )}
-    </fieldset>
+    </div>
   );
 }

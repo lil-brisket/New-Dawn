@@ -7,6 +7,7 @@ import { getBattleRng } from '../../utils/battleRng';
 import { createAbilityContext } from './AbilityContext';
 import { resolveEffect, resolveChargeSkill } from './effects';
 import { resolveSkillTargets } from './targeting';
+import { dispatchStatusTriggers } from '../status/dispatchTriggers';
 
 export interface SkillCalculation {
   readonly state: BattleState;
@@ -62,6 +63,16 @@ export function calculateSkill(
     }
     resolveEffect(effect, ctx);
   }
+
+  const attackTriggers = dispatchStatusTriggers(
+    ctx.battle,
+    action.combatantId,
+    'on_attack',
+    registry,
+    getBattleRng(state),
+  );
+  ctx.battle = attackTriggers.state;
+  ctx.events.push(...attackTriggers.events);
 
   const targetIds = targets.map((t) => t.id);
   ctx.events.unshift({

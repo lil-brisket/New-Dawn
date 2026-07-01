@@ -16,23 +16,25 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
-import type { SkillEffect } from '@dawn/types';
+import type { ElementType, SkillEffect } from '@dawn/types';
 import { EFFECT_TYPES } from '../fields/constants';
 import { EnumSelect } from '../fields/EnumSelect';
+import { btnGhost } from '../fields/styles';
 import {
   ApplyStatusEffectEditor,
   DamageEffectEditor,
   HealEffectEditor,
   RangeEffectEditor,
   SummonEffectEditor,
+  ShieldEffectEditor,
   createDefaultEffect,
 } from './editors';
 
 const block: React.CSSProperties = {
   background: '#252530',
-  borderRadius: 8,
-  marginBottom: 8,
-  border: '1px solid #333',
+  borderRadius: 10,
+  marginBottom: 10,
+  border: '1px solid #2e2e3a',
 };
 
 function EffectFields({
@@ -51,11 +53,14 @@ function EffectFields({
   if (effect.type === 'apply_status') {
     return <ApplyStatusEffectEditor effect={effect} onChange={onChange} />;
   }
-  if (effect.type === 'move' || effect.type === 'teleport') {
+  if (effect.type === 'move') {
     return <RangeEffectEditor effect={effect} onChange={onChange} />;
   }
   if (effect.type === 'summon') {
     return <SummonEffectEditor effect={effect} onChange={onChange} />;
+  }
+  if (effect.type === 'shield') {
+    return <ShieldEffectEditor effect={effect} onChange={onChange} />;
   }
   return <span>{(effect as SkillEffect).type}</span>;
 }
@@ -86,6 +91,8 @@ function SortableBlock({
     transition,
   };
 
+  const typeLabel = EFFECT_TYPES.find((t) => t.value === effect.type)?.label ?? effect.type;
+
   return (
     <div ref={setNodeRef} style={style}>
       <div
@@ -93,38 +100,39 @@ function SortableBlock({
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          padding: '8px 12px',
-          borderBottom: collapsed ? undefined : '1px solid #333',
+          padding: '10px 14px',
+          borderBottom: collapsed ? undefined : '1px solid #2e2e3a',
         }}
       >
         <span {...attributes} {...listeners} style={{ cursor: 'grab', color: '#666' }}>
           ⠿
         </span>
         <strong>{index + 1}.</strong>
-        <span style={{ flex: 1, textTransform: 'capitalize' }}>
-          {effect.type.replace('_', ' ')}
-        </span>
-        <button type="button" onClick={onToggle}>
+        <span style={{ flex: 1 }}>{typeLabel}</span>
+        <button type="button" style={btnGhost} onClick={onToggle}>
           {collapsed ? '▸' : '▾'}
         </button>
-        <button type="button" onClick={onDuplicate}>
+        <button type="button" style={btnGhost} onClick={onDuplicate}>
           Duplicate
         </button>
-        <button type="button" onClick={onDelete}>
+        <button type="button" style={btnGhost} onClick={onDelete}>
           Delete
         </button>
       </div>
       {!collapsed && (
-        <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label>
-            Type{' '}
+        <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            Type
             <EnumSelect
-              value={effect.type}
+              value={effect.type === 'teleport' ? 'move' : effect.type}
               options={[...EFFECT_TYPES]}
-              onChange={(t) => t && onChange(createDefaultEffect(t))}
+              onChange={(t) => t && onChange(createDefaultEffect(t, skillElement))}
             />
           </label>
-          <EffectFields effect={effect} onChange={onChange} />
+          <EffectFields
+            effect={effect.type === 'teleport' ? { type: 'move', range: effect.range } : effect}
+            onChange={onChange}
+          />
         </div>
       )}
     </div>
@@ -135,10 +143,12 @@ export function EffectBuilder({
   effects,
   onChange,
   single = false,
+  skillElement,
 }: {
   effects: SkillEffect[];
   onChange: (effects: SkillEffect[]) => void;
   single?: boolean;
+  skillElement?: ElementType;
 }) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
   const [addType, setAddType] = useState<SkillEffect['type']>('damage');
@@ -155,24 +165,24 @@ export function EffectBuilder({
     onChange(arrayMove(effects, oldIndex, newIndex));
   };
 
-  const collapseAll = () => {
-    const next: Record<number, boolean> = {};
-    effects.forEach((_, i) => {
-      next[i] = true;
-    });
-    setCollapsed(next);
-  };
-
-  const expandAll = () => setCollapsed({});
-
   return (
     <div>
       {effects.length > 1 && !single && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          <button type="button" onClick={collapseAll} style={{ fontSize: 12 }}>
+          <button
+            type="button"
+            style={btnGhost}
+            onClick={() => {
+              const next: Record<number, boolean> = {};
+              effects.forEach((_, i) => {
+                next[i] = true;
+              });
+              setCollapsed(next);
+            }}
+          >
             Collapse all
           </button>
-          <button type="button" onClick={expandAll} style={{ fontSize: 12 }}>
+          <button type="button" style={btnGhost} onClick={() => setCollapsed({})}>
             Expand all
           </button>
         </div>
@@ -208,7 +218,7 @@ export function EffectBuilder({
         </SortableContext>
       </DndContext>
       {!single && (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10 }}>
           <EnumSelect
             value={addType}
             options={[...EFFECT_TYPES]}
@@ -216,21 +226,19 @@ export function EffectBuilder({
           />
           <button
             type="button"
-            onClick={() => onChange([...effects, createDefaultEffect(addType)])}
-            style={{
-              padding: '8px 12px',
-              borderRadius: 6,
-              border: '1px dashed #555',
-              background: 'transparent',
-              color: '#8ab4f8',
-            }}
+            onClick={() => onChange([...effects, createDefaultEffect(addType, skillElement)])}
+            style={btnGhost}
           >
             + Add Effect
           </button>
         </div>
       )}
       {single && effects.length === 0 && (
-        <button type="button" onClick={() => onChange([createDefaultEffect('damage')])}>
+        <button
+          type="button"
+          style={btnGhost}
+          onClick={() => onChange([createDefaultEffect('damage', skillElement)])}
+        >
           + Add trigger effect
         </button>
       )}

@@ -1,4 +1,5 @@
 import type { ActionResult, BattleAction, BattleEvent, BattleState } from '@dawn/types';
+import { defaultRegistry } from '@dawn/game-data';
 import { validateMove } from '../systems/movement/validate';
 import { calculateMove } from '../systems/movement/calculate';
 import { applyMove } from '../systems/movement/apply';
@@ -46,7 +47,7 @@ export function dispatchAction(state: BattleState, action: BattleAction): Action
       const validation = validateMove(state, action);
       if (!validation.ok) return { ok: false, error: validation.error };
 
-      const calculated = calculateMove(state, action);
+      const calculated = calculateMove(state, action, defaultRegistry);
       const { state: newState, events } = applyMove(state, action, calculated);
       return finalizeState(newState, action, events);
     }

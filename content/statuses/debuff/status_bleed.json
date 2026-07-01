@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "id": "status_bleed",
+  "name": "Bleed",
+  "description": "Takes damage each turn, and when moving or attacking.",
+  "duration": 3,
+  "stackable": true,
+  "maxStacks": 3,
+  "behaviors": [
+    {
+      "type": "dot",
+      "element": "physical",
+      "damagePerTurn": {
+        "base": 5,
+        "terms": [{ "source": "stat", "key": "attack", "ratio": 0.1 }]
+      }
+    },
+    {
+      "type": "trigger",
+      "event": "on_move",
+      "effect": {
+        "type": "damage",
+        "element": "physical",
+        "value": { "base": 5, "terms": [{ "source": "stat", "key": "attack", "ratio": 0.1 }] }
+      }
+    },
+    {
+      "type": "trigger",
+      "event": "on_attack",
+      "effect": {
+        "type": "damage",
+        "element": "physical",
+        "value": { "base": 5, "terms": [{ "source": "stat", "key": "attack", "ratio": 0.1 }] }
+      }
+    }
+  ]
+}

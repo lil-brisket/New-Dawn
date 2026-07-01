@@ -1,15 +1,20 @@
 import type { DamageEffect } from '@dawn/types';
 import type { AbilityContext } from '../AbilityContext';
-import { withHp } from '../../../entities/Combatant';
 import { getCombatant } from '../../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../../queries/isCombatantAlive';
 import { updateMap } from '../../../utils/immutable';
 import { createEffectContext } from '../../scaling/EffectContext';
-import { resolveDamage } from '../../scaling/formulaPipeline';
+import { calculateOffense, resolveDamage } from '../../scaling/formulaPipeline';
+import {
+  applyIncomingDamage,
+  isAliveAfterDamage,
+  shieldAbsorbedEvent,
+} from '../../combat/resolveIncomingDamage';
 
 export function resolveDamageEffect(effect: DamageEffect, ctx: AbilityContext): void {
   const skillId = ctx.skill?.id;
   const combatStats = ctx.registry.getCombatStatsConfig();
+  const pierce = effect.pierce === true;
 
   for (const target of ctx.targets) {
     const liveTarget = getCombatant(ctx.battle, target.id);
@@ -25,25 +30,44 @@ export function resolveDamageEffect(effect: DamageEffect, ctx: AbilityContext): 
       skill: ctx.skill,
     });
 
-    const damage = resolveDamage(effect.value, effectCtx);
-    const updated = withHp(liveTarget, liveTarget.hp - damage);
+    const damage = pierce
+      ? Math.max(1, calculateOffense(effect.value, effectCtx))
+      : resolveDamage(effect.value, effectCtx);
+
+    const result = applyIncomingDamage(liveTarget, damage, pierce);
 
     ctx.battle = {
       ...ctx.battle,
-      combatants: updateMap(ctx.battle.combatants, target.id, updated),
+      combatants: updateMap(ctx.battle.combatants, target.id, result.combatant),
     };
 
-    ctx.events.push({
-      type: 'damage_dealt',
-      sourceId: ctx.source.id,
-      targetId: target.id,
-      amount: damage,
-      reason: 'skill',
-      skillId,
-      element: effect.element,
-    });
+    if (result.shieldsBroken) {
+      ctx.events.push({
+        type: 'shield_broken',
+        targetId: target.id,
+        sourceId: ctx.source.id,
+        skillId,
+      });
+    }
 
-    if (!isCombatantAlive(updated)) {
+    if (result.shieldDamage > 0) {
+      ctx.events.push(shieldAbsorbedEvent(target.id, result.shieldDamage, ctx.source.id));
+    }
+
+    if (result.hpDamage > 0) {
+      ctx.events.push({
+        type: 'damage_dealt',
+        sourceId: ctx.source.id,
+        targetId: target.id,
+        amount: result.hpDamage,
+        reason: 'skill',
+        skillId,
+        element: effect.element,
+        pierce,
+      });
+    }
+
+    if (!isAliveAfterDamage(result.combatant)) {
       ctx.events.push({
         type: 'combatant_killed',
         combatantId: target.id,

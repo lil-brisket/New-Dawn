@@ -17,6 +17,10 @@ export default defineConfig({
       '@dawn/content-pipeline': join(repoRoot, 'packages/content-pipeline/src'),
       '@dawn/content-pipeline/domains': join(repoRoot, 'packages/content-pipeline/src/domains.ts'),
       '@dawn/content-pipeline/schemas': join(repoRoot, 'packages/content-pipeline/src/schemas.ts'),
+      '@dawn/content-pipeline/migrations/v1-to-v2': join(
+        repoRoot,
+        'packages/content-pipeline/src/migrations/v1-to-v2.ts',
+      ),
       '@dawn/types': join(repoRoot, 'packages/types/src'),
       '@dawn/utils': join(repoRoot, 'packages/utils/src'),
     },

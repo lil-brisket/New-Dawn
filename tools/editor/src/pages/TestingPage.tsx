@@ -3,7 +3,7 @@ import {
   createBattle,
   createCombatant,
   createGrid,
-  createHex,
+  offsetToCube,
   dispatchAction,
 } from '@dawn/game-core';
 import { defaultRegistry } from '@dawn/game-data';
@@ -52,7 +52,7 @@ export function TestingPage() {
       id: 'player',
       name: 'Tester',
       team: 'player',
-      position: createHex(2, 3),
+      position: offsetToCube(2, 3),
       hp: 200,
       maxHp: 200,
       sp: 100,
@@ -68,7 +68,7 @@ export function TestingPage() {
       id: 'dummy',
       name: 'Training Dummy',
       team: 'enemy',
-      position: createHex(4, 3),
+      position: offsetToCube(4, 3),
       hp: 500,
       maxHp: 500,
       sp: 0,

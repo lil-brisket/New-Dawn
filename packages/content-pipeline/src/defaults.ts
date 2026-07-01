@@ -28,6 +28,7 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
     cooldown: 0,
     effects: [{ type: 'damage', element: 'physical', value: defaultDamageFormula }],
     targeting: { type: 'single_enemy', range: 1 },
+    shapeType: 'aoe',
     iconId: `icon_${slug}`,
     vfxId: `vfx_${slug}`,
     sfxId: `sfx_${slug}`,

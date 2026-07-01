@@ -69,3 +69,15 @@ export function withCooldown(combatant: Combatant, skillId: string, turns: numbe
     skillCooldowns: { ...combatant.skillCooldowns, [skillId]: turns },
   };
 }
+
+export function withShield(combatant: Combatant, shieldHp: number, shieldTurns: number): Combatant {
+  return {
+    ...combatant,
+    shieldHp: Math.max(0, shieldHp),
+    shieldTurns: Math.max(0, Math.min(2, shieldTurns)),
+  };
+}
+
+export function clearShield(combatant: Combatant): Combatant {
+  return { ...combatant, shieldHp: 0, shieldTurns: 0 };
+}

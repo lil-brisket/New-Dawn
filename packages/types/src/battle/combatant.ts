@@ -22,4 +22,7 @@ export interface Combatant {
   readonly skillIds: readonly string[];
   readonly statuses: readonly StatusInstance[];
   readonly skillCooldowns: Readonly<Record<string, number>>;
+  /** Bonus HP pool — damage is absorbed here before real HP. */
+  readonly shieldHp?: number;
+  readonly shieldTurns?: number;
 }

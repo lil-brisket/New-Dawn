@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "id": "status_defense_down",
+  "name": "Defense Down",
+  "description": "Reduces defense.",
+  "duration": 3,
+  "behaviors": [
+    {
+      "type": "stat_mod",
+      "stat": "defense",
+      "mode": "percent",
+      "value": { "base": -20, "terms": [] }
+    }
+  ]
+}

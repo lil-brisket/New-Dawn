@@ -4,6 +4,7 @@ import { restoreResources } from './restoreResources';
 import { updateMap } from '../../utils/immutable';
 import type { TurnCalculation } from './calculate';
 import { tickStatuses, decayStatuses, decrementCooldowns } from '../status/tickStatuses';
+import { decayShields } from '../status/dispatchTriggers';
 
 export interface TurnApplyResult {
   readonly state: BattleState;
@@ -27,6 +28,8 @@ export function applyEndTurn(
   const decayResult = decayStatuses(currentState, action.combatantId, defaultRegistry);
   currentState = decayResult.state;
   events.push(...decayResult.events);
+
+  currentState = decayShields(currentState, action.combatantId);
 
   currentState = decrementCooldowns(currentState, action.combatantId);
 

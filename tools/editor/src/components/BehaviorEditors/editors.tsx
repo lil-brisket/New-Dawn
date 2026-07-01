@@ -1,7 +1,8 @@
-import type { StatusBehavior } from '@dawn/types';
+import type { ElementType, StatusBehavior } from '@dawn/types';
 import { EnumSelect } from '../fields/EnumSelect';
 import { FormulaEditor } from '../fields/FormulaEditor';
-import { ELEMENTS, STAT_MOD_MODES, TRIGGER_EVENTS } from '../fields/constants';
+import { EFFECT_ELEMENT_OPTIONS, STAT_MOD_MODES, TRIGGER_EVENTS } from '../fields/constants';
+import { field } from '../fields/styles';
 import { useCombatStatOptions } from '../../hooks/useCombatStats';
 import { EffectBuilder } from '../EffectBuilder/EffectBuilder';
 
@@ -13,13 +14,13 @@ export function DotEditor({
   onChange: (b: StatusBehavior) => void;
 }) {
   return (
-    <>
-      <label>
-        Element{' '}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <label style={field}>
+        Element
         <EnumSelect
-          value={behavior.element}
-          options={[...ELEMENTS]}
-          onChange={(v) => v && onChange({ ...behavior, element: v })}
+          value={behavior.element ?? ''}
+          options={EFFECT_ELEMENT_OPTIONS}
+          onChange={(v) => onChange({ ...behavior, element: (v || 'fire') as ElementType })}
         />
       </label>
       <FormulaEditor
@@ -27,7 +28,7 @@ export function DotEditor({
         value={behavior.damagePerTurn}
         onChange={(damagePerTurn) => onChange({ ...behavior, damagePerTurn })}
       />
-    </>
+    </div>
   );
 }
 
@@ -39,11 +40,14 @@ export function ControlEditor({
   onChange: (b: StatusBehavior) => void;
 }) {
   return (
-    <label>
-      Effect{' '}
+    <label style={field}>
+      Effect
       <EnumSelect
         value={behavior.effect}
-        options={['stun']}
+        options={[
+          { value: 'stun', label: 'Stun' },
+          { value: 'bind', label: 'Bind' },
+        ]}
         onChange={(v) => v && onChange({ ...behavior, effect: v })}
       />
     </label>
@@ -60,17 +64,17 @@ export function StatModEditor({
   const statOptions = useCombatStatOptions();
 
   return (
-    <>
-      <label>
-        Stat{' '}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <label style={field}>
+        Stat
         <EnumSelect
           value={behavior.stat}
           options={statOptions}
           onChange={(v) => v && onChange({ ...behavior, stat: v })}
         />
       </label>
-      <label>
-        Mode{' '}
+      <label style={field}>
+        Mode
         <EnumSelect
           value={behavior.mode}
           options={[...STAT_MOD_MODES]}
@@ -82,7 +86,7 @@ export function StatModEditor({
         value={behavior.value}
         onChange={(value) => onChange({ ...behavior, value })}
       />
-    </>
+    </div>
   );
 }
 
@@ -94,17 +98,17 @@ export function TriggerEditor({
   onChange: (b: StatusBehavior) => void;
 }) {
   return (
-    <>
-      <label>
-        Event{' '}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <label style={field}>
+        Event
         <EnumSelect
           value={behavior.event}
           options={[...TRIGGER_EVENTS]}
           onChange={(v) => v && onChange({ ...behavior, event: v })}
         />
       </label>
-      <div style={{ marginTop: 8 }}>
-        <strong>Trigger effect</strong>
+      <div>
+        <span style={{ fontSize: 12, color: '#9aa0b4' }}>Trigger effect</span>
         <EffectBuilder
           single
           effects={[behavior.effect]}
@@ -114,7 +118,7 @@ export function TriggerEditor({
           }}
         />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -124,14 +128,14 @@ export function createDefaultBehavior(type: StatusBehavior['type']): StatusBehav
       return {
         type: 'dot',
         element: 'fire',
-        damagePerTurn: { base: 5, terms: [{ source: 'stat', key: 'attack', ratio: 0.2 }] },
+        damagePerTurn: { base: 5, terms: [{ source: 'stat', key: 'attack', ratio: 1 }] },
       };
     case 'stat_mod':
       return {
         type: 'stat_mod',
         stat: 'attack',
         mode: 'flat',
-        value: { base: 10, terms: [{ source: 'stat', key: 'willpower', ratio: 0.15 }] },
+        value: { base: 10, terms: [{ source: 'stat', key: 'willpower', ratio: 1 }] },
       };
     case 'control':
       return { type: 'control', effect: 'stun' };
@@ -142,7 +146,7 @@ export function createDefaultBehavior(type: StatusBehavior['type']): StatusBehav
         effect: {
           type: 'damage',
           element: 'fire',
-          value: { base: 0, terms: [{ source: 'stat', key: 'attack', ratio: 0.5 }] },
+          value: { base: 0, terms: [{ source: 'stat', key: 'attack', ratio: 1 }] },
         },
       };
   }

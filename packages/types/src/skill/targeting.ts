@@ -1,5 +1,7 @@
 import type { HexCoord } from '../battle/grid';
 
+export type SkillShapeType = 'line' | 'aoe' | 'cone';
+
 export interface SingleEnemyTarget {
   type: 'single_enemy';
   range: number;

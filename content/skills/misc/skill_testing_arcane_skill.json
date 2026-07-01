@@ -1,0 +1,27 @@
+{
+  "id": "skill_testing_arcane_skill",
+  "name": "Testing arcane skill",
+  "description": "Unleashes arcane energy around a foe, hitting nearby enemies.",
+  "spCost": 30,
+  "cooldown": 2,
+  "effects": [
+    {
+      "type": "damage",
+      "element": "physical",
+      "value": {
+        "base": 0,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 0.9
+          }
+        ]
+      }
+    }
+  ],
+  "targeting": {
+    "type": "single_enemy",
+    "range": 3
+  }
+}

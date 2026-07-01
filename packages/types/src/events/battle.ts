@@ -2,7 +2,7 @@ import type { ElementType } from '../common';
 import type { HexCoord } from '../battle/grid';
 import type { Team } from '../battle/team';
 
-export type ActionReason = 'attack' | 'skill' | 'status' | 'environment';
+export type ActionReason = 'attack' | 'skill' | 'status' | 'environment' | 'shield';
 
 export interface CombatantMovedEvent {
   readonly type: 'combatant_moved';
@@ -20,6 +20,7 @@ export interface DamageDealtEvent {
   readonly skillId?: string;
   readonly element?: ElementType;
   readonly statusId?: string;
+  readonly pierce?: boolean;
 }
 
 export interface HealAppliedEvent {
@@ -59,6 +60,22 @@ export interface StatusTickEvent {
   readonly damage?: number;
 }
 
+export interface ShieldAppliedEvent {
+  readonly type: 'shield_applied';
+  readonly sourceId: string;
+  readonly targetId: string;
+  readonly amount: number;
+  readonly turns: number;
+  readonly skillId?: string;
+}
+
+export interface ShieldBrokenEvent {
+  readonly type: 'shield_broken';
+  readonly targetId: string;
+  readonly sourceId: string;
+  readonly skillId?: string;
+}
+
 export interface CombatantKilledEvent {
   readonly type: 'combatant_killed';
   readonly combatantId: string;
@@ -89,6 +106,8 @@ export type BattleEvent =
   | StatusAppliedEvent
   | StatusRemovedEvent
   | StatusTickEvent
+  | ShieldAppliedEvent
+  | ShieldBrokenEvent
   | CombatantKilledEvent
   | TurnStartedEvent
   | TurnEndedEvent

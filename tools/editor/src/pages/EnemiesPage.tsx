@@ -6,6 +6,7 @@ export function EnemiesPage() {
     <ContentEditorLayout
       domain="enemies"
       title="Enemies"
+      showReferences
       renderForm={(draft, onChange) => <EnemyForm draft={draft} onChange={onChange} />}
     />
   );

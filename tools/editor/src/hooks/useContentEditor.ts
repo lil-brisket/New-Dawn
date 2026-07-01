@@ -10,7 +10,9 @@ import {
   type ContentListItem,
 } from '../api/contentApi';
 import { useUndoRedo } from '../history/useUndoRedo';
+import { validateContentId } from '../components/fields/IdField';
 import { upgradeDraft } from '../utils/upgradeDraft';
+import { nameToContentId } from '../utils/contentId';
 
 export function useContentEditor(domain: ContentDomain) {
   const [items, setItems] = useState<ContentListItem[]>([]);
@@ -66,10 +68,23 @@ export function useContentEditor(domain: ContentDomain) {
     setMessage('');
     try {
       const upgraded = upgradeDraft(domain, draft);
+      const newId = String(upgraded.id);
+      if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, newId)) {
+        setMessage(validateContentId(domain, newId)!);
+        return;
+      }
       const stripped = await stripDefaults(domain, upgraded);
-      await saveContent(domain, selectedId, stripped);
-      await loadList();
-      clearHistory();
+      if (newId !== selectedId) {
+        await saveContent(domain, newId, stripped);
+        await deleteContent(domain, selectedId);
+        setSelectedId(newId);
+        await loadList();
+        await loadItem(newId);
+      } else {
+        await saveContent(domain, selectedId, stripped);
+        await loadList();
+        await loadItem(selectedId);
+      }
       setMessage('Saved & synced');
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Save failed');
@@ -79,20 +94,31 @@ export function useContentEditor(domain: ContentDomain) {
   };
 
   const handleNew = async () => {
-    const id = prompt(`New ${domain} id (e.g. skill_my_skill):`);
+    const name = prompt('Display name:');
+    if (!name?.trim()) return;
+    const id =
+      domain === 'skills' || domain === 'statuses'
+        ? nameToContentId(name, domain === 'skills' ? 'skill' : 'status')
+        : prompt(`New ${domain} id:`)?.trim();
     if (!id) return;
-    const name = prompt('Display name:') ?? id;
-    const category = prompt('Category folder (e.g. magic, physical):') ?? 'misc';
-    const base = upgradeDraft(domain, { id, name, category });
+    if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, id)) {
+      alert(validateContentId(domain, id));
+      return;
+    }
+    const base = upgradeDraft(domain, { id: id.trim(), name });
     await createContent(domain, base);
     await loadList();
-    await loadItem(id);
+    await loadItem(id.trim());
   };
 
   const handleDuplicate = async () => {
     if (!draft.id) return;
     const newId = prompt('Duplicate as id:', `${String(draft.id)}_copy`);
     if (!newId) return;
+    if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, newId)) {
+      alert(validateContentId(domain, newId));
+      return;
+    }
     const copy = upgradeDraft(domain, {
       ...draft,
       id: newId,

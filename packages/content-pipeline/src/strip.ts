@@ -61,6 +61,7 @@ export function stripSkillDefaults(
     cooldown: skill.cooldown,
     effects: skill.effects,
     targeting: skill.targeting,
+    shapeType: skill.shapeType,
     iconId: skill.iconId,
     vfxId: skill.vfxId,
     sfxId: skill.sfxId,

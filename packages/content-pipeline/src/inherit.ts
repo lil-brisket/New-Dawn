@@ -132,6 +132,7 @@ export function rawToDefaultSkill(id: string, name: string): RawSkill {
     cooldown: defaults.cooldown,
     effects: defaults.effects as RawSkill['effects'],
     targeting: defaults.targeting,
+    shapeType: defaults.shapeType,
     iconId: defaults.iconId,
     vfxId: defaults.vfxId,
     sfxId: defaults.sfxId,

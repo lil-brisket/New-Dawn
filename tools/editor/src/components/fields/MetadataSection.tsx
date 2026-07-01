@@ -1,78 +1,52 @@
 import type { ContentDomain } from '@dawn/content-pipeline/domains';
 import type { ElementType } from '@dawn/types';
-import { ELEMENTS, SKILL_CATEGORIES } from './constants';
-import { ContentRefSelect } from './ContentRefSelect';
+import type { SkillEffect } from '@dawn/types';
+import { EFFECT_ELEMENT_OPTIONS } from './constants';
+import { skillElementToDamageElement } from './elementUtils';
 import { EnumSelect } from './EnumSelect';
-import { TagSelect } from './TagSelect';
-import { field, input, sectionTitle } from './styles';
-import type { ContentRefOption } from './ContentRefSelect';
+import { IconField } from './IconField';
+import { field, fieldGrid, sectionCard, sectionTitle } from './styles';
 
 export function MetadataSection({
   draft,
   onChange,
-  inheritOptions,
-  inheritDomain,
 }: {
   draft: Record<string, unknown>;
   onChange: (d: Record<string, unknown>) => void;
-  inheritOptions?: ContentRefOption[];
-  inheritDomain?: ContentDomain;
 }) {
   const set = (key: string, value: unknown) => onChange({ ...draft, [key]: value });
-  const tags = (draft.tags as string[] | undefined) ?? [];
 
   return (
-    <section>
-      <h3 style={sectionTitle}>Metadata</h3>
-      <label style={field}>
-        Category
-        <EnumSelect
-          value={String(draft.category ?? '')}
-          options={[...SKILL_CATEGORIES]}
-          allowEmpty
-          onChange={(v) => set('category', v)}
-        />
-      </label>
-      <label style={field}>
-        Element
-        <EnumSelect
-          value={String(draft.element ?? '')}
-          options={[...ELEMENTS]}
-          allowEmpty
-          onChange={(v) => set('element', v)}
-        />
-      </label>
-      <TagSelect value={tags} onChange={(t) => set('tags', t)} />
-      <label style={field}>
-        Icon
-        <input
-          style={input}
-          value={String(draft.iconId ?? '')}
-          onChange={(e) => set('iconId', e.target.value)}
-          placeholder="icon_skill_name (Select Asset… later)"
-        />
-      </label>
-      {inheritOptions && inheritDomain && (
-        <ContentRefSelect
-          value={String(draft.inherits ?? '')}
-          options={inheritOptions}
-          allowEmpty
-          emptyLabel="(no inheritance)"
-          onChange={(id) => set('inherits', id)}
-        />
-      )}
-      {inheritOptions && !inheritDomain && (
+    <section style={sectionCard}>
+      <h3 style={sectionTitle}>Properties</h3>
+      <div style={fieldGrid}>
         <label style={field}>
-          Inherits
-          <input
-            style={input}
-            value={String(draft.inherits ?? '')}
-            onChange={(e) => set('inherits', e.target.value || undefined)}
+          Element
+          <EnumSelect
+            value={String(draft.element ?? '')}
+            options={EFFECT_ELEMENT_OPTIONS}
+            onChange={(v) => {
+              const element = (v || undefined) as ElementType | undefined;
+              const damageElement = skillElementToDamageElement(v as ElementType | '');
+              const effects = Array.isArray(draft.effects)
+                ? (draft.effects as SkillEffect[]).map((effect) =>
+                    effect.type === 'damage' ? { ...effect, element: damageElement } : effect,
+                  )
+                : draft.effects;
+              onChange({ ...draft, element, effects });
+            }}
           />
         </label>
-      )}
+      </div>
+      <IconField iconId={String(draft.iconId ?? '')} onChange={(iconId) => set('iconId', iconId)} />
     </section>
   );
 }
 
-export type { ElementType };
+// Keep domain in signature for call-site compatibility.
+export type MetadataSectionProps = {
+  draft: Record<string, unknown>;
+  onChange: (d: Record<string, unknown>) => void;
+  inheritOptions?: unknown;
+  inheritDomain?: ContentDomain;
+};

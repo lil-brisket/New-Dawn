@@ -5,6 +5,7 @@ import { resolveHealEffect } from './heal';
 import { resolveStatusEffect } from './status';
 import { resolveMoveEffect } from './move';
 import { resolveTeleportEffect } from './teleport';
+import { resolveShieldEffect } from './shield';
 import { resolveChargeEffect } from './charge';
 
 export function resolveEffect(effect: SkillEffect, ctx: AbilityContext): void {
@@ -25,6 +26,9 @@ export function resolveEffect(effect: SkillEffect, ctx: AbilityContext): void {
       resolveTeleportEffect(effect, ctx);
       break;
     case 'summon':
+      break;
+    case 'shield':
+      resolveShieldEffect(effect, ctx);
       break;
     default: {
       const _exhaustive: never = effect;

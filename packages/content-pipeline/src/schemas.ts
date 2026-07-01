@@ -58,11 +58,9 @@ export const contentMetadataSchema = z
   .partial();
 
 export function createFormulaSchemas(statIds: readonly string[]) {
-  const statIdSchema = z
-    .string()
-    .refine((id) => statIds.includes(id), {
-      message: `Unknown stat: must be one of ${statIds.join(', ')}`,
-    });
+  const statIdSchema = z.string().refine((id) => statIds.includes(id), {
+    message: `Unknown stat: must be one of ${statIds.join(', ')}`,
+  });
 
   const formulaTermSchema = z.object({
     source: formulaTermSource,
@@ -92,6 +90,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       type: z.literal('damage'),
       element: elementType,
       value: statFormulaSchema,
+      pierce: z.boolean().optional(),
     }),
     z.object({
       type: z.literal('heal'),
@@ -114,6 +113,11 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       duration: z.number().int().min(0).optional(),
       durationFormula: durationFormulaSchema.optional(),
       applicationFormula: applicationFormulaSchema.optional(),
+    }),
+    z.object({
+      type: z.literal('shield'),
+      value: statFormulaSchema,
+      duration: z.number().int().min(1).max(2).optional(),
     }),
     z.object({
       type: z.literal('summon'),
@@ -145,7 +149,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       }),
       z.object({
         type: z.literal('control'),
-        effect: z.literal('stun'),
+        effect: z.enum(['stun', 'bind']),
       }),
       z.object({
         type: z.literal('stat_mod'),
@@ -155,7 +159,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       }),
       z.object({
         type: z.literal('trigger'),
-        event: z.enum(['on_hit', 'on_damaged', 'on_turn_start']),
+        event: z.enum(['on_hit', 'on_damaged', 'on_turn_start', 'on_move', 'on_attack']),
         effect: skillEffectSchema,
       }),
     ]),
@@ -187,6 +191,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       cooldown: z.number().int().min(0).optional(),
       effects: z.array(skillEffectSchema).optional(),
       targeting: targetingSchema.optional(),
+      shapeType: z.enum(['line', 'aoe', 'cone']).optional(),
       iconId: z.string().optional(),
       vfxId: z.string().optional(),
       sfxId: z.string().optional(),

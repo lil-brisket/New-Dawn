@@ -32,6 +32,7 @@ export function normalizeSkill(raw: RawSkill, filePath?: string): SkillDefinitio
     cooldown: raw.cooldown ?? defaults.cooldown,
     effects: (raw.effects ?? defaults.effects) as SkillEffect[],
     targeting: raw.targeting ?? defaults.targeting,
+    shapeType: raw.shapeType ?? defaults.shapeType,
     iconId: raw.iconId ?? defaults.iconId,
     vfxId,
     sfxId,
