@@ -17,6 +17,7 @@ export * from './skill/simulation';
 export * from './equipment';
 export * from './inventory';
 export * from './status';
+export * from './scaling';
 export * from './guild';
 export * from './quest';
 export * from './world';

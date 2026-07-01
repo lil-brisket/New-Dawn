@@ -1,6 +1,9 @@
 import type { ElementType, EquipmentSlot, ItemRarity } from '../common';
 import type { SkillEffect } from '../skill/effects';
 import type { TargetSelector } from '../skill/targeting';
+import type { ApplicationFormula, CombatStatId, DurationFormula, StatFormula } from '../scaling';
+
+export type StatModMode = 'flat' | 'percent';
 
 /** Authoring metadata — normalized into definitions; engine may ignore until used. */
 export interface ContentMetadata {
@@ -21,8 +24,8 @@ export interface BaseStats {
   attack: number;
   defense: number;
   speed: number;
-  critRate: number;
-  critDamage: number;
+  willpower: number;
+  resistance: number;
 }
 
 export interface CharacterDefinition {
@@ -53,6 +56,7 @@ export interface SkillDefinition extends ContentMetadata {
   animationKey: string;
   /** Engine/display compat — set from sfxId during normalization */
   soundKey: string;
+  schemaVersion?: number;
 }
 
 export interface EquipmentDefinition {
@@ -86,18 +90,17 @@ export interface EnemyDefinition extends ContentMetadata {
   aiProfileId: string;
   lootTableId: string;
   element: ElementType;
+  schemaVersion?: number;
 }
 
-export type StatModMode = 'flat' | 'percent';
-
 export type StatusBehavior =
-  | { type: 'dot'; element: ElementType; damagePerStack: number }
+  | { type: 'dot'; element: ElementType; damagePerTurn: StatFormula }
   | { type: 'control'; effect: 'stun' }
   | {
       type: 'stat_mod';
-      stat: 'attack' | 'defense';
+      stat: CombatStatId;
       mode: StatModMode;
-      amountPerStack: number;
+      value: StatFormula;
     }
   | {
       type: 'trigger';
@@ -114,4 +117,7 @@ export interface StatusDefinition extends ContentMetadata {
   maxStacks: number;
   iconId: string;
   behaviors: StatusBehavior[];
+  applicationFormula?: ApplicationFormula;
+  durationFormula?: DurationFormula;
+  schemaVersion?: number;
 }

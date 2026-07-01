@@ -6,6 +6,7 @@ import { StatusesPage } from './pages/StatusesPage';
 import { EnemiesPage } from './pages/EnemiesPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { TestingPage } from './pages/TestingPage';
+import { CombatStatsPage } from './pages/CombatStatsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 export function App() {
@@ -16,6 +17,7 @@ export function App() {
         <Route path="skills" element={<SkillsPage />} />
         <Route path="statuses" element={<StatusesPage />} />
         <Route path="enemies" element={<EnemiesPage />} />
+        <Route path="combat-stats" element={<CombatStatsPage />} />
         <Route path="characters" element={<PlaceholderPage title="Characters" />} />
         <Route path="items" element={<PlaceholderPage title="Items" />} />
         <Route path="equipment" element={<PlaceholderPage title="Equipment" />} />

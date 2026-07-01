@@ -2,8 +2,14 @@ import type { SkillEffect } from '@dawn/types';
 import { EnumSelect } from '../fields/EnumSelect';
 import { NumberField } from '../fields/NumberField';
 import { ContentRefSelect } from '../fields/ContentRefSelect';
+import { FormulaEditor, DurationFormulaEditor } from '../fields/FormulaEditor';
 import { ELEMENTS } from '../fields/constants';
 import { useStatusOptions } from '../../hooks/useContentOptions';
+
+const DEFAULT_DAMAGE_VALUE = {
+  base: 0,
+  terms: [{ source: 'stat' as const, key: 'attack', ratio: 1 }],
+};
 
 export function DamageEffectEditor({
   effect,
@@ -22,16 +28,10 @@ export function DamageEffectEditor({
           onChange={(v) => v && onChange({ ...effect, element: v })}
         />
       </label>
-      <NumberField
-        label="Multiplier"
-        value={effect.multiplier}
-        step={0.1}
-        onChange={(multiplier) => onChange({ ...effect, multiplier })}
-      />
-      <NumberField
-        label="Flat bonus"
-        value={effect.flatBonus ?? 0}
-        onChange={(flatBonus) => onChange({ ...effect, flatBonus: flatBonus || undefined })}
+      <FormulaEditor
+        label="Damage formula"
+        value={effect.value}
+        onChange={(value) => onChange({ ...effect, value })}
       />
     </>
   );
@@ -45,19 +45,11 @@ export function HealEffectEditor({
   onChange: (e: SkillEffect) => void;
 }) {
   return (
-    <>
-      <NumberField
-        label="Multiplier"
-        value={effect.multiplier}
-        step={0.1}
-        onChange={(multiplier) => onChange({ ...effect, multiplier })}
-      />
-      <NumberField
-        label="Flat bonus"
-        value={effect.flatBonus ?? 0}
-        onChange={(flatBonus) => onChange({ ...effect, flatBonus: flatBonus || undefined })}
-      />
-    </>
+    <FormulaEditor
+      label="Heal formula"
+      value={effect.value}
+      onChange={(value) => onChange({ ...effect, value })}
+    />
   );
 }
 
@@ -109,6 +101,14 @@ export function ApplyStatusEffectEditor({
           onChange={(duration) => onChange({ ...effect, duration })}
         />
       )}
+      <DurationFormulaEditor
+        value={effect.durationFormula}
+        onChange={(durationFormula) => onChange({ ...effect, durationFormula })}
+        onClear={() => {
+          const { durationFormula: _d, ...rest } = effect;
+          onChange(rest as SkillEffect);
+        }}
+      />
     </>
   );
 }
@@ -151,9 +151,12 @@ export function SummonEffectEditor({
 export function createDefaultEffect(type: SkillEffect['type']): SkillEffect {
   switch (type) {
     case 'damage':
-      return { type: 'damage', element: 'physical', multiplier: 1 };
+      return { type: 'damage', element: 'physical', value: DEFAULT_DAMAGE_VALUE };
     case 'heal':
-      return { type: 'heal', multiplier: 1 };
+      return {
+        type: 'heal',
+        value: { base: 0, terms: [{ source: 'stat', key: 'willpower', ratio: 1 }] },
+      };
     case 'apply_status':
       return { type: 'apply_status', statusId: 'status_burn', chance: 0.3 };
     case 'move':

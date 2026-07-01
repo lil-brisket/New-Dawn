@@ -1,14 +1,12 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import type { EnemyDefinition, SkillDefinition, StatusDefinition } from '@dawn/types';
-import {
-  rawEnemySchema,
-  rawSkillSchema,
-  rawStatusSchema,
-  type RawEnemy,
-  type RawSkill,
-  type RawStatus,
-} from './schemas';
+import type {
+  CombatStatsConfig,
+  EnemyDefinition,
+  SkillDefinition,
+  StatusDefinition,
+} from '@dawn/types';
+import { createFormulaSchemas } from './schemas';
 import {
   resolveEnemyInheritance,
   resolveSkillInheritance,
@@ -17,6 +15,11 @@ import {
 } from './inherit';
 import { normalizeEnemy, normalizeSkill, normalizeStatus } from './normalize';
 import { getReferenceIndex, validateReferences } from './references';
+import type { ContentDomain } from './domains';
+import { loadCombatStatsConfig, migrateContent } from './migrations';
+import type { RawEnemy, RawSkill, RawStatus } from './schemas';
+
+export type { ContentDomain } from './domains';
 
 export interface ContentFile {
   id: string;
@@ -25,12 +28,11 @@ export interface ContentFile {
   relativePath: string;
 }
 
-export type ContentDomain = 'skills' | 'statuses' | 'enemies';
-
 export interface ProcessedContent {
   skills: SkillDefinition[];
   statuses: StatusDefinition[];
   enemies: EnemyDefinition[];
+  combatStats: CombatStatsConfig;
   errors: PipelineError[];
   warnings: PipelineError[];
   references: ReturnType<typeof getReferenceIndex>;
@@ -72,7 +74,7 @@ function loadDomain<T>(
 
   for (const file of files) {
     try {
-      const json = JSON.parse(readFileSync(file.filePath, 'utf-8'));
+      const json = migrateContent(JSON.parse(readFileSync(file.filePath, 'utf-8')));
       const parsed = schema.parse(json);
       const id = (parsed as { id: string }).id;
       if (items.has(id)) {
@@ -99,6 +101,10 @@ function loadDomain<T>(
 }
 
 export function processContent(contentRoot: string): ProcessedContent {
+  const combatStats = loadCombatStatsConfig(contentRoot);
+  const statIds = combatStats.stats.map((s) => s.id);
+  const { rawSkillSchema, rawStatusSchema, rawEnemySchema } = createFormulaSchemas(statIds);
+
   const skillFiles = walkJsonFiles(join(contentRoot, 'skills'), contentRoot, 'skills');
   const statusFiles = walkJsonFiles(join(contentRoot, 'statuses'), contentRoot, 'statuses');
   const enemyFiles = walkJsonFiles(join(contentRoot, 'enemies'), contentRoot, 'enemies');
@@ -151,6 +157,7 @@ export function processContent(contentRoot: string): ProcessedContent {
     skills,
     statuses,
     enemies,
+    combatStats,
     errors,
     warnings,
     references: getReferenceIndex(skills, statuses, enemies),

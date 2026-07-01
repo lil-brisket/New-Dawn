@@ -50,8 +50,10 @@ export function SkillPreview({ draft }: { draft: Record<string, unknown> }) {
         <strong>Effects</strong>
         {effects.map((e, i) => (
           <div key={i} style={{ padding: '4px 0', borderTop: '1px solid #333', color: '#ccc' }}>
-            {e.type === 'damage' && `Damage — ${e.multiplier}x ${e.element}`}
-            {e.type === 'heal' && `Heal — ${e.multiplier}x`}
+            {e.type === 'damage' &&
+              `Damage — base ${e.value.base} + ${e.value.terms.map((t) => `${t.key}×${t.ratio}`).join(', ')} (${e.element})`}
+            {e.type === 'heal' &&
+              `Heal — base ${e.value.base} + ${e.value.terms.map((t) => `${t.key}×${t.ratio}`).join(', ')}`}
             {e.type === 'apply_status' &&
               `Apply ${e.statusId} — ${Math.round(e.chance * 100)}%${e.duration !== undefined ? ` · ${e.duration} turns` : ''}`}
             {e.type === 'move' && `Move — ${e.range}`}

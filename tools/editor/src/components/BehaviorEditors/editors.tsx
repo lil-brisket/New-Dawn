@@ -1,7 +1,8 @@
 import type { StatusBehavior } from '@dawn/types';
 import { EnumSelect } from '../fields/EnumSelect';
-import { NumberField } from '../fields/NumberField';
+import { FormulaEditor } from '../fields/FormulaEditor';
 import { ELEMENTS, STAT_MOD_MODES, TRIGGER_EVENTS } from '../fields/constants';
+import { useCombatStatOptions } from '../../hooks/useCombatStats';
 import { EffectBuilder } from '../EffectBuilder/EffectBuilder';
 
 export function DotEditor({
@@ -21,10 +22,10 @@ export function DotEditor({
           onChange={(v) => v && onChange({ ...behavior, element: v })}
         />
       </label>
-      <NumberField
-        label="Damage per stack"
-        value={behavior.damagePerStack}
-        onChange={(damagePerStack) => onChange({ ...behavior, damagePerStack })}
+      <FormulaEditor
+        label="Damage per turn"
+        value={behavior.damagePerTurn}
+        onChange={(damagePerTurn) => onChange({ ...behavior, damagePerTurn })}
       />
     </>
   );
@@ -56,13 +57,15 @@ export function StatModEditor({
   behavior: Extract<StatusBehavior, { type: 'stat_mod' }>;
   onChange: (b: StatusBehavior) => void;
 }) {
+  const statOptions = useCombatStatOptions();
+
   return (
     <>
       <label>
         Stat{' '}
         <EnumSelect
           value={behavior.stat}
-          options={['attack', 'defense']}
+          options={statOptions}
           onChange={(v) => v && onChange({ ...behavior, stat: v })}
         />
       </label>
@@ -74,10 +77,10 @@ export function StatModEditor({
           onChange={(v) => v && onChange({ ...behavior, mode: v })}
         />
       </label>
-      <NumberField
-        label="Amount per stack"
-        value={behavior.amountPerStack}
-        onChange={(amountPerStack) => onChange({ ...behavior, amountPerStack })}
+      <FormulaEditor
+        label="Value per stack"
+        value={behavior.value}
+        onChange={(value) => onChange({ ...behavior, value })}
       />
     </>
   );
@@ -118,16 +121,29 @@ export function TriggerEditor({
 export function createDefaultBehavior(type: StatusBehavior['type']): StatusBehavior {
   switch (type) {
     case 'dot':
-      return { type: 'dot', element: 'fire', damagePerStack: 5 };
+      return {
+        type: 'dot',
+        element: 'fire',
+        damagePerTurn: { base: 5, terms: [{ source: 'stat', key: 'attack', ratio: 0.2 }] },
+      };
     case 'stat_mod':
-      return { type: 'stat_mod', stat: 'attack', mode: 'flat', amountPerStack: 5 };
+      return {
+        type: 'stat_mod',
+        stat: 'attack',
+        mode: 'flat',
+        value: { base: 10, terms: [{ source: 'stat', key: 'willpower', ratio: 0.15 }] },
+      };
     case 'control':
       return { type: 'control', effect: 'stun' };
     case 'trigger':
       return {
         type: 'trigger',
         event: 'on_turn_start',
-        effect: { type: 'damage', element: 'fire', multiplier: 0.5 },
+        effect: {
+          type: 'damage',
+          element: 'fire',
+          value: { base: 0, terms: [{ source: 'stat', key: 'attack', ratio: 0.5 }] },
+        },
       };
   }
 }

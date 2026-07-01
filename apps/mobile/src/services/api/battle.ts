@@ -21,8 +21,8 @@ function combatantFromDefinition(
     attack: 20,
     defense: 10,
     speed: 50,
-    critRate: 0.1,
-    critDamage: 1.5,
+    willpower: 10,
+    resistance: 10,
   };
 
   return {
@@ -36,10 +36,12 @@ function combatantFromDefinition(
     maxSp: stats.maxMp,
     attack: stats.attack,
     defense: stats.defense,
+    speed: stats.speed,
+    willpower: stats.willpower,
+    resistance: stats.resistance,
     movement: 3,
     ap: 30,
     maxAp: 30,
-    powerStat: stats.attack,
     skillIds: def?.skillIds ?? [],
     statuses: [],
     skillCooldowns: {},

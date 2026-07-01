@@ -3,6 +3,7 @@ export const NAV_ITEMS: { path: string; label: string; placeholder?: boolean }[]
   { path: '/skills', label: 'Skills' },
   { path: '/statuses', label: 'Statuses' },
   { path: '/enemies', label: 'Enemies' },
+  { path: '/combat-stats', label: 'Combat Stats' },
   { path: '/characters', label: 'Characters', placeholder: true },
   { path: '/items', label: 'Items', placeholder: true },
   { path: '/equipment', label: 'Equipment', placeholder: true },

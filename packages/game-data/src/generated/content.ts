@@ -14,7 +14,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'fire',
-        multiplier: 0.9,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.9,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -32,6 +41,7 @@ export const generatedSkills = [
     category: 'magic',
     element: 'fire',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_blink',
@@ -58,6 +68,7 @@ export const generatedSkills = [
     soundKey: 'sfx_blink',
     category: 'magic',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_fireball',
@@ -71,7 +82,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'fire',
-        multiplier: 1.4,
+        value: {
+          base: 20,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 1.2,
+            },
+          ],
+        },
       },
       {
         type: 'apply_status',
@@ -91,6 +111,7 @@ export const generatedSkills = [
     category: 'magic',
     element: 'fire',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_inferno',
@@ -104,7 +125,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'fire',
-        multiplier: 2.4,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 2.4,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -119,6 +149,7 @@ export const generatedSkills = [
     category: 'magic',
     element: 'fire',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_meteor',
@@ -132,7 +163,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'fire',
-        multiplier: 1.1,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 1.1,
+            },
+          ],
+        },
       },
       {
         type: 'apply_status',
@@ -155,6 +195,7 @@ export const generatedSkills = [
     category: 'magic',
     element: 'fire',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_charge',
@@ -172,7 +213,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'physical',
-        multiplier: 1.1,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 1.1,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -186,6 +236,7 @@ export const generatedSkills = [
     soundKey: 'sfx_charge',
     category: 'physical',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_poison_dart',
@@ -199,7 +250,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'physical',
-        multiplier: 0.6,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.6,
+            },
+          ],
+        },
       },
       {
         type: 'apply_status',
@@ -218,25 +278,40 @@ export const generatedSkills = [
     soundKey: 'sfx_poison_dart',
     category: 'physical',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_shield_bash',
     name: 'Shield Bash',
-    description: 'Stuns the target with a heavy shield strike.',
+    description: 'A defensive strike fueled by armor and blade.',
     hpCost: 0,
     spCost: 15,
     apCost: 0,
-    cooldown: 3,
+    cooldown: 0,
     effects: [
       {
         type: 'damage',
         element: 'physical',
-        multiplier: 0.8,
+        value: {
+          base: 10,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.6,
+            },
+            {
+              source: 'stat',
+              key: 'defense',
+              ratio: 0.8,
+            },
+          ],
+        },
       },
       {
         type: 'apply_status',
         statusId: 'status_stun',
-        chance: 0.5,
+        chance: 0.25,
       },
     ],
     targeting: {
@@ -250,6 +325,7 @@ export const generatedSkills = [
     soundKey: 'sfx_shield_bash',
     category: 'physical',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_slash',
@@ -263,7 +339,16 @@ export const generatedSkills = [
       {
         type: 'damage',
         element: 'physical',
-        multiplier: 1,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 1,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -277,6 +362,7 @@ export const generatedSkills = [
     soundKey: 'sfx_slash',
     category: 'physical',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_fortify',
@@ -304,6 +390,7 @@ export const generatedSkills = [
     soundKey: 'sfx_fortify',
     category: 'support',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_healing_rain',
@@ -316,7 +403,16 @@ export const generatedSkills = [
     effects: [
       {
         type: 'heal',
-        multiplier: 0.7,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.7,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -333,11 +429,12 @@ export const generatedSkills = [
     soundKey: 'sfx_healing_rain',
     category: 'support',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_mend',
     name: 'Mend',
-    description: 'Restores an ally health.',
+    description: "Restores an ally's vitality through focused will.",
     hpCost: 0,
     spCost: 20,
     apCost: 0,
@@ -345,7 +442,16 @@ export const generatedSkills = [
     effects: [
       {
         type: 'heal',
-        multiplier: 1.2,
+        value: {
+          base: 15,
+          terms: [
+            {
+              source: 'stat',
+              key: 'willpower',
+              ratio: 1.4,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -359,6 +465,7 @@ export const generatedSkills = [
     soundKey: 'sfx_mend',
     category: 'support',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_second_wind',
@@ -371,7 +478,16 @@ export const generatedSkills = [
     effects: [
       {
         type: 'heal',
-        multiplier: 0.8,
+        value: {
+          base: 0,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.8,
+            },
+          ],
+        },
       },
     ],
     targeting: {
@@ -384,6 +500,7 @@ export const generatedSkills = [
     soundKey: 'sfx_second_wind',
     category: 'support',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'skill_war_cry',
@@ -410,6 +527,7 @@ export const generatedSkills = [
     soundKey: 'sfx_war_cry',
     category: 'support',
     tags: [],
+    schemaVersion: 2,
   },
 ] as const satisfies readonly SkillDefinition[];
 
@@ -417,8 +535,8 @@ export const generatedStatuses = [
   {
     id: 'status_attack_up',
     name: 'Attack Up',
-    description: 'Increased attack power.',
-    duration: 2,
+    description: 'Increases attack power.',
+    duration: 3,
     stackable: false,
     maxStacks: 1,
     iconId: 'icon_attack_up',
@@ -427,17 +545,27 @@ export const generatedStatuses = [
         type: 'stat_mod',
         stat: 'attack',
         mode: 'percent',
-        amountPerStack: 20,
+        value: {
+          base: 20,
+          terms: [
+            {
+              source: 'stat',
+              key: 'willpower',
+              ratio: 0.15,
+            },
+          ],
+        },
       },
     ],
     category: 'buff',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'status_defense_up',
     name: 'Defense Up',
-    description: 'Increased defense.',
-    duration: 2,
+    description: 'Increases defense.',
+    duration: 3,
     stackable: false,
     maxStacks: 1,
     iconId: 'icon_defense_up',
@@ -446,11 +574,15 @@ export const generatedStatuses = [
         type: 'stat_mod',
         stat: 'defense',
         mode: 'percent',
-        amountPerStack: 20,
+        value: {
+          base: 20,
+          terms: [],
+        },
       },
     ],
     category: 'buff',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'status_burn',
@@ -464,29 +596,43 @@ export const generatedStatuses = [
       {
         type: 'dot',
         element: 'fire',
-        damagePerStack: 5,
+        damagePerTurn: {
+          base: 5,
+          terms: [
+            {
+              source: 'stat',
+              key: 'attack',
+              ratio: 0.2,
+            },
+          ],
+        },
       },
     ],
     category: 'debuff',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'status_poison',
     name: 'Poison',
     description: 'Takes physical damage each turn.',
-    duration: 3,
+    duration: 4,
     stackable: true,
-    maxStacks: 3,
+    maxStacks: 5,
     iconId: 'icon_poison',
     behaviors: [
       {
         type: 'dot',
         element: 'physical',
-        damagePerStack: 4,
+        damagePerTurn: {
+          base: 4,
+          terms: [],
+        },
       },
     ],
     category: 'debuff',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'status_stun',
@@ -504,6 +650,7 @@ export const generatedStatuses = [
     ],
     category: 'debuff',
     tags: [],
+    schemaVersion: 2,
   },
 ] as const satisfies readonly StatusDefinition[];
 
@@ -511,19 +658,19 @@ export const generatedEnemies = [
   {
     id: 'enemy_goblin',
     name: 'Goblin',
-    description: 'A mischievous forest goblin.',
+    description: 'A scrappy forest goblin.',
     portraitId: 'portrait_goblin',
     spriteId: 'sprite_goblin',
     baseStats: {
-      hp: 400,
-      maxHp: 400,
-      mp: 50,
-      maxMp: 50,
-      attack: 35,
-      defense: 15,
+      hp: 40,
+      maxHp: 40,
+      mp: 20,
+      maxMp: 20,
+      attack: 12,
+      defense: 3,
       speed: 55,
-      critRate: 0.05,
-      critDamage: 1.2,
+      willpower: 8,
+      resistance: 6,
     },
     skillIds: ['skill_slash'],
     aiProfileId: 'ai_aggressive',
@@ -531,6 +678,7 @@ export const generatedEnemies = [
     element: 'earth',
     category: 'common',
     tags: [],
+    schemaVersion: 2,
   },
   {
     id: 'enemy_goblin_chief',
@@ -539,22 +687,23 @@ export const generatedEnemies = [
     portraitId: 'portrait_goblin_chief',
     spriteId: 'sprite_goblin_chief',
     baseStats: {
-      hp: 1200,
-      maxHp: 1200,
-      mp: 100,
-      maxMp: 100,
-      attack: 55,
-      defense: 35,
+      hp: 80,
+      maxHp: 80,
+      mp: 30,
+      maxMp: 30,
+      attack: 18,
+      defense: 8,
       speed: 45,
-      critRate: 0.1,
-      critDamage: 1.4,
+      willpower: 12,
+      resistance: 10,
     },
-    skillIds: ['skill_slash', 'skill_shield_bash'],
-    aiProfileId: 'ai_tactical',
+    skillIds: ['skill_slash', 'skill_war_cry'],
+    aiProfileId: 'ai_aggressive',
     lootTableId: 'loot_goblin_chief',
     element: 'earth',
     category: 'common',
     tags: [],
+    schemaVersion: 2,
   },
 ] as const satisfies readonly EnemyDefinition[];
 

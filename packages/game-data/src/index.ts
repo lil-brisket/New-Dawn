@@ -7,4 +7,5 @@ export * from './professions';
 export * from './masteries';
 export * from './generated/content';
 export * from './generated/references';
+export * from './generated/combat-stats';
 export * from './loaders/registry';

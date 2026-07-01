@@ -13,10 +13,12 @@ export interface Combatant {
   readonly maxSp: number;
   readonly attack: number;
   readonly defense: number;
+  readonly speed: number;
+  readonly willpower: number;
+  readonly resistance: number;
   readonly movement: number;
   readonly ap: number;
   readonly maxAp: number;
-  readonly powerStat: number;
   readonly skillIds: readonly string[];
   readonly statuses: readonly StatusInstance[];
   readonly skillCooldowns: Readonly<Record<string, number>>;

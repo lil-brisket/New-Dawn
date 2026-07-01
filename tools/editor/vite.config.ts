@@ -15,6 +15,8 @@ export default defineConfig({
       '@dawn/game-core': join(repoRoot, 'packages/game-core/src'),
       '@dawn/game-data': join(repoRoot, 'packages/game-data/src'),
       '@dawn/content-pipeline': join(repoRoot, 'packages/content-pipeline/src'),
+      '@dawn/content-pipeline/domains': join(repoRoot, 'packages/content-pipeline/src/domains.ts'),
+      '@dawn/content-pipeline/schemas': join(repoRoot, 'packages/content-pipeline/src/schemas.ts'),
       '@dawn/types': join(repoRoot, 'packages/types/src'),
       '@dawn/utils': join(repoRoot, 'packages/utils/src'),
     },

@@ -115,6 +115,30 @@ export function contentApiPlugin(repoRoot: string): Plugin {
         if (
           parts[0] === 'api' &&
           parts[1] === 'content' &&
+          parts[2] === 'config' &&
+          parts[3] === 'combat_stats'
+        ) {
+          const configPath = join(contentRoot, 'config', 'combat_stats.json');
+          if (req.method === 'GET') {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(readFileSync(configPath, 'utf-8'));
+            return;
+          }
+          if (req.method === 'PUT') {
+            let body = '';
+            for await (const chunk of req) body += chunk;
+            mkdirSync(dirname(configPath), { recursive: true });
+            writeFileSync(configPath, JSON.stringify(JSON.parse(body), null, 2) + '\n');
+            runCodegen();
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: true }));
+            return;
+          }
+        }
+
+        if (
+          parts[0] === 'api' &&
+          parts[1] === 'content' &&
           parts[2] &&
           DOMAINS.includes(parts[2] as ContentDomain)
         ) {

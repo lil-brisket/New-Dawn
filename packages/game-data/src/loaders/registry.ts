@@ -1,5 +1,6 @@
 import type {
   CharacterDefinition,
+  CombatStatsConfig,
   EnemyDefinition,
   EquipmentDefinition,
   ItemDefinition,
@@ -15,6 +16,7 @@ import * as loot from '../loot';
 import * as professions from '../professions';
 import * as masteries from '../masteries';
 import { skills, statuses, enemies } from '../generated/content';
+import { combatStatsConfig } from '../generated/combat-stats';
 
 export interface DefinitionRegistry {
   getCharacter(id: string): CharacterDefinition | undefined;
@@ -27,6 +29,7 @@ export interface DefinitionRegistry {
   getLootTable(id: string): loot.LootTable | undefined;
   getProfession(id: string): professions.ProfessionDefinition | undefined;
   getMastery(id: string): masteries.MasteryDefinition | undefined;
+  getCombatStatsConfig(): CombatStatsConfig;
   getAllSkills(): SkillDefinition[];
   getAllStatuses(): StatusDefinition[];
   getAllEnemies(): EnemyDefinition[];
@@ -59,6 +62,7 @@ export function createDefinitionRegistry(): DefinitionRegistry {
     getLootTable: (id) => lootMap.get(id),
     getProfession: (id) => professionMap.get(id),
     getMastery: (id) => masteryMap.get(id),
+    getCombatStatsConfig: () => combatStatsConfig,
     getAllSkills: () => skills,
     getAllStatuses: () => statuses,
     getAllEnemies: () => enemies,

@@ -4,20 +4,28 @@ import { withHp } from '../../../entities/Combatant';
 import { getCombatant } from '../../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../../queries/isCombatantAlive';
 import { updateMap } from '../../../utils/immutable';
-import { getEffectiveStats } from '../../status/getEffectiveStats';
-import { calculateDamage } from '../../combat/Damage';
+import { createEffectContext } from '../../scaling/EffectContext';
+import { resolveDamage } from '../../scaling/formulaPipeline';
 
 export function resolveDamageEffect(effect: DamageEffect, ctx: AbilityContext): void {
-  const sourceStats = getEffectiveStats(ctx.source, ctx.registry);
   const skillId = ctx.skill?.id;
+  const combatStats = ctx.registry.getCombatStatsConfig();
 
   for (const target of ctx.targets) {
     const liveTarget = getCombatant(ctx.battle, target.id);
     if (!liveTarget || !isCombatantAlive(liveTarget)) continue;
 
-    const targetStats = getEffectiveStats(liveTarget, ctx.registry);
-    const rawAttack = Math.floor(sourceStats.attack * effect.multiplier + (effect.flatBonus ?? 0));
-    const damage = calculateDamage(rawAttack, targetStats.defense);
+    const effectCtx = createEffectContext({
+      source: ctx.source,
+      target: liveTarget,
+      battle: ctx.battle,
+      registry: ctx.registry,
+      combatStats,
+      rng: ctx.rng,
+      skill: ctx.skill,
+    });
+
+    const damage = resolveDamage(effect.value, effectCtx);
     const updated = withHp(liveTarget, liveTarget.hp - damage);
 
     ctx.battle = {

@@ -1,10 +1,11 @@
+export type { StatusApplicationInput, StatusApplicationResult } from './resolveStatusApplication';
+export { resolveStatusApplication } from './resolveStatusApplication';
+
 import type { DefinitionRegistry } from '@dawn/game-data';
-import type { BattleEvent, BattleState, StatusInstance } from '@dawn/types';
-import { createId } from '@dawn/utils';
+import type { BattleEvent, BattleState } from '@dawn/types';
 import type { RandomSource } from '@dawn/utils';
-import { withStatuses } from '../../entities/Combatant';
-import { getCombatant } from '../../queries/getActiveCombatant';
-import { updateMap } from '../../utils/immutable';
+import { createEffectContext } from '../scaling/EffectContext';
+import { resolveStatusApplication } from './resolveStatusApplication';
 
 export interface ApplyStatusInput {
   readonly state: BattleState;
@@ -23,70 +24,33 @@ export interface ApplyStatusResult {
   readonly applied: boolean;
 }
 
+/** Backward-compatible wrapper around resolveStatusApplication */
 export function applyStatus(input: ApplyStatusInput): ApplyStatusResult {
-  const { chance, registry, rng, sourceId, statusId, targetId } = input;
-  if (!rng.chance(chance)) {
+  const source = input.state.combatants.get(input.sourceId);
+  const target = input.state.combatants.get(input.targetId);
+  if (!source || !target) {
     return { state: input.state, events: [], applied: false };
   }
 
-  const definition = registry.getStatus(statusId);
-  if (!definition) {
-    return { state: input.state, events: [], applied: false };
-  }
+  const ctx = createEffectContext({
+    source,
+    target,
+    battle: input.state,
+    registry: input.registry,
+    combatStats: input.registry.getCombatStatsConfig(),
+    rng: input.rng,
+  });
 
-  const target = getCombatant(input.state, targetId);
-  if (!target) {
-    return { state: input.state, events: [], applied: false };
-  }
+  const result = resolveStatusApplication({
+    ctx,
+    statusId: input.statusId,
+    baseChance: input.chance,
+    baseDuration: input.durationOverride,
+  });
 
-  const duration = input.durationOverride ?? definition.duration;
-  const existing = target.statuses.find((s) => s.statusDefinitionId === statusId);
-  let nextStatuses: StatusInstance[];
-  let stacks: number;
-
-  if (existing) {
-    if (!definition.stackable) {
-      nextStatuses = target.statuses.map((s) =>
-        s.statusDefinitionId === statusId ? { ...s, remainingTurns: duration, stacks: 1 } : s,
-      );
-      stacks = 1;
-    } else {
-      const newStacks = Math.min(existing.stacks + 1, definition.maxStacks);
-      nextStatuses = target.statuses.map((s) =>
-        s.statusDefinitionId === statusId
-          ? { ...s, remainingTurns: duration, stacks: newStacks }
-          : s,
-      );
-      stacks = newStacks;
-    }
-  } else {
-    const instance: StatusInstance = {
-      id: createId('status'),
-      statusDefinitionId: statusId,
-      sourceId,
-      targetId,
-      remainingTurns: duration,
-      stacks: 1,
-    };
-    nextStatuses = [...target.statuses, instance];
-    stacks = 1;
-  }
-
-  const updated = withStatuses(target, nextStatuses);
-  const state: BattleState = {
-    ...input.state,
-    combatants: updateMap(input.state.combatants, targetId, updated),
+  return {
+    state: result.state,
+    events: result.events,
+    applied: result.applied,
   };
-
-  const events: BattleEvent[] = [
-    {
-      type: 'status_applied',
-      sourceId,
-      targetId,
-      statusId,
-      stacks,
-    },
-  ];
-
-  return { state, events, applied: true };
 }

@@ -13,10 +13,12 @@ export interface CreateCombatantInput {
   readonly maxSp: number;
   readonly attack: number;
   readonly defense: number;
+  readonly speed?: number;
+  readonly willpower?: number;
+  readonly resistance?: number;
   readonly movement: number;
   readonly ap: number;
   readonly maxAp: number;
-  readonly powerStat?: number;
   readonly skillIds?: readonly string[];
   readonly statuses?: readonly StatusInstance[];
   readonly skillCooldowns?: Readonly<Record<string, number>>;
@@ -25,7 +27,9 @@ export interface CreateCombatantInput {
 export function createCombatant(input: CreateCombatantInput): Combatant {
   return {
     ...input,
-    powerStat: input.powerStat ?? input.attack,
+    speed: input.speed ?? 50,
+    willpower: input.willpower ?? 10,
+    resistance: input.resistance ?? 10,
     skillIds: input.skillIds ?? [],
     statuses: input.statuses ?? [],
     skillCooldowns: input.skillCooldowns ?? {},
@@ -64,8 +68,4 @@ export function withCooldown(combatant: Combatant, skillId: string, turns: numbe
     ...combatant,
     skillCooldowns: { ...combatant.skillCooldowns, [skillId]: turns },
   };
-}
-
-export function withPowerStat(combatant: Combatant, powerStat: number): Combatant {
-  return { ...combatant, powerStat };
 }

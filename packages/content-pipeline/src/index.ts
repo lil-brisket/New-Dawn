@@ -24,11 +24,12 @@ export {
   type PipelineError,
 } from './inherit';
 
+export type { ContentDomain } from './domains';
+
 export {
   processContent,
   computeDashboardStats,
   type ProcessedContent,
-  type ContentDomain,
   type ContentFile,
 } from './process';
 
@@ -42,3 +43,6 @@ export {
   statusToAuthoringJson,
   enemyToAuthoringJson,
 } from './strip';
+
+export { migrateToV2, migrateContent, loadCombatStatsConfig } from './migrations';
+export { createFormulaSchemas, combatStatsConfigSchema } from './schemas';

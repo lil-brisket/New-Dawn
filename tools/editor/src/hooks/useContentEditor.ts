@@ -1,4 +1,4 @@
-import type { ContentDomain } from '@dawn/content-pipeline';
+import type { ContentDomain } from '@dawn/content-pipeline/domains';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   createContent,

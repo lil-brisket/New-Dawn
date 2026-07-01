@@ -1,5 +1,5 @@
-import type { ContentDomain } from '@dawn/content-pipeline';
-import { rawEnemySchema, rawSkillSchema, rawStatusSchema } from '@dawn/content-pipeline';
+import type { ContentDomain } from '@dawn/content-pipeline/domains';
+import { rawEnemySchema, rawSkillSchema, rawStatusSchema } from '@dawn/content-pipeline/schemas';
 import { useMemo } from 'react';
 
 export type DraftIssue = { path: string; message: string };

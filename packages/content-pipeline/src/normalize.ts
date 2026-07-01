@@ -44,6 +44,7 @@ export function normalizeSkill(raw: RawSkill, filePath?: string): SkillDefinitio
     rarity: raw.rarity,
     tags: raw.tags ?? defaults.tags ?? [],
     unlockLevel: raw.unlockLevel,
+    schemaVersion: raw.schemaVersion ?? 2,
   };
 }
 
@@ -59,6 +60,8 @@ export function normalizeStatus(raw: RawStatus, filePath?: string): StatusDefini
     maxStacks: raw.maxStacks ?? defaults.maxStacks,
     iconId: raw.iconId ?? defaults.iconId,
     behaviors: (raw.behaviors ?? defaults.behaviors) as StatusBehavior[],
+    applicationFormula: raw.applicationFormula,
+    durationFormula: raw.durationFormula,
     category: raw.category ?? inferCategoryFromPath(filePath ?? ''),
     element: raw.element,
     weaponType: raw.weaponType,
@@ -66,6 +69,7 @@ export function normalizeStatus(raw: RawStatus, filePath?: string): StatusDefini
     rarity: raw.rarity,
     tags: raw.tags ?? defaults.tags ?? [],
     unlockLevel: raw.unlockLevel,
+    schemaVersion: raw.schemaVersion ?? 2,
   };
 }
 
@@ -90,5 +94,6 @@ export function normalizeEnemy(raw: RawEnemy, filePath?: string): EnemyDefinitio
     rarity: raw.rarity,
     tags: raw.tags ?? defaults.tags ?? [],
     unlockLevel: raw.unlockLevel,
+    schemaVersion: raw.schemaVersion ?? 2,
   };
 }

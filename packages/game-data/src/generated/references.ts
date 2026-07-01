@@ -8,10 +8,9 @@ export const contentReferences = {
     status_attack_up: ['skill_war_cry'],
     skill_slash: ['enemy_goblin', 'enemy_goblin_chief'],
     loot_goblin: ['enemy_goblin'],
-    ai_aggressive: ['enemy_goblin'],
-    skill_shield_bash: ['enemy_goblin_chief'],
+    ai_aggressive: ['enemy_goblin', 'enemy_goblin_chief'],
+    skill_war_cry: ['enemy_goblin_chief'],
     loot_goblin_chief: ['enemy_goblin_chief'],
-    ai_tactical: ['enemy_goblin_chief'],
   },
   uses: {
     skill_fireball: ['status_burn'],
@@ -21,7 +20,7 @@ export const contentReferences = {
     skill_fortify: ['status_defense_up'],
     skill_war_cry: ['status_attack_up'],
     enemy_goblin: ['skill_slash', 'loot_goblin', 'ai_aggressive'],
-    enemy_goblin_chief: ['skill_slash', 'skill_shield_bash', 'loot_goblin_chief', 'ai_tactical'],
+    enemy_goblin_chief: ['skill_slash', 'skill_war_cry', 'loot_goblin_chief', 'ai_aggressive'],
   },
 } as const;
 

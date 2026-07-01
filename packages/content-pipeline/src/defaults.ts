@@ -13,6 +13,11 @@ function enemySlug(id: string): string {
   return id.replace(/^enemy_/, '');
 }
 
+const defaultDamageFormula = {
+  base: 0,
+  terms: [{ source: 'stat' as const, key: 'attack', ratio: 1.0 }],
+};
+
 export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'name'> {
   const slug = skillSlug(id);
   return {
@@ -21,7 +26,7 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
     spCost: 0,
     apCost: 0,
     cooldown: 0,
-    effects: [{ type: 'damage', element: 'physical', multiplier: 1.0 }],
+    effects: [{ type: 'damage', element: 'physical', value: defaultDamageFormula }],
     targeting: { type: 'single_enemy', range: 1 },
     iconId: `icon_${slug}`,
     vfxId: `vfx_${slug}`,
@@ -30,6 +35,7 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
     soundKey: `sfx_${slug}`,
     category: 'physical',
     tags: [],
+    schemaVersion: 2,
   };
 }
 
@@ -43,6 +49,7 @@ export function defaultStatusFields(id: string): Omit<StatusDefinition, 'id' | '
     iconId: `icon_${slug}`,
     behaviors: [],
     tags: [],
+    schemaVersion: 2,
   };
 }
 
@@ -60,14 +67,15 @@ export function defaultEnemyFields(id: string): Omit<EnemyDefinition, 'id' | 'na
       attack: 20,
       defense: 10,
       speed: 50,
-      critRate: 0.05,
-      critDamage: 1.2,
+      willpower: 10,
+      resistance: 10,
     },
     skillIds: [],
     aiProfileId: 'ai_aggressive',
     lootTableId: `loot_${slug}`,
     element: 'earth',
     tags: [],
+    schemaVersion: 2,
   };
 }
 

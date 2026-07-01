@@ -1,4 +1,4 @@
-import type { ContentDomain } from '@dawn/content-pipeline';
+import type { ContentDomain } from '@dawn/content-pipeline/domains';
 
 export interface ContentListItem {
   id: string;

@@ -1,4 +1,4 @@
-import type { ContentDomain } from '@dawn/content-pipeline';
+import type { ContentDomain } from '@dawn/content-pipeline/domains';
 import type { ElementType } from '@dawn/types';
 import { ELEMENTS, SKILL_CATEGORIES } from './constants';
 import { ContentRefSelect } from './ContentRefSelect';

@@ -13,6 +13,37 @@ const elementType = z.enum([
 
 const itemRarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']);
 
+const formulaTermSource = z.enum([
+  'stat',
+  'stacks',
+  'level',
+  'missing_hp',
+  'hp_percent',
+  'distance',
+]);
+
+export const combatStatsConfigSchema = z.object({
+  schemaVersion: z.number().int().min(1),
+  stats: z.array(
+    z.object({
+      id: z.string().min(1),
+      label: z.string().min(1),
+    }),
+  ),
+  formulas: z.object({
+    statusApplication: z.object({
+      attackerStat: z.string().min(1),
+      defenderStat: z.string().min(1),
+      perPointDelta: z.number(),
+    }),
+    durationReduction: z.object({
+      defenderStat: z.string().min(1),
+      perPointReduction: z.number(),
+      minDuration: z.number().int().min(0),
+    }),
+  }),
+});
+
 export const contentMetadataSchema = z
   .object({
     category: z.string().optional(),
@@ -26,137 +57,198 @@ export const contentMetadataSchema = z
   .strict()
   .partial();
 
-const skillEffectSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('damage'),
-    element: elementType,
-    multiplier: z.number(),
-    flatBonus: z.number().optional(),
-  }),
-  z.object({
-    type: z.literal('heal'),
-    multiplier: z.number(),
-    flatBonus: z.number().optional(),
-  }),
-  z.object({
-    type: z.literal('move'),
-    range: z.number().int().min(0),
-  }),
-  z.object({
-    type: z.literal('teleport'),
-    range: z.number().int().min(0),
-  }),
-  z.object({
-    type: z.literal('apply_status'),
-    statusId: z.string(),
-    chance: z.number().min(0).max(1),
-    duration: z.number().int().min(0).optional(),
-  }),
-  z.object({
-    type: z.literal('summon'),
-    entityDefinitionId: z.string(),
-    position: z.object({ q: z.number(), r: z.number() }).optional(),
-  }),
+export function createFormulaSchemas(statIds: readonly string[]) {
+  const statIdSchema = z
+    .string()
+    .refine((id) => statIds.includes(id), {
+      message: `Unknown stat: must be one of ${statIds.join(', ')}`,
+    });
+
+  const formulaTermSchema = z.object({
+    source: formulaTermSource,
+    key: z.string(),
+    ratio: z.number(),
+  });
+
+  const statFormulaSchema = z.object({
+    base: z.number(),
+    terms: z.array(formulaTermSchema),
+  });
+
+  const durationFormulaSchema = z.object({
+    stat: statIdSchema,
+    ratio: z.number(),
+    maxBonus: z.number().optional(),
+  });
+
+  const applicationFormulaSchema = z.object({
+    attackerStat: statIdSchema,
+    defenderStat: statIdSchema,
+    perPointDelta: z.number(),
+  });
+
+  const skillEffectSchema = z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('damage'),
+      element: elementType,
+      value: statFormulaSchema,
+    }),
+    z.object({
+      type: z.literal('heal'),
+      value: statFormulaSchema,
+    }),
+    z.object({
+      type: z.literal('move'),
+      range: z.number().int().min(0),
+      rangeFormula: statFormulaSchema.optional(),
+    }),
+    z.object({
+      type: z.literal('teleport'),
+      range: z.number().int().min(0),
+      rangeFormula: statFormulaSchema.optional(),
+    }),
+    z.object({
+      type: z.literal('apply_status'),
+      statusId: z.string(),
+      chance: z.number().min(0).max(1),
+      duration: z.number().int().min(0).optional(),
+      durationFormula: durationFormulaSchema.optional(),
+      applicationFormula: applicationFormulaSchema.optional(),
+    }),
+    z.object({
+      type: z.literal('summon'),
+      entityDefinitionId: z.string(),
+      position: z.object({ q: z.number(), r: z.number() }).optional(),
+    }),
+  ]);
+
+  const targetingSchema = z.discriminatedUnion('type', [
+    z.object({ type: z.literal('single_enemy'), range: z.number().int().min(0) }),
+    z.object({ type: z.literal('single_ally'), range: z.number().int().min(0) }),
+    z.object({ type: z.literal('self') }),
+    z.object({ type: z.literal('tile'), range: z.number().int().min(0) }),
+    z.object({
+      type: z.literal('area'),
+      range: z.number().int().min(0),
+      radius: z.number().int().min(0),
+      filter: z.enum(['enemy', 'ally', 'all']),
+      center: z.enum(['unit', 'tile']),
+    }),
+  ]);
+
+  const statusBehaviorSchema: z.ZodType<unknown> = z.lazy(() =>
+    z.discriminatedUnion('type', [
+      z.object({
+        type: z.literal('dot'),
+        element: elementType,
+        damagePerTurn: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('control'),
+        effect: z.literal('stun'),
+      }),
+      z.object({
+        type: z.literal('stat_mod'),
+        stat: statIdSchema,
+        mode: z.enum(['flat', 'percent']),
+        value: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('trigger'),
+        event: z.enum(['on_hit', 'on_damaged', 'on_turn_start']),
+        effect: skillEffectSchema,
+      }),
+    ]),
+  );
+
+  const baseStatsSchema = z.object({
+    hp: z.number().int().min(0),
+    maxHp: z.number().int().min(0),
+    mp: z.number().int().min(0),
+    maxMp: z.number().int().min(0),
+    attack: z.number().int().min(0),
+    defense: z.number().int().min(0),
+    speed: z.number().int().min(0),
+    willpower: z.number().int().min(0),
+    resistance: z.number().int().min(0),
+  });
+
+  const rawSkillSchema = z
+    .object({
+      schemaVersion: z.number().int().min(1).optional(),
+      id: z.string().regex(/^skill_[a-z0-9_]+$/),
+      inherits: z.string().optional(),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      hpCost: z.number().int().min(0).optional(),
+      spCost: z.number().int().min(0).optional(),
+      apCost: z.number().int().min(0).optional(),
+      mpCost: z.number().int().min(0).optional(),
+      cooldown: z.number().int().min(0).optional(),
+      effects: z.array(skillEffectSchema).optional(),
+      targeting: targetingSchema.optional(),
+      iconId: z.string().optional(),
+      vfxId: z.string().optional(),
+      sfxId: z.string().optional(),
+    })
+    .merge(contentMetadataSchema);
+
+  const rawStatusSchema = z
+    .object({
+      schemaVersion: z.number().int().min(1).optional(),
+      id: z.string().regex(/^status_[a-z0-9_]+$/),
+      inherits: z.string().optional(),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      duration: z.number().int().min(0).optional(),
+      stackable: z.boolean().optional(),
+      maxStacks: z.number().int().min(1).optional(),
+      iconId: z.string().optional(),
+      behaviors: z.array(statusBehaviorSchema).optional(),
+      applicationFormula: applicationFormulaSchema.optional(),
+      durationFormula: durationFormulaSchema.optional(),
+    })
+    .merge(contentMetadataSchema);
+
+  const rawEnemySchema = z
+    .object({
+      schemaVersion: z.number().int().min(1).optional(),
+      id: z.string().regex(/^enemy_[a-z0-9_]+$/),
+      inherits: z.string().optional(),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      portraitId: z.string().optional(),
+      spriteId: z.string().optional(),
+      baseStats: baseStatsSchema.partial().optional(),
+      skillIds: z.array(z.string()).optional(),
+      aiProfileId: z.string().optional(),
+      lootTableId: z.string().optional(),
+      element: elementType.optional(),
+    })
+    .merge(contentMetadataSchema);
+
+  return {
+    rawSkillSchema,
+    rawStatusSchema,
+    rawEnemySchema,
+    statFormulaSchema,
+    durationFormulaSchema,
+    applicationFormulaSchema,
+  };
+}
+
+/** Default schemas using built-in stat ids — used when config not yet loaded */
+const defaultSchemas = createFormulaSchemas([
+  'attack',
+  'defense',
+  'speed',
+  'willpower',
+  'resistance',
 ]);
 
-const targetingSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('single_enemy'), range: z.number().int().min(0) }),
-  z.object({ type: z.literal('single_ally'), range: z.number().int().min(0) }),
-  z.object({ type: z.literal('self') }),
-  z.object({ type: z.literal('tile'), range: z.number().int().min(0) }),
-  z.object({
-    type: z.literal('area'),
-    range: z.number().int().min(0),
-    radius: z.number().int().min(0),
-    filter: z.enum(['enemy', 'ally', 'all']),
-    center: z.enum(['unit', 'tile']),
-  }),
-]);
-
-export const rawSkillSchema = z
-  .object({
-    id: z.string().regex(/^skill_[a-z0-9_]+$/),
-    inherits: z.string().optional(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    hpCost: z.number().int().min(0).optional(),
-    spCost: z.number().int().min(0).optional(),
-    apCost: z.number().int().min(0).optional(),
-    /** @deprecated use spCost */
-    mpCost: z.number().int().min(0).optional(),
-    cooldown: z.number().int().min(0).optional(),
-    effects: z.array(skillEffectSchema).optional(),
-    targeting: targetingSchema.optional(),
-    iconId: z.string().optional(),
-    vfxId: z.string().optional(),
-    sfxId: z.string().optional(),
-  })
-  .merge(contentMetadataSchema);
-
-const statusBehaviorSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('dot'),
-    element: elementType,
-    damagePerStack: z.number(),
-  }),
-  z.object({
-    type: z.literal('control'),
-    effect: z.literal('stun'),
-  }),
-  z.object({
-    type: z.literal('stat_mod'),
-    stat: z.enum(['attack', 'defense']),
-    mode: z.enum(['flat', 'percent']),
-    amountPerStack: z.number(),
-  }),
-  z.object({
-    type: z.literal('trigger'),
-    event: z.enum(['on_hit', 'on_damaged', 'on_turn_start']),
-    effect: skillEffectSchema,
-  }),
-]);
-
-export const rawStatusSchema = z
-  .object({
-    id: z.string().regex(/^status_[a-z0-9_]+$/),
-    inherits: z.string().optional(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    duration: z.number().int().min(0).optional(),
-    stackable: z.boolean().optional(),
-    maxStacks: z.number().int().min(1).optional(),
-    iconId: z.string().optional(),
-    behaviors: z.array(statusBehaviorSchema).optional(),
-  })
-  .merge(contentMetadataSchema);
-
-const baseStatsSchema = z.object({
-  hp: z.number().int().min(0),
-  maxHp: z.number().int().min(0),
-  mp: z.number().int().min(0),
-  maxMp: z.number().int().min(0),
-  attack: z.number().int().min(0),
-  defense: z.number().int().min(0),
-  speed: z.number().int().min(0),
-  critRate: z.number().min(0).max(1),
-  critDamage: z.number().min(0),
-});
-
-export const rawEnemySchema = z
-  .object({
-    id: z.string().regex(/^enemy_[a-z0-9_]+$/),
-    inherits: z.string().optional(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    portraitId: z.string().optional(),
-    spriteId: z.string().optional(),
-    baseStats: baseStatsSchema.partial().optional(),
-    skillIds: z.array(z.string()).optional(),
-    aiProfileId: z.string().optional(),
-    lootTableId: z.string().optional(),
-    element: elementType.optional(),
-  })
-  .merge(contentMetadataSchema);
+export const rawSkillSchema = defaultSchemas.rawSkillSchema;
+export const rawStatusSchema = defaultSchemas.rawStatusSchema;
+export const rawEnemySchema = defaultSchemas.rawEnemySchema;
 
 export type RawSkill = z.infer<typeof rawSkillSchema>;
 export type RawStatus = z.infer<typeof rawStatusSchema>;

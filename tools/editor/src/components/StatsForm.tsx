@@ -8,8 +8,8 @@ const fields: (keyof BaseStats)[] = [
   'attack',
   'defense',
   'speed',
-  'critRate',
-  'critDamage',
+  'willpower',
+  'resistance',
 ];
 
 export function StatsForm({
@@ -26,7 +26,7 @@ export function StatsForm({
           {f}
           <input
             type="number"
-            step={f.includes('crit') ? 0.01 : 1}
+            step={1}
             value={stats[f] ?? ''}
             onChange={(e) => onChange({ ...stats, [f]: Number(e.target.value) })}
           />

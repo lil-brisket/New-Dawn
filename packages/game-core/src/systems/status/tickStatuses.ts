@@ -4,6 +4,15 @@ import { withHp, withStatuses } from '../../entities/Combatant';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
 import { updateMap } from '../../utils/immutable';
+import { createEffectContext } from '../scaling/EffectContext';
+import { evaluateFormula } from '../scaling/getEffectiveStat';
+import { statusHookDispatcher } from './hooks/dispatcher';
+
+const noopRng = {
+  chance: () => true,
+  next: () => 0.5,
+  nextInt: (min: number) => min,
+};
 
 export interface StatusTickResult {
   readonly state: BattleState;
@@ -22,6 +31,7 @@ export function tickStatuses(
 
   const events: BattleEvent[] = [];
   let current = combatant;
+  const combatStats = registry.getCombatStatsConfig();
 
   for (const instance of combatant.statuses) {
     const def = registry.getStatus(instance.statusDefinitionId);
@@ -30,7 +40,20 @@ export function tickStatuses(
     for (const behavior of def.behaviors) {
       if (behavior.type !== 'dot') continue;
 
-      const damage = behavior.damagePerStack * instance.stacks;
+      const source = getCombatant(state, instance.sourceId);
+      const effectCtx = createEffectContext({
+        source: source ?? current,
+        target: current,
+        battle: state,
+        registry,
+        combatStats,
+        rng: noopRng,
+        status: def,
+        statusInstance: instance,
+      });
+
+      const perStack = evaluateFormula(behavior.damagePerTurn, effectCtx, instance);
+      const damage = perStack * instance.stacks;
       if (damage <= 0) continue;
 
       const newHp = current.hp - damage;
@@ -75,7 +98,7 @@ export function tickStatuses(
 export function decayStatuses(
   state: BattleState,
   combatantId: string,
-  _registry: DefinitionRegistry,
+  registry: DefinitionRegistry,
 ): StatusTickResult {
   const combatant = getCombatant(state, combatantId);
   if (!combatant || combatant.statuses.length === 0) {
@@ -84,12 +107,28 @@ export function decayStatuses(
 
   const events: BattleEvent[] = [];
   const remaining: StatusInstance[] = [];
+  const combatStats = registry.getCombatStatsConfig();
 
   for (const instance of combatant.statuses) {
     const nextTurns = instance.remainingTurns - 1;
     if (nextTurns > 0) {
       remaining.push({ ...instance, remainingTurns: nextTurns });
     } else {
+      const def = registry.getStatus(instance.statusDefinitionId);
+      const hookCtx = {
+        source: getCombatant(state, instance.sourceId) ?? combatant,
+        target: combatant,
+        battle: state,
+        registry,
+        combatStats,
+        rng: noopRng,
+        status: def,
+        statusInstance: instance,
+        instance,
+        events: [] as BattleEvent[],
+      };
+      statusHookDispatcher.dispatch('onExpire', hookCtx);
+      events.push(...hookCtx.events);
       events.push({
         type: 'status_removed',
         targetId: combatantId,

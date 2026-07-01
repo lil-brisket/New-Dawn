@@ -1,12 +1,22 @@
 {
+  "schemaVersion": 2,
   "id": "skill_shield_bash",
   "name": "Shield Bash",
-  "description": "Stuns the target with a heavy shield strike.",
+  "description": "A defensive strike fueled by armor and blade.",
   "spCost": 15,
-  "cooldown": 3,
   "effects": [
-    { "type": "damage", "element": "physical", "multiplier": 0.8 },
-    { "type": "apply_status", "statusId": "status_stun", "chance": 0.5 }
+    {
+      "type": "damage",
+      "element": "physical",
+      "value": {
+        "base": 10,
+        "terms": [
+          { "source": "stat", "key": "attack", "ratio": 0.6 },
+          { "source": "stat", "key": "defense", "ratio": 0.8 }
+        ]
+      }
+    },
+    { "type": "apply_status", "statusId": "status_stun", "chance": 0.25 }
   ],
   "targeting": { "type": "single_enemy", "range": 1 }
 }

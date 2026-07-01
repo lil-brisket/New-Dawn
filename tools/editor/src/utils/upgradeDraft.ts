@@ -1,13 +1,18 @@
-import type { ContentDomain } from '@dawn/content-pipeline';
+import type { ContentDomain } from '@dawn/content-pipeline/domains';
+import { migrateToV2 } from '@dawn/content-pipeline';
 
 const DEFAULT_SKILL_TARGETING = { type: 'single_enemy' as const, range: 1 };
-const DEFAULT_EFFECT = { type: 'damage' as const, element: 'physical' as const, multiplier: 1.0 };
+const DEFAULT_EFFECT = {
+  type: 'damage' as const,
+  element: 'physical' as const,
+  value: { base: 0, terms: [{ source: 'stat' as const, key: 'attack', ratio: 1.0 }] },
+};
 
 export function upgradeDraft(
   domain: ContentDomain,
   raw: Record<string, unknown>,
 ): Record<string, unknown> {
-  const draft = { ...raw };
+  const draft = migrateToV2({ ...raw });
 
   if (domain === 'skills') {
     if (draft.mpCost !== undefined && draft.spCost === undefined) {

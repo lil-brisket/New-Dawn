@@ -1,27 +1,28 @@
 import type { ElementType } from '../common';
 import type { HexCoord } from '../battle/grid';
+import type { ApplicationFormula, CombatStatId, DurationFormula, StatFormula } from '../scaling';
 
 export interface DamageEffect {
   type: 'damage';
   element: ElementType;
-  multiplier: number;
-  flatBonus?: number;
+  value: StatFormula;
 }
 
 export interface HealEffect {
   type: 'heal';
-  multiplier: number;
-  flatBonus?: number;
+  value: StatFormula;
 }
 
 export interface MoveEffect {
   type: 'move';
   range: number;
+  rangeFormula?: StatFormula;
 }
 
 export interface TeleportEffect {
   type: 'teleport';
   range: number;
+  rangeFormula?: StatFormula;
 }
 
 export interface BuffEffect {
@@ -29,6 +30,8 @@ export interface BuffEffect {
   statusId: string;
   chance: number;
   duration?: number;
+  durationFormula?: DurationFormula;
+  applicationFormula?: ApplicationFormula;
 }
 
 export interface SummonEffect {
@@ -39,3 +42,5 @@ export interface SummonEffect {
 
 export type SkillEffect =
   DamageEffect | HealEffect | MoveEffect | TeleportEffect | BuffEffect | SummonEffect;
+
+export type { CombatStatId, StatFormula, DurationFormula, ApplicationFormula };

@@ -1,36 +1,78 @@
 import type { DefinitionRegistry } from '@dawn/game-data';
-import type { Combatant } from '@dawn/types';
+import type { Combatant, CombatStatId } from '@dawn/types';
+import type { RandomSource } from '@dawn/utils';
+import type { EffectContext } from '../scaling/EffectContext';
+import { evaluateFormula } from '../scaling/getEffectiveStat';
 
 export interface EffectiveStats {
   readonly attack: number;
   readonly defense: number;
 }
 
-export function getEffectiveStats(
+const noopRng: RandomSource = {
+  chance: () => true,
+  next: () => 0.5,
+  nextInt: (min) => min,
+};
+
+function getCombatantStatValue(combatant: Combatant, statId: CombatStatId): number {
+  switch (statId) {
+    case 'attack':
+      return combatant.attack;
+    case 'defense':
+      return combatant.defense;
+    case 'speed':
+      return combatant.speed;
+    case 'willpower':
+      return combatant.willpower;
+    case 'resistance':
+      return combatant.resistance;
+    default:
+      return 0;
+  }
+}
+
+export function getEffectiveStatForCombatant(
   combatant: Combatant,
+  statId: CombatStatId,
   registry: DefinitionRegistry,
-): EffectiveStats {
-  let attack = combatant.attack;
-  let defense = combatant.defense;
+): number {
+  let value = getCombatantStatValue(combatant, statId);
 
   for (const instance of combatant.statuses) {
     const def = registry.getStatus(instance.statusDefinitionId);
     if (!def) continue;
 
     for (const behavior of def.behaviors) {
-      if (behavior.type !== 'stat_mod') continue;
+      if (behavior.type !== 'stat_mod' || behavior.stat !== statId) continue;
 
-      const total = behavior.amountPerStack * instance.stacks;
-      if (behavior.stat === 'attack') {
-        attack = behavior.mode === 'flat' ? attack + total : attack * (1 + total / 100);
+      const amountPerStack = evaluateFormula(behavior.value, {
+        source: combatant,
+        target: combatant,
+        battle: {} as EffectContext['battle'],
+        registry,
+        combatStats: registry.getCombatStatsConfig(),
+        rng: noopRng,
+      });
+      const total = amountPerStack * instance.stacks;
+
+      if (behavior.mode === 'flat') {
+        value += total;
       } else {
-        defense = behavior.mode === 'flat' ? defense + total : defense * (1 + total / 100);
+        value = value * (1 + total / 100);
       }
     }
   }
 
+  return Math.max(0, Math.floor(value));
+}
+
+export function getEffectiveStats(
+  combatant: Combatant,
+  registry: DefinitionRegistry,
+): EffectiveStats {
   return {
-    attack: Math.max(0, Math.floor(attack)),
-    defense: Math.max(0, Math.floor(defense)),
+    attack: getEffectiveStatForCombatant(combatant, 'attack', registry),
+    defense: getEffectiveStatForCombatant(combatant, 'defense', registry),
   };
 }
