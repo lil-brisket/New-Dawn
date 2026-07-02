@@ -7,7 +7,8 @@ import { getBattleRng } from '../../utils/battleRng';
 import { createAbilityContext } from './AbilityContext';
 import { resolveEffect, resolveChargeSkill } from './effects';
 import { resolveSkillTargets } from './targeting';
-import { dispatchStatusTriggers } from '../status/dispatchTriggers';
+import { dispatchTagTriggers } from '../tag/dispatchTriggers';
+import { isMoveTagEffect } from './skillTagUtils';
 
 export interface SkillCalculation {
   readonly state: BattleState;
@@ -58,13 +59,17 @@ export function calculateSkill(
   }
 
   for (const effect of skill.effects) {
-    if (action.skillId === 'skill_charge' && effect.type === 'move') {
+    if (
+      action.skillId === 'skill_charge' &&
+      effect.type === 'apply_tag' &&
+      isMoveTagEffect(effect)
+    ) {
       continue;
     }
     resolveEffect(effect, ctx);
   }
 
-  const attackTriggers = dispatchStatusTriggers(
+  const attackTriggers = dispatchTagTriggers(
     ctx.battle,
     action.combatantId,
     'on_attack',

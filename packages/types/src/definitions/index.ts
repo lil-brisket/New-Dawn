@@ -1,7 +1,8 @@
 import type { ElementType, EquipmentSlot, ItemRarity } from '../common';
-import type { SkillEffect } from '../skill/effects';
+import type { ApplyTagEffect } from '../skill/effects';
 import type { TargetSelector, SkillShapeType } from '../skill/targeting';
 import type { ApplicationFormula, CombatStatId, DurationFormula, StatFormula } from '../scaling';
+import type { HexCoord } from '../battle/grid';
 
 export type StatModMode = 'flat' | 'percent';
 
@@ -12,7 +13,7 @@ export interface ContentMetadata {
   weaponType?: string;
   job?: string;
   rarity?: ItemRarity;
-  tags?: string[];
+  labels?: string[];
   unlockLevel?: number;
 }
 
@@ -47,7 +48,7 @@ export interface SkillDefinition extends ContentMetadata {
   spCost: number;
   apCost: number;
   cooldown: number;
-  effects: SkillEffect[];
+  effects: ApplyTagEffect[];
   targeting: TargetSelector;
   shapeType?: SkillShapeType;
   iconId: string;
@@ -94,7 +95,13 @@ export interface EnemyDefinition extends ContentMetadata {
   schemaVersion?: number;
 }
 
-export type StatusBehavior =
+export type TagBehavior =
+  | { type: 'instant_damage'; element: ElementType; value: StatFormula; pierce?: boolean }
+  | { type: 'instant_heal'; value: StatFormula }
+  | { type: 'shield_grant'; value: StatFormula; duration?: number }
+  | { type: 'move'; range: number; rangeFormula?: StatFormula; teleport?: boolean }
+  | { type: 'teleport'; range: number; rangeFormula?: StatFormula }
+  | { type: 'summon'; entityDefinitionId: string; position?: HexCoord }
   | { type: 'dot'; element: ElementType; damagePerTurn: StatFormula }
   | { type: 'control'; effect: 'stun' | 'bind' }
   | {
@@ -106,10 +113,15 @@ export type StatusBehavior =
   | {
       type: 'trigger';
       event: 'on_hit' | 'on_damaged' | 'on_turn_start' | 'on_move' | 'on_attack';
-      effect: SkillEffect;
-    };
+      effect: ApplyTagEffect;
+    }
+  | { type: 'absorb'; percent: StatFormula }
+  | { type: 'lifesteal'; percent: StatFormula }
+  | { type: 'reflect'; percent: StatFormula }
+  | { type: 'clear'; polarity: 'positive' }
+  | { type: 'cleanse'; polarity: 'negative' };
 
-export interface StatusDefinition extends ContentMetadata {
+export interface TagDefinition extends ContentMetadata {
   id: string;
   name: string;
   description: string;
@@ -117,8 +129,13 @@ export interface StatusDefinition extends ContentMetadata {
   stackable: boolean;
   maxStacks: number;
   iconId: string;
-  behaviors: StatusBehavior[];
+  behaviors: TagBehavior[];
   applicationFormula?: ApplicationFormula;
   durationFormula?: DurationFormula;
   schemaVersion?: number;
 }
+
+/** @deprecated Use TagDefinition */
+export type StatusDefinition = TagDefinition;
+/** @deprecated Use TagBehavior */
+export type StatusBehavior = TagBehavior;

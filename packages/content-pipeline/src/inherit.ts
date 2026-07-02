@@ -1,11 +1,11 @@
-import type { RawEnemy, RawSkill, RawStatus } from './schemas';
+import type { RawEnemy, RawSkill, RawTag } from './schemas';
 import {
   defaultEnemyFields,
   defaultSkillFields,
-  defaultStatusFields,
+  defaultTagFields,
   mergeEnemyRaw,
   mergeSkillRaw,
-  mergeStatusRaw,
+  mergeTagRaw,
 } from './defaults';
 
 export interface PipelineError {
@@ -84,15 +84,15 @@ export function resolveSkillInheritance(
   return { resolved, errors };
 }
 
-export function resolveStatusInheritance(
-  items: Map<string, RawStatus>,
+export function resolveTagInheritance(
+  items: Map<string, RawTag>,
   fileMap: Map<string, string>,
-): { resolved: Map<string, RawStatus>; errors: PipelineError[] } {
-  const resolved = new Map<string, RawStatus>();
+): { resolved: Map<string, RawTag>; errors: PipelineError[] } {
+  const resolved = new Map<string, RawTag>();
   const errors: PipelineError[] = [];
 
   for (const id of items.keys()) {
-    const result = resolveChain(id, items, mergeStatusRaw, fileMap);
+    const result = resolveChain(id, items, mergeTagRaw, fileMap);
     errors.push(...result.errors);
     if (result.merged) {
       resolved.set(id, result.merged);
@@ -101,6 +101,9 @@ export function resolveStatusInheritance(
 
   return { resolved, errors };
 }
+
+/** @deprecated Use resolveTagInheritance */
+export const resolveStatusInheritance = resolveTagInheritance;
 
 export function resolveEnemyInheritance(
   items: Map<string, RawEnemy>,
@@ -137,12 +140,12 @@ export function rawToDefaultSkill(id: string, name: string): RawSkill {
     vfxId: defaults.vfxId,
     sfxId: defaults.sfxId,
     category: defaults.category,
-    tags: defaults.tags,
+    labels: defaults.labels,
   };
 }
 
-export function rawToDefaultStatus(id: string, name: string): RawStatus {
-  const defaults = defaultStatusFields(id);
+export function rawToDefaultTag(id: string, name: string): RawTag {
+  const defaults = defaultTagFields(id);
   return {
     id,
     name,
@@ -151,10 +154,13 @@ export function rawToDefaultStatus(id: string, name: string): RawStatus {
     stackable: defaults.stackable,
     maxStacks: defaults.maxStacks,
     iconId: defaults.iconId,
-    behaviors: defaults.behaviors as RawStatus['behaviors'],
-    tags: defaults.tags,
+    behaviors: defaults.behaviors as RawTag['behaviors'],
+    labels: defaults.labels,
   };
 }
+
+/** @deprecated Use rawToDefaultTag */
+export const rawToDefaultStatus = rawToDefaultTag;
 
 export function rawToDefaultEnemy(id: string, name: string): RawEnemy {
   const defaults = defaultEnemyFields(id);
@@ -169,6 +175,6 @@ export function rawToDefaultEnemy(id: string, name: string): RawEnemy {
     aiProfileId: defaults.aiProfileId,
     lootTableId: defaults.lootTableId,
     element: defaults.element,
-    tags: defaults.tags,
+    labels: defaults.labels,
   };
 }

@@ -1,8 +1,0 @@
-{
-  "schemaVersion": 2,
-  "id": "status_bind",
-  "name": "Bind",
-  "description": "Movement is reduced.",
-  "duration": 2,
-  "behaviors": [{ "type": "control", "effect": "bind" }]
-}

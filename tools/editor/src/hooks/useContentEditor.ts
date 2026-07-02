@@ -68,8 +68,11 @@ export function useContentEditor(domain: ContentDomain) {
     setMessage('');
     try {
       const upgraded = upgradeDraft(domain, draft);
-      const newId = String(upgraded.id);
-      if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, newId)) {
+      const newId = domain === 'tags' && selectedId ? selectedId : String(upgraded.id);
+      if (domain === 'tags') {
+        upgraded.id = newId;
+      }
+      if ((domain === 'skills' || domain === 'tags') && validateContentId(domain, newId)) {
         setMessage(validateContentId(domain, newId)!);
         return;
       }
@@ -97,11 +100,11 @@ export function useContentEditor(domain: ContentDomain) {
     const name = prompt('Display name:');
     if (!name?.trim()) return;
     const id =
-      domain === 'skills' || domain === 'statuses'
-        ? nameToContentId(name, domain === 'skills' ? 'skill' : 'status')
+      domain === 'skills' || domain === 'tags'
+        ? nameToContentId(name, domain === 'skills' ? 'skill' : 'tag')
         : prompt(`New ${domain} id:`)?.trim();
     if (!id) return;
-    if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, id)) {
+    if ((domain === 'skills' || domain === 'tags') && validateContentId(domain, id)) {
       alert(validateContentId(domain, id));
       return;
     }
@@ -115,7 +118,7 @@ export function useContentEditor(domain: ContentDomain) {
     if (!draft.id) return;
     const newId = prompt('Duplicate as id:', `${String(draft.id)}_copy`);
     if (!newId) return;
-    if ((domain === 'skills' || domain === 'statuses') && validateContentId(domain, newId)) {
+    if ((domain === 'skills' || domain === 'tags') && validateContentId(domain, newId)) {
       alert(validateContentId(domain, newId));
       return;
     }

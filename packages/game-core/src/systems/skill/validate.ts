@@ -4,7 +4,7 @@ import { err, ok } from '@dawn/utils';
 import { defaultRegistry, type DefinitionRegistry } from '@dawn/game-data';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
-import { isStunned } from '../status/hasControlEffect';
+import { isStunned } from '../tag/hasControlEffect';
 import { canTarget } from './targeting';
 
 /** Minimum HP combatant must retain after paying an HP cost (self-sacrifice skills may override later). */

@@ -12,24 +12,18 @@ export function useSkillOptions(): ContentRefOption[] {
   return skills;
 }
 
-export function useStatusOptions(): ContentRefOption[] {
-  const [statuses, setStatuses] = useState<ContentRefOption[]>([]);
+export function useTagOptions(): ContentRefOption[] {
+  const [tags, setTags] = useState<ContentRefOption[]>([]);
   useEffect(() => {
-    listContent('statuses')
-      .then((list) =>
-        setStatuses(
-          list
-            .map((s) => ({
-              id: s.id,
-              name: s.name,
-            }))
-            .sort((a, b) => a.name.localeCompare(b.name)),
-        ),
-      )
+    listContent('tags')
+      .then((list) => setTags(list.map((s) => ({ id: s.id, name: s.name }))))
       .catch(console.error);
   }, []);
-  return statuses;
+  return tags;
 }
+
+/** @deprecated Use useTagOptions */
+export const useStatusOptions = useTagOptions;
 
 export function useEnemyOptions(): ContentRefOption[] {
   const [enemies, setEnemies] = useState<ContentRefOption[]>([]);

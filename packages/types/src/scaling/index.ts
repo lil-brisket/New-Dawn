@@ -32,7 +32,7 @@ export interface StatDef {
   readonly label: string;
 }
 
-export interface StatusApplicationFormulaConfig {
+export interface TagApplicationFormulaConfig {
   readonly attackerStat: CombatStatId;
   readonly defenderStat: CombatStatId;
   readonly perPointDelta: number;
@@ -45,7 +45,7 @@ export interface DurationReductionFormulaConfig {
 }
 
 export interface CombatStatsFormulas {
-  readonly statusApplication: StatusApplicationFormulaConfig;
+  readonly tagApplication: TagApplicationFormulaConfig;
   readonly durationReduction: DurationReductionFormulaConfig;
 }
 
@@ -54,3 +54,6 @@ export interface CombatStatsConfig {
   readonly stats: readonly StatDef[];
   readonly formulas: CombatStatsFormulas;
 }
+
+/** @deprecated Use TagApplicationFormulaConfig */
+export type StatusApplicationFormulaConfig = TagApplicationFormulaConfig;

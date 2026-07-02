@@ -102,27 +102,27 @@ function mapSingleEvent(event: BattleEvent, state: BattleState | null): BattleUI
           state,
         ),
       ];
-    case 'status_applied':
+    case 'tag_applied':
       return [
         makeEvent(
           {
-            type: 'status',
+            type: 'tag',
             icon: BattleAssets.icons.skill,
-            title: 'Status',
-            description: `${event.statusId} applied (${event.stacks} stacks)`,
+            title: 'Tag',
+            description: `${event.tagId} applied (${event.stacks} stacks)`,
             color: 'warning',
             priority: 1,
             payload: {
               targetId: event.targetId,
-              statusId: event.statusId,
+              tagId: event.tagId,
               stacks: event.stacks,
             },
           },
           state,
         ),
       ];
-    case 'status_removed':
-    case 'status_tick':
+    case 'tag_removed':
+    case 'tag_tick':
       return [];
     case 'combatant_killed':
       return [

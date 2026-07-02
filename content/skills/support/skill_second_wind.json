@@ -4,6 +4,29 @@
   "description": "Recovers your own vitality.",
   "spCost": 15,
   "cooldown": 2,
-  "effects": [{ "type": "heal", "multiplier": 0.8 }],
-  "targeting": { "type": "self" }
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_instant_heal",
+      "chance": 1,
+      "overrides": {
+        "instant_heal": {
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.8
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "targeting": {
+    "type": "self"
+  },
+  "schemaVersion": 3
 }

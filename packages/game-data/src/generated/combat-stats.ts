@@ -12,7 +12,7 @@ export const COMBAT_STAT_IDS: readonly CombatStatId[] = [
 ] as const;
 
 export const combatStatsConfig: CombatStatsConfig = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   stats: [
     {
       id: 'attack',
@@ -36,7 +36,7 @@ export const combatStatsConfig: CombatStatsConfig = {
     },
   ],
   formulas: {
-    statusApplication: {
+    tagApplication: {
       attackerStat: 'willpower',
       defenderStat: 'resistance',
       perPointDelta: 0.005,

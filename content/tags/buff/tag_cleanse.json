@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_cleanse",
+  "name": "Cleanse",
+  "description": "Removes negative effects from self.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "buff",
+  "behaviors": [
+    {
+      "type": "cleanse",
+      "polarity": "negative"
+    }
+  ]
+}

@@ -16,17 +16,17 @@ import {
   migrateContent,
   normalizeEnemy,
   normalizeSkill,
-  normalizeStatus,
+  normalizeTag,
   processContent,
   rawEnemySchema,
   rawSkillSchema,
-  rawStatusSchema,
+  rawTagSchema,
   skillToAuthoringJson,
-  statusToAuthoringJson,
+  tagToAuthoringJson,
   type ContentDomain,
 } from '../../packages/content-pipeline/src/index';
 
-const DOMAINS: ContentDomain[] = ['skills', 'statuses', 'enemies'];
+const DOMAINS: ContentDomain[] = ['skills', 'tags', 'enemies'];
 
 function walkJson(
   dir: string,
@@ -157,8 +157,8 @@ export function contentApiPlugin(repoRoot: string): Plugin {
             const normalized =
               domain === 'skills'
                 ? processed.skills
-                : domain === 'statuses'
-                  ? processed.statuses
+                : domain === 'tags'
+                  ? processed.tags
                   : processed.enemies;
             const list = files.map((f) => {
               const norm = normalized.find((n) => n.id === f.id);
@@ -177,6 +177,9 @@ export function contentApiPlugin(repoRoot: string): Plugin {
                 category: (norm as { category?: string })?.category,
               };
             });
+            list.sort((a, b) =>
+              (a.name ?? a.id).localeCompare(b.name ?? b.id, undefined, { sensitivity: 'base' }),
+            );
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(list));
             return;
@@ -256,11 +259,11 @@ export function contentApiPlugin(repoRoot: string): Plugin {
             res.end(skillToAuthoringJson(normalized, raw));
             return;
           }
-          if (domain === 'statuses') {
-            const raw = rawStatusSchema.parse(migrated);
-            const normalized = normalizeStatus(raw);
+          if (domain === 'tags') {
+            const raw = rawTagSchema.parse(migrated);
+            const normalized = normalizeTag(raw);
             res.setHeader('Content-Type', 'application/json');
-            res.end(statusToAuthoringJson(normalized));
+            res.end(tagToAuthoringJson(normalized));
             return;
           }
           const raw = rawEnemySchema.parse(migrated);

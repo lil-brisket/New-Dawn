@@ -1,4 +1,4 @@
-import type { EnemyDefinition, SkillDefinition, StatusDefinition } from '@dawn/types';
+import type { EnemyDefinition, SkillDefinition, TagDefinition } from '@dawn/types';
 import type { PipelineError } from './inherit';
 
 export interface ReferenceIndex {
@@ -16,20 +16,28 @@ function addRef(index: ReferenceIndex, from: string, to: string): void {
 
 export function buildReferenceIndex(
   skills: SkillDefinition[],
-  statuses: StatusDefinition[],
+  tags: TagDefinition[],
   enemies: EnemyDefinition[],
-): { index: ReferenceIndex; statusIds: Set<string>; skillIds: Set<string> } {
+): { index: ReferenceIndex; tagIds: Set<string>; skillIds: Set<string> } {
   const index: ReferenceIndex = { usedBy: {}, uses: {} };
-  const statusIds = new Set(statuses.map((s) => s.id));
+  const tagIds = new Set(tags.map((s) => s.id));
   const skillIds = new Set(skills.map((s) => s.id));
 
   for (const skill of skills) {
     for (const effect of skill.effects) {
-      if (effect.type === 'apply_status') {
-        addRef(index, skill.id, effect.statusId);
+      if (effect.type === 'apply_tag') {
+        addRef(index, skill.id, effect.tagId);
       }
-      if (effect.type === 'summon') {
-        addRef(index, skill.id, effect.entityDefinitionId);
+    }
+  }
+
+  for (const tag of tags) {
+    for (const behavior of tag.behaviors) {
+      if (behavior.type === 'summon') {
+        addRef(index, tag.id, behavior.entityDefinitionId);
+      }
+      if (behavior.type === 'trigger' && behavior.effect.type === 'apply_tag') {
+        addRef(index, tag.id, behavior.effect.tagId);
       }
     }
   }
@@ -46,25 +54,25 @@ export function buildReferenceIndex(
     }
   }
 
-  return { index, statusIds, skillIds };
+  return { index, tagIds, skillIds };
 }
 
 export function validateReferences(
   skills: SkillDefinition[],
-  statuses: StatusDefinition[],
+  tags: TagDefinition[],
   enemies: EnemyDefinition[],
   knownLootTables: Set<string> = new Set(['loot_goblin', 'loot_goblin_chief']),
 ): PipelineError[] {
   const errors: PipelineError[] = [];
-  const { statusIds, skillIds } = buildReferenceIndex(skills, statuses, enemies);
+  const { tagIds, skillIds } = buildReferenceIndex(skills, tags, enemies);
 
   for (const skill of skills) {
     for (const effect of skill.effects) {
-      if (effect.type === 'apply_status' && !statusIds.has(effect.statusId)) {
+      if (effect.type === 'apply_tag' && !tagIds.has(effect.tagId)) {
         errors.push({
           file: skill.id,
           id: skill.id,
-          message: `Unknown statusId: ${effect.statusId}`,
+          message: `Unknown tagId: ${effect.tagId}`,
           severity: 'error',
         });
       }
@@ -97,8 +105,8 @@ export function validateReferences(
 
 export function getReferenceIndex(
   skills: SkillDefinition[],
-  statuses: StatusDefinition[],
+  tags: TagDefinition[],
   enemies: EnemyDefinition[],
 ): ReferenceIndex {
-  return buildReferenceIndex(skills, statuses, enemies).index;
+  return buildReferenceIndex(skills, tags, enemies).index;
 }

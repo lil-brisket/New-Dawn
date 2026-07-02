@@ -5,7 +5,7 @@ import type {
   EquipmentDefinition,
   ItemDefinition,
   SkillDefinition,
-  StatusDefinition,
+  TagDefinition,
   MapData,
 } from '@dawn/types';
 import * as characters from '../characters';
@@ -15,7 +15,7 @@ import * as maps from '../maps';
 import * as loot from '../loot';
 import * as professions from '../professions';
 import * as masteries from '../masteries';
-import { skills, statuses, enemies } from '../generated/content';
+import { skills, tags, enemies } from '../generated/content';
 import { combatStatsConfig } from '../generated/combat-stats';
 
 export interface DefinitionRegistry {
@@ -24,15 +24,19 @@ export interface DefinitionRegistry {
   getEquipment(id: string): EquipmentDefinition | undefined;
   getItem(id: string): ItemDefinition | undefined;
   getEnemy(id: string): EnemyDefinition | undefined;
-  getStatus(id: string): StatusDefinition | undefined;
+  getTag(id: string): TagDefinition | undefined;
   getMap(id: string): MapData | undefined;
   getLootTable(id: string): loot.LootTable | undefined;
   getProfession(id: string): professions.ProfessionDefinition | undefined;
   getMastery(id: string): masteries.MasteryDefinition | undefined;
   getCombatStatsConfig(): CombatStatsConfig;
   getAllSkills(): SkillDefinition[];
-  getAllStatuses(): StatusDefinition[];
+  getAllTags(): TagDefinition[];
   getAllEnemies(): EnemyDefinition[];
+  /** @deprecated Use getTag */
+  getStatus(id: string): TagDefinition | undefined;
+  /** @deprecated Use getAllTags */
+  getAllStatuses(): TagDefinition[];
 }
 
 function buildRegistry<T extends { id: string }>(items: T[]): Map<string, T> {
@@ -45,7 +49,7 @@ export function createDefinitionRegistry(): DefinitionRegistry {
   const equipmentMap = buildRegistry(Object.values(equipment));
   const itemMap = buildRegistry(Object.values(items));
   const enemyMap = buildRegistry(enemies);
-  const statusMap = buildRegistry(statuses);
+  const tagMap = buildRegistry(tags);
   const mapMap = buildRegistry(Object.values(maps));
   const lootMap = buildRegistry(Object.values(loot));
   const professionMap = buildRegistry(Object.values(professions));
@@ -57,14 +61,16 @@ export function createDefinitionRegistry(): DefinitionRegistry {
     getEquipment: (id) => equipmentMap.get(id),
     getItem: (id) => itemMap.get(id),
     getEnemy: (id) => enemyMap.get(id),
-    getStatus: (id) => statusMap.get(id),
+    getTag: (id) => tagMap.get(id),
+    getStatus: (id) => tagMap.get(id),
     getMap: (id) => mapMap.get(id),
     getLootTable: (id) => lootMap.get(id),
     getProfession: (id) => professionMap.get(id),
     getMastery: (id) => masteryMap.get(id),
     getCombatStatsConfig: () => combatStatsConfig,
     getAllSkills: () => skills,
-    getAllStatuses: () => statuses,
+    getAllTags: () => tags,
+    getAllStatuses: () => tags,
     getAllEnemies: () => enemies,
   };
 }

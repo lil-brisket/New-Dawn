@@ -16,19 +16,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
-import type { ElementType, SkillEffect } from '@dawn/types';
-import { EFFECT_TYPES } from '../fields/constants';
-import { EnumSelect } from '../fields/EnumSelect';
+import type { ApplyTagEffect } from '@dawn/types';
 import { btnGhost } from '../fields/styles';
-import {
-  ApplyStatusEffectEditor,
-  DamageEffectEditor,
-  HealEffectEditor,
-  RangeEffectEditor,
-  SummonEffectEditor,
-  ShieldEffectEditor,
-  createDefaultEffect,
-} from './editors';
+import { ApplyTagEffectEditor, createDefaultEffect } from './editors';
+import { useTagOptions } from '../../hooks/useContentOptions';
 
 const block: React.CSSProperties = {
   background: '#252530',
@@ -36,34 +27,6 @@ const block: React.CSSProperties = {
   marginBottom: 10,
   border: '1px solid #2e2e3a',
 };
-
-function EffectFields({
-  effect,
-  onChange,
-}: {
-  effect: SkillEffect;
-  onChange: (e: SkillEffect) => void;
-}) {
-  if (effect.type === 'damage') {
-    return <DamageEffectEditor effect={effect} onChange={onChange} />;
-  }
-  if (effect.type === 'heal') {
-    return <HealEffectEditor effect={effect} onChange={onChange} />;
-  }
-  if (effect.type === 'apply_status') {
-    return <ApplyStatusEffectEditor effect={effect} onChange={onChange} />;
-  }
-  if (effect.type === 'move') {
-    return <RangeEffectEditor effect={effect} onChange={onChange} />;
-  }
-  if (effect.type === 'summon') {
-    return <SummonEffectEditor effect={effect} onChange={onChange} />;
-  }
-  if (effect.type === 'shield') {
-    return <ShieldEffectEditor effect={effect} onChange={onChange} />;
-  }
-  return <span>{(effect as SkillEffect).type}</span>;
-}
 
 function SortableBlock({
   effect,
@@ -73,14 +36,16 @@ function SortableBlock({
   onChange,
   onDuplicate,
   onDelete,
+  tagLabel,
 }: {
-  effect: SkillEffect;
+  effect: ApplyTagEffect;
   index: number;
   collapsed: boolean;
   onToggle: () => void;
-  onChange: (e: SkillEffect) => void;
+  onChange: (e: ApplyTagEffect) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  tagLabel: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: String(index),
@@ -90,8 +55,6 @@ function SortableBlock({
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  const typeLabel = EFFECT_TYPES.find((t) => t.value === effect.type)?.label ?? effect.type;
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -108,7 +71,7 @@ function SortableBlock({
           ⠿
         </span>
         <strong>{index + 1}.</strong>
-        <span style={{ flex: 1 }}>{typeLabel}</span>
+        <span style={{ flex: 1 }}>{tagLabel}</span>
         <button type="button" style={btnGhost} onClick={onToggle}>
           {collapsed ? '▸' : '▾'}
         </button>
@@ -120,19 +83,8 @@ function SortableBlock({
         </button>
       </div>
       {!collapsed && (
-        <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            Type
-            <EnumSelect
-              value={effect.type === 'teleport' ? 'move' : effect.type}
-              options={[...EFFECT_TYPES]}
-              onChange={(t) => t && onChange(createDefaultEffect(t, skillElement))}
-            />
-          </label>
-          <EffectFields
-            effect={effect.type === 'teleport' ? { type: 'move', range: effect.range } : effect}
-            onChange={onChange}
-          />
+        <div style={{ padding: 14 }}>
+          <ApplyTagEffectEditor effect={effect} onChange={onChange} />
         </div>
       )}
     </div>
@@ -143,15 +95,13 @@ export function EffectBuilder({
   effects,
   onChange,
   single = false,
-  skillElement,
 }: {
-  effects: SkillEffect[];
-  onChange: (effects: SkillEffect[]) => void;
+  effects: ApplyTagEffect[];
+  onChange: (effects: ApplyTagEffect[]) => void;
   single?: boolean;
-  skillElement?: ElementType;
 }) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
-  const [addType, setAddType] = useState<SkillEffect['type']>('damage');
+  const tagOptions = useTagOptions();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -164,6 +114,9 @@ export function EffectBuilder({
     const newIndex = Number(over.id);
     onChange(arrayMove(effects, oldIndex, newIndex));
   };
+
+  const labelFor = (effect: ApplyTagEffect) =>
+    tagOptions.find((t) => t.id === effect.tagId)?.name ?? effect.tagId;
 
   return (
     <div>
@@ -197,6 +150,7 @@ export function EffectBuilder({
               key={index}
               index={index}
               effect={effect}
+              tagLabel={labelFor(effect)}
               collapsed={collapsed[index] ?? false}
               onToggle={() => setCollapsed((c) => ({ ...c, [index]: !c[index] }))}
               onChange={(e) => {
@@ -218,28 +172,17 @@ export function EffectBuilder({
         </SortableContext>
       </DndContext>
       {!single && (
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10 }}>
-          <EnumSelect
-            value={addType}
-            options={[...EFFECT_TYPES]}
-            onChange={(t) => t && setAddType(t)}
-          />
-          <button
-            type="button"
-            onClick={() => onChange([...effects, createDefaultEffect(addType, skillElement)])}
-            style={btnGhost}
-          >
-            + Add Effect
-          </button>
-        </div>
-      )}
-      {single && effects.length === 0 && (
         <button
           type="button"
+          onClick={() => onChange([...effects, createDefaultEffect()])}
           style={btnGhost}
-          onClick={() => onChange([createDefaultEffect('damage', skillElement)])}
         >
-          + Add trigger effect
+          + Add Tag Effect
+        </button>
+      )}
+      {single && effects.length === 0 && (
+        <button type="button" style={btnGhost} onClick={() => onChange([createDefaultEffect()])}>
+          + Add trigger tag
         </button>
       )}
     </div>

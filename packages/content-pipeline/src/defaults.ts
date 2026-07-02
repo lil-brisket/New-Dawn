@@ -1,12 +1,12 @@
-import type { EnemyDefinition, SkillDefinition, StatusDefinition } from '@dawn/types';
-import type { RawEnemy, RawSkill, RawStatus } from './schemas';
+import type { EnemyDefinition, SkillDefinition, TagDefinition } from '@dawn/types';
+import type { RawEnemy, RawSkill, RawTag } from './schemas';
 
 function skillSlug(id: string): string {
   return id.replace(/^skill_/, '');
 }
 
-function statusSlug(id: string): string {
-  return id.replace(/^status_/, '');
+function tagSlug(id: string): string {
+  return id.replace(/^tag_/, '');
 }
 
 function enemySlug(id: string): string {
@@ -26,7 +26,16 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
     spCost: 0,
     apCost: 0,
     cooldown: 0,
-    effects: [{ type: 'damage', element: 'physical', value: defaultDamageFormula }],
+    effects: [
+      {
+        type: 'apply_tag',
+        tagId: 'tag_damage',
+        chance: 1,
+        overrides: {
+          instant_damage: { element: 'physical', value: defaultDamageFormula },
+        },
+      },
+    ],
     targeting: { type: 'single_enemy', range: 1 },
     shapeType: 'aoe',
     iconId: `icon_${slug}`,
@@ -35,13 +44,13 @@ export function defaultSkillFields(id: string): Omit<SkillDefinition, 'id' | 'na
     animationKey: `anim_${slug}`,
     soundKey: `sfx_${slug}`,
     category: 'physical',
-    tags: [],
-    schemaVersion: 2,
+    labels: [],
+    schemaVersion: 3,
   };
 }
 
-export function defaultStatusFields(id: string): Omit<StatusDefinition, 'id' | 'name'> {
-  const slug = statusSlug(id);
+export function defaultTagFields(id: string): Omit<TagDefinition, 'id' | 'name'> {
+  const slug = tagSlug(id);
   return {
     description: '',
     duration: 1,
@@ -49,10 +58,13 @@ export function defaultStatusFields(id: string): Omit<StatusDefinition, 'id' | '
     maxStacks: 1,
     iconId: `icon_${slug}`,
     behaviors: [],
-    tags: [],
-    schemaVersion: 2,
+    labels: [],
+    schemaVersion: 3,
   };
 }
+
+/** @deprecated Use defaultTagFields */
+export const defaultStatusFields = defaultTagFields;
 
 export function defaultEnemyFields(id: string): Omit<EnemyDefinition, 'id' | 'name'> {
   const slug = enemySlug(id);
@@ -75,14 +87,14 @@ export function defaultEnemyFields(id: string): Omit<EnemyDefinition, 'id' | 'na
     aiProfileId: 'ai_aggressive',
     lootTableId: `loot_${slug}`,
     element: 'earth',
-    tags: [],
-    schemaVersion: 2,
+    labels: [],
+    schemaVersion: 3,
   };
 }
 
 export function inferCategoryFromPath(filePath: string): string | undefined {
   const parts = filePath.replace(/\\/g, '/').split('/');
-  const domainIndex = parts.findIndex((p) => ['skills', 'statuses', 'enemies'].includes(p));
+  const domainIndex = parts.findIndex((p) => ['skills', 'tags', 'statuses', 'enemies'].includes(p));
   if (domainIndex >= 0 && parts[domainIndex + 1] && !parts[domainIndex + 1]!.endsWith('.json')) {
     return parts[domainIndex + 1];
   }
@@ -95,11 +107,14 @@ export function mergeSkillRaw(base: RawSkill, override: RawSkill): RawSkill {
   return { id, name, ...b, ...rest };
 }
 
-export function mergeStatusRaw(base: RawStatus, override: RawStatus): RawStatus {
+export function mergeTagRaw(base: RawTag, override: RawTag): RawTag {
   const { inherits: _b, id: _bid, name: _bname, ...b } = base;
   const { inherits: _o, id, name, ...rest } = override;
   return { id, name, ...b, ...rest };
 }
+
+/** @deprecated Use mergeTagRaw */
+export const mergeStatusRaw = mergeTagRaw;
 
 export function mergeEnemyRaw(base: RawEnemy, override: RawEnemy): RawEnemy {
   const { inherits: _b, id: _bid, name: _bname, ...b } = base;

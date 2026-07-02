@@ -1,22 +1,37 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "stats": [
-    { "id": "attack", "label": "Attack" },
-    { "id": "defense", "label": "Defense" },
-    { "id": "speed", "label": "Speed" },
-    { "id": "willpower", "label": "Willpower" },
-    { "id": "resistance", "label": "Resistance" }
+    {
+      "id": "attack",
+      "label": "Attack"
+    },
+    {
+      "id": "defense",
+      "label": "Defense"
+    },
+    {
+      "id": "speed",
+      "label": "Speed"
+    },
+    {
+      "id": "willpower",
+      "label": "Willpower"
+    },
+    {
+      "id": "resistance",
+      "label": "Resistance"
+    }
   ],
   "formulas": {
-    "statusApplication": {
-      "attackerStat": "willpower",
-      "defenderStat": "resistance",
-      "perPointDelta": 0.005
-    },
     "durationReduction": {
       "defenderStat": "resistance",
       "perPointReduction": 0.02,
       "minDuration": 1
+    },
+    "tagApplication": {
+      "attackerStat": "willpower",
+      "defenderStat": "resistance",
+      "perPointDelta": 0.005
     }
   }
 }

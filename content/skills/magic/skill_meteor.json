@@ -6,8 +6,38 @@
   "cooldown": 3,
   "element": "fire",
   "effects": [
-    { "type": "damage", "element": "fire", "multiplier": 1.1 },
-    { "type": "apply_status", "statusId": "status_burn", "chance": 0.4 }
+    {
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "fire",
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 1.1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "apply_tag",
+      "tagId": "tag_burn",
+      "chance": 0.4
+    }
   ],
-  "targeting": { "type": "area", "range": 4, "radius": 1, "filter": "enemy", "center": "tile" }
+  "targeting": {
+    "type": "area",
+    "range": 4,
+    "radius": 1,
+    "filter": "enemy",
+    "center": "tile"
+  },
+  "schemaVersion": 3
 }

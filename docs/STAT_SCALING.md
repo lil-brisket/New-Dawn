@@ -1,6 +1,6 @@
 # Stat Scaling
 
-Dawn uses a data-driven **StatFormula** pipeline for skills, statuses, and combat resolution. No skill-specific code paths — all scaling comes from content JSON.
+Dawn uses a data-driven **StatFormula** pipeline for skills, tags, and combat resolution. No skill-specific code paths — all scaling comes from content JSON.
 
 ## Core types
 
@@ -53,21 +53,21 @@ evaluateFormula
   → final heal amount
 ```
 
-## Status application
+## Tag application
 
-`resolveStatusApplication()` runs a full pipeline:
+Skills apply effects exclusively through `apply_tag`. `resolveTagApplication()` runs a full pipeline:
 
 1. Immunity check (stub)
-2. Calculate chance — `willpower` vs `resistance` from config (or per-status override)
+2. Calculate chance — `willpower` vs `resistance` from config (or per-tag override)
 3. RNG roll
 4. Calculate duration — optional `durationFormula` + resistance reduction
 5. `onBeforeApply` hooks
-6. Apply `StatusInstance` with **source stat snapshots**
+6. Execute tag behaviors (instant) or apply `TagInstance` with **source stat snapshots** (persistent)
 7. `onApply` hooks + events
 
 ### Source snapshots
 
-When a status is applied, all combat stats from the source are frozen on the instance:
+When a persistent tag is applied, all combat stats from the source are frozen on the instance:
 
 ```typescript
 sourceSnapshots?: Partial<Record<CombatStatId, number>>
@@ -84,8 +84,8 @@ interface EffectContext {
   source: Combatant;
   target: Combatant;
   skill?: SkillDefinition;
-  status?: StatusDefinition;
-  statusInstance?: StatusInstance;
+  tag?: TagDefinition;
+  tagInstance?: TagInstance;
   battle: BattleState;
   registry: DefinitionRegistry;
   combatStats: CombatStatsConfig;
@@ -99,25 +99,34 @@ interface EffectContext {
 
 ## Schema versioning
 
-Content files support `"schemaVersion": 2`. The pipeline migrates v1 content automatically:
+Content files support `"schemaVersion": 3`. The pipeline migrates older content automatically:
 
 | Legacy                          | Migrated                                                                     |
 | ------------------------------- | ---------------------------------------------------------------------------- |
 | `multiplier: 1.4, flatBonus: 5` | `value: { base: 5, terms: [{ source: "stat", key: "attack", ratio: 1.4 }] }` |
 | `damagePerStack: 5`             | `damagePerTurn: { base: 5, terms: [] }`                                      |
 | `amountPerStack: 10`            | `value: { base: 10, terms: [] }`                                             |
+| `type: "damage"` skill effect   | `apply_tag` → `tag_damage` with overrides                                    |
+| `statuses/` content domain      | `tags/` with `tag_*` IDs                                                     |
+| metadata `tags`                 | `labels`                                                                     |
 
 ## Example skills
 
-### Fireball (attack scaling)
+### Fireball (attack scaling via tag override)
 
 ```json
 {
-  "type": "damage",
-  "element": "fire",
-  "value": {
-    "base": 20,
-    "terms": [{ "source": "stat", "key": "attack", "ratio": 1.2 }]
+  "type": "apply_tag",
+  "tagId": "tag_damage",
+  "chance": 1,
+  "overrides": {
+    "instant_damage": {
+      "element": "fire",
+      "value": {
+        "base": 20,
+        "terms": [{ "source": "stat", "key": "attack", "ratio": 1.2 }]
+      }
+    }
   }
 }
 ```
@@ -126,14 +135,20 @@ Content files support `"schemaVersion": 2`. The pipeline migrates v1 content aut
 
 ```json
 {
-  "type": "damage",
-  "element": "physical",
-  "value": {
-    "base": 10,
-    "terms": [
-      { "source": "stat", "key": "attack", "ratio": 0.6 },
-      { "source": "stat", "key": "defense", "ratio": 0.8 }
-    ]
+  "type": "apply_tag",
+  "tagId": "tag_damage",
+  "chance": 1,
+  "overrides": {
+    "instant_damage": {
+      "element": "physical",
+      "value": {
+        "base": 10,
+        "terms": [
+          { "source": "stat", "key": "attack", "ratio": 0.6 },
+          { "source": "stat", "key": "defense", "ratio": 0.8 }
+        ]
+      }
+    }
   }
 }
 ```
@@ -142,15 +157,21 @@ Content files support `"schemaVersion": 2`. The pipeline migrates v1 content aut
 
 ```json
 {
-  "type": "heal",
-  "value": {
-    "base": 15,
-    "terms": [{ "source": "stat", "key": "willpower", "ratio": 1.4 }]
+  "type": "apply_tag",
+  "tagId": "tag_instant_heal",
+  "chance": 1,
+  "overrides": {
+    "instant_heal": {
+      "value": {
+        "base": 15,
+        "terms": [{ "source": "stat", "key": "willpower", "ratio": 1.4 }]
+      }
+    }
   }
 }
 ```
 
-## Example statuses
+## Example tags
 
 ### Burn (scaled DoT)
 
@@ -185,7 +206,7 @@ AP, SP, and HP are **not** combat stats. They do not appear in `combat_stats.jso
 
 ## Dawn Studio
 
-- **FormulaEditor** — configure base + terms on skill effects and status behaviors
-- **Combat Stats** page — edit `combat_stats.json` and global formula bindings
+- **FormulaEditor** — configure base + terms on tag behaviors and skill tag overrides
+- **Combat Stats** page — edit `combat_stats.json` and global formula bindings (`tagApplication`, `durationReduction`)
 
 After saving content, run `pnpm content:codegen` (automatic in Dawn Studio).

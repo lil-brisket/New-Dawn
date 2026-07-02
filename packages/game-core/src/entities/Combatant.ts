@@ -1,4 +1,4 @@
-import type { Combatant, HexCoord, Team, StatusInstance } from '@dawn/types';
+import type { Combatant, HexCoord, Team, TagInstance } from '@dawn/types';
 
 export type { Combatant };
 
@@ -20,7 +20,7 @@ export interface CreateCombatantInput {
   readonly ap: number;
   readonly maxAp: number;
   readonly skillIds?: readonly string[];
-  readonly statuses?: readonly StatusInstance[];
+  readonly tags?: readonly TagInstance[];
   readonly skillCooldowns?: Readonly<Record<string, number>>;
 }
 
@@ -31,7 +31,7 @@ export function createCombatant(input: CreateCombatantInput): Combatant {
     willpower: input.willpower ?? 10,
     resistance: input.resistance ?? 10,
     skillIds: input.skillIds ?? [],
-    statuses: input.statuses ?? [],
+    tags: input.tags ?? [],
     skillCooldowns: input.skillCooldowns ?? {},
   };
 }
@@ -52,9 +52,12 @@ export function withSp(combatant: Combatant, sp: number): Combatant {
   return { ...combatant, sp: Math.max(0, Math.min(sp, combatant.maxSp)) };
 }
 
-export function withStatuses(combatant: Combatant, statuses: readonly StatusInstance[]): Combatant {
-  return { ...combatant, statuses };
+export function withTags(combatant: Combatant, tags: readonly TagInstance[]): Combatant {
+  return { ...combatant, tags };
 }
+
+/** @deprecated Use withTags */
+export const withStatuses = withTags;
 
 export function withCooldowns(
   combatant: Combatant,

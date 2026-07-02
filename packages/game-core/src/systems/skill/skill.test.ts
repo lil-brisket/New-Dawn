@@ -6,7 +6,7 @@ import { createCombatant } from '../../entities/Combatant';
 import { createBattle } from '../../battle/createBattle';
 import { dispatchAction } from '../../battle/dispatchAction';
 import { simulateSkill } from './simulateSkill';
-import { applyStatus } from '../status/applyStatus';
+import { applyTag } from '../tag/applyTag';
 import { defaultRegistry } from '@dawn/game-data';
 import { createSeededRandom } from '@dawn/utils';
 
@@ -211,22 +211,22 @@ describe('skill system', () => {
   });
 });
 
-describe('status on skill', () => {
+describe('tag on skill', () => {
   it('applies burn from fireball with seeded rng', () => {
     const { battle, enemy } = setup();
     const rng = createSeededRandom(999);
     let state = battle;
-    const applied = applyStatus({
+    const applied = applyTag({
       state,
       sourceId: 'player',
       targetId: enemy.id,
-      statusId: 'status_burn',
+      tagId: 'tag_burn',
       chance: 1,
       registry: defaultRegistry,
       rng,
     });
     state = applied.state;
     expect(applied.applied).toBe(true);
-    expect(state.combatants.get(enemy.id)!.statuses.length).toBe(1);
+    expect(state.combatants.get(enemy.id)!.tags.length).toBe(1);
   });
 });

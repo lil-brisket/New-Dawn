@@ -21,6 +21,10 @@ export default defineConfig({
         repoRoot,
         'packages/content-pipeline/src/migrations/v1-to-v2.ts',
       ),
+      '@dawn/content-pipeline/migrations/applyMigrations': join(
+        repoRoot,
+        'packages/content-pipeline/src/migrations/applyMigrations.ts',
+      ),
       '@dawn/types': join(repoRoot, 'packages/types/src'),
       '@dawn/utils': join(repoRoot, 'packages/utils/src'),
     },

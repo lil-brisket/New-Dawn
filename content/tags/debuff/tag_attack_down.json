@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_attack_down",
+  "name": "Attack Down",
+  "description": "Reduces attack power.",
+  "duration": 3,
+  "behaviors": [
+    {
+      "type": "stat_mod",
+      "stat": "attack",
+      "mode": "percent",
+      "value": {
+        "base": -20,
+        "terms": []
+      }
+    }
+  ]
+}

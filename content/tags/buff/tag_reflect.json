@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_reflect",
+  "name": "Reflect",
+  "description": "Returns a portion of damage taken to the attacker.",
+  "duration": 3,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "buff",
+  "behaviors": [
+    {
+      "type": "reflect",
+      "percent": {
+        "base": 0.15,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "defense",
+            "ratio": 0.005
+          }
+        ]
+      }
+    }
+  ]
+}

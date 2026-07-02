@@ -4,20 +4,20 @@ import type {
   CombatStatsConfig,
   EnemyDefinition,
   SkillDefinition,
-  StatusDefinition,
+  TagDefinition,
 } from '@dawn/types';
 import { createFormulaSchemas } from './schemas';
 import {
   resolveEnemyInheritance,
   resolveSkillInheritance,
-  resolveStatusInheritance,
+  resolveTagInheritance,
   type PipelineError,
 } from './inherit';
-import { normalizeEnemy, normalizeSkill, normalizeStatus } from './normalize';
+import { normalizeEnemy, normalizeSkill, normalizeTag } from './normalize';
 import { getReferenceIndex, validateReferences } from './references';
 import type { ContentDomain } from './domains';
 import { loadCombatStatsConfig, migrateContent } from './migrations';
-import type { RawEnemy, RawSkill, RawStatus } from './schemas';
+import type { RawEnemy, RawSkill, RawTag } from './schemas';
 
 export type { ContentDomain } from './domains';
 
@@ -30,7 +30,7 @@ export interface ContentFile {
 
 export interface ProcessedContent {
   skills: SkillDefinition[];
-  statuses: StatusDefinition[];
+  tags: TagDefinition[];
   enemies: EnemyDefinition[];
   combatStats: CombatStatsConfig;
   errors: PipelineError[];
@@ -103,32 +103,29 @@ function loadDomain<T>(
 export function processContent(contentRoot: string): ProcessedContent {
   const combatStats = loadCombatStatsConfig(contentRoot);
   const statIds = combatStats.stats.map((s) => s.id);
-  const { rawSkillSchema, rawStatusSchema, rawEnemySchema } = createFormulaSchemas(statIds);
+  const { rawSkillSchema, rawTagSchema, rawEnemySchema } = createFormulaSchemas(statIds);
 
   const skillFiles = walkJsonFiles(join(contentRoot, 'skills'), contentRoot, 'skills');
-  const statusFiles = walkJsonFiles(join(contentRoot, 'statuses'), contentRoot, 'statuses');
+  const tagFiles = walkJsonFiles(join(contentRoot, 'tags'), contentRoot, 'tags');
   const enemyFiles = walkJsonFiles(join(contentRoot, 'enemies'), contentRoot, 'enemies');
 
   const skillLoad = loadDomain(skillFiles, rawSkillSchema);
-  const statusLoad = loadDomain(statusFiles, rawStatusSchema);
+  const tagLoad = loadDomain(tagFiles, rawTagSchema);
   const enemyLoad = loadDomain(enemyFiles, rawEnemySchema);
 
-  const errors: PipelineError[] = [...skillLoad.errors, ...statusLoad.errors, ...enemyLoad.errors];
+  const errors: PipelineError[] = [...skillLoad.errors, ...tagLoad.errors, ...enemyLoad.errors];
 
   const skillResolved = resolveSkillInheritance(
     skillLoad.items as Map<string, RawSkill>,
     skillLoad.fileMap,
   );
-  const statusResolved = resolveStatusInheritance(
-    statusLoad.items as Map<string, RawStatus>,
-    statusLoad.fileMap,
-  );
+  const tagResolved = resolveTagInheritance(tagLoad.items as Map<string, RawTag>, tagLoad.fileMap);
   const enemyResolved = resolveEnemyInheritance(
     enemyLoad.items as Map<string, RawEnemy>,
     enemyLoad.fileMap,
   );
 
-  errors.push(...skillResolved.errors, ...statusResolved.errors, ...enemyResolved.errors);
+  errors.push(...skillResolved.errors, ...tagResolved.errors, ...enemyResolved.errors);
 
   const skills: SkillDefinition[] = [];
   for (const [id, raw] of skillResolved.resolved) {
@@ -136,10 +133,10 @@ export function processContent(contentRoot: string): ProcessedContent {
     skills.push(normalizeSkill(raw, filePath));
   }
 
-  const statuses: StatusDefinition[] = [];
-  for (const [id, raw] of statusResolved.resolved) {
-    const filePath = statusLoad.fileMap.get(id) ?? id;
-    statuses.push(normalizeStatus(raw, filePath));
+  const tags: TagDefinition[] = [];
+  for (const [id, raw] of tagResolved.resolved) {
+    const filePath = tagLoad.fileMap.get(id) ?? id;
+    tags.push(normalizeTag(raw, filePath));
   }
 
   const enemies: EnemyDefinition[] = [];
@@ -148,20 +145,20 @@ export function processContent(contentRoot: string): ProcessedContent {
     enemies.push(normalizeEnemy(raw, filePath));
   }
 
-  const refErrors = validateReferences(skills, statuses, enemies);
+  const refErrors = validateReferences(skills, tags, enemies);
   const warnings = refErrors.filter((e) => e.severity === 'warning');
   const refErrs = refErrors.filter((e) => e.severity === 'error');
   errors.push(...refErrs);
 
   return {
     skills,
-    statuses,
+    tags,
     enemies,
     combatStats,
     errors,
     warnings,
-    references: getReferenceIndex(skills, statuses, enemies),
-    files: [...skillFiles, ...statusFiles, ...enemyFiles],
+    references: getReferenceIndex(skills, tags, enemies),
+    files: [...skillFiles, ...tagFiles, ...enemyFiles],
   };
 }
 
@@ -180,7 +177,7 @@ export function computeDashboardStats(
 
   return {
     skillCount: processed.skills.length,
-    statusCount: processed.statuses.length,
+    tagCount: processed.tags.length,
     enemyCount: processed.enemies.length,
     brokenReferences: processed.errors.filter((e) => e.message.includes('Unknown')).length,
     warnings: processed.warnings.length,

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_attack_up",
+  "name": "Attack Up",
+  "description": "Increases attack power.",
+  "duration": 3,
+  "behaviors": [
+    {
+      "type": "stat_mod",
+      "stat": "attack",
+      "mode": "percent",
+      "value": {
+        "base": 20,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "willpower",
+            "ratio": 0.15
+          }
+        ]
+      }
+    }
+  ]
+}

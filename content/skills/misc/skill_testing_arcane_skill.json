@@ -6,22 +6,29 @@
   "cooldown": 2,
   "effects": [
     {
-      "type": "damage",
-      "element": "physical",
-      "value": {
-        "base": 0,
-        "terms": [
-          {
-            "source": "stat",
-            "key": "attack",
-            "ratio": 0.9
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "physical",
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.9
+              }
+            ]
           }
-        ]
+        }
       }
     }
   ],
   "targeting": {
     "type": "single_enemy",
     "range": 3
-  }
+  },
+  "schemaVersion": 3
 }

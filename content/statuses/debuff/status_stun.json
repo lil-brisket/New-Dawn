@@ -1,6 +1,0 @@
-{
-  "id": "status_stun",
-  "name": "Stun",
-  "description": "Cannot act while stunned.",
-  "behaviors": [{ "type": "control", "effect": "stun" }]
-}

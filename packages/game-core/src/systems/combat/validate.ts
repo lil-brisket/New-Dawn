@@ -6,7 +6,7 @@ import { distance } from '../../grid/HexMath';
 import { isEnemy } from '../../entities/Team';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
-import { isStunned } from '../status/hasControlEffect';
+import { isStunned } from '../tag/hasControlEffect';
 
 export function validateAttack(
   state: BattleState,

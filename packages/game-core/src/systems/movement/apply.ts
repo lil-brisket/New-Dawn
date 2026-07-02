@@ -5,7 +5,7 @@ import { withAp, withPosition } from '../../entities/Combatant';
 import { getCombatant } from '../../queries/getActiveCombatant';
 import { updateMap } from '../../utils/immutable';
 import { getBattleRng } from '../../utils/battleRng';
-import { dispatchStatusTriggers } from '../status/dispatchTriggers';
+import { dispatchTagTriggers } from '../tag/dispatchTriggers';
 import type { MoveCalculation } from './calculate';
 
 export interface MoveApplyResult {
@@ -39,7 +39,7 @@ export function applyMove(
     { type: 'combatant_moved', combatantId: action.combatantId, from, to },
   ];
 
-  const triggerResult = dispatchStatusTriggers(
+  const triggerResult = dispatchTagTriggers(
     newState,
     action.combatantId,
     'on_move',

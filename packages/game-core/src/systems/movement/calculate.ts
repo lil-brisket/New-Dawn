@@ -2,7 +2,7 @@ import type { BattleState, HexCoord, MoveAction } from '@dawn/types';
 import type { DefinitionRegistry } from '@dawn/game-data';
 import { findPath } from './Pathfinder';
 import { getCombatant } from '../../queries/getActiveCombatant';
-import { getEffectiveMovement } from '../status/getEffectiveMovement';
+import { getEffectiveMovement } from '../tag/getEffectiveMovement';
 import { getRemainingMoves } from '../../queries/getReachableTiles';
 
 export interface MoveCalculation {

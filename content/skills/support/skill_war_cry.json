@@ -4,6 +4,15 @@
   "description": "Boosts your attack power.",
   "spCost": 10,
   "cooldown": 3,
-  "effects": [{ "type": "apply_status", "statusId": "status_attack_up", "chance": 1 }],
-  "targeting": { "type": "self" }
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_attack_up",
+      "chance": 1
+    }
+  ],
+  "targeting": {
+    "type": "self"
+  },
+  "schemaVersion": 3
 }

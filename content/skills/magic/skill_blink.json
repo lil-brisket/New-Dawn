@@ -4,6 +4,22 @@
   "description": "Teleport to a nearby tile.",
   "spCost": 18,
   "cooldown": 2,
-  "effects": [{ "type": "teleport", "range": 3 }],
-  "targeting": { "type": "tile", "range": 3 }
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_move",
+      "chance": 1,
+      "overrides": {
+        "move": {
+          "range": 3,
+          "teleport": true
+        }
+      }
+    }
+  ],
+  "targeting": {
+    "type": "tile",
+    "range": 3
+  },
+  "schemaVersion": 3
 }

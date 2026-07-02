@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { AppShell } from './shell/AppShell';
 import { DashboardPage } from './pages/DashboardPage';
 import { SkillsPage } from './pages/SkillsPage';
-import { StatusesPage } from './pages/StatusesPage';
+import { TagsPage } from './pages/TagsPage';
 import { EnemiesPage } from './pages/EnemiesPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { TestingPage } from './pages/TestingPage';
@@ -15,7 +15,7 @@ export function App() {
       <Route element={<AppShell />}>
         <Route index element={<DashboardPage />} />
         <Route path="skills" element={<SkillsPage />} />
-        <Route path="statuses" element={<StatusesPage />} />
+        <Route path="tags" element={<TagsPage />} />
         <Route path="enemies" element={<EnemiesPage />} />
         <Route path="combat-stats" element={<CombatStatsPage />} />
         <Route path="characters" element={<PlaceholderPage title="Characters" />} />

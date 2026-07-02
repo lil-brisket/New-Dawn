@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "enemy_goblin",
   "name": "Goblin",
   "description": "A scrappy forest goblin.",

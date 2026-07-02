@@ -29,9 +29,19 @@ export function MetadataSection({
               const element = (v || undefined) as ElementType | undefined;
               const damageElement = skillElementToDamageElement(v as ElementType | '');
               const effects = Array.isArray(draft.effects)
-                ? (draft.effects as SkillEffect[]).map((effect) =>
-                    effect.type === 'damage' ? { ...effect, element: damageElement } : effect,
-                  )
+                ? (draft.effects as SkillEffect[]).map((effect) => {
+                    if (!effect.overrides?.instant_damage) return effect;
+                    return {
+                      ...effect,
+                      overrides: {
+                        ...effect.overrides,
+                        instant_damage: {
+                          ...effect.overrides.instant_damage,
+                          element: damageElement,
+                        },
+                      },
+                    };
+                  })
                 : draft.effects;
               onChange({ ...draft, element, effects });
             }}

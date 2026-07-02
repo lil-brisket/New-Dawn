@@ -1,6 +1,6 @@
 import type { HexCoord } from './grid';
 import type { Team } from './team';
-import type { StatusInstance } from '../status';
+import type { TagInstance } from '../tag';
 
 export interface Combatant {
   readonly id: string;
@@ -20,7 +20,7 @@ export interface Combatant {
   readonly ap: number;
   readonly maxAp: number;
   readonly skillIds: readonly string[];
-  readonly statuses: readonly StatusInstance[];
+  readonly tags: readonly TagInstance[];
   readonly skillCooldowns: Readonly<Record<string, number>>;
   /** Bonus HP pool — damage is absorbed here before real HP. */
   readonly shieldHp?: number;

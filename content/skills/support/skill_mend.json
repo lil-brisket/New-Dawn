@@ -1,17 +1,32 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "skill_mend",
   "name": "Mend",
   "description": "Restores an ally's vitality through focused will.",
   "spCost": 20,
   "effects": [
     {
-      "type": "heal",
-      "value": {
-        "base": 15,
-        "terms": [{ "source": "stat", "key": "willpower", "ratio": 1.4 }]
+      "type": "apply_tag",
+      "tagId": "tag_instant_heal",
+      "chance": 1,
+      "overrides": {
+        "instant_heal": {
+          "value": {
+            "base": 15,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "willpower",
+                "ratio": 1.4
+              }
+            ]
+          }
+        }
       }
     }
   ],
-  "targeting": { "type": "single_ally", "range": 2 }
+  "targeting": {
+    "type": "single_ally",
+    "range": 2
+  }
 }

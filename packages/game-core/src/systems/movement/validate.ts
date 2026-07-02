@@ -8,7 +8,7 @@ import { getCombatant } from '../../queries/getActiveCombatant';
 import { canMoveTo } from '../../queries/getReachableTiles';
 import { isTileOccupied } from '../../queries/getCombatantAt';
 import { isCombatantAlive } from '../../queries/isCombatantAlive';
-import { isStunned } from '../status/hasControlEffect';
+import { isStunned } from '../tag/hasControlEffect';
 
 export function validateMove(state: BattleState, action: MoveAction): Result<void, BattleError> {
   if (state.winner !== null) {

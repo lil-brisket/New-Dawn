@@ -1,3 +1,4 @@
+import type { ApplyTagEffect, TagBehavior } from '@dawn/types';
 import { z } from 'zod';
 
 const elementType = z.enum([
@@ -31,14 +32,14 @@ export const combatStatsConfigSchema = z.object({
     }),
   ),
   formulas: z.object({
-    statusApplication: z.object({
+    tagApplication: z.object({
       attackerStat: z.string().min(1),
       defenderStat: z.string().min(1),
       perPointDelta: z.number(),
     }),
     durationReduction: z.object({
       defenderStat: z.string().min(1),
-      perPointReduction: z.number(),
+      perPointReduction: z.number().min(0),
       minDuration: z.number().int().min(0),
     }),
   }),
@@ -51,7 +52,7 @@ export const contentMetadataSchema = z
     weaponType: z.string().optional(),
     job: z.string().optional(),
     rarity: itemRarity.optional(),
-    tags: z.array(z.string()).optional(),
+    labels: z.array(z.string()).optional(),
     unlockLevel: z.number().int().min(0).optional(),
   })
   .strict()
@@ -60,6 +61,12 @@ export const contentMetadataSchema = z
 export function createFormulaSchemas(statIds: readonly string[]) {
   const statIdSchema = z.string().refine((id) => statIds.includes(id), {
     message: `Unknown stat: must be one of ${statIds.join(', ')}`,
+  });
+
+  const hexCoordSchema = z.object({
+    x: z.number(),
+    y: z.number(),
+    z: z.number(),
   });
 
   const formulaTermSchema = z.object({
@@ -85,46 +92,57 @@ export function createFormulaSchemas(statIds: readonly string[]) {
     perPointDelta: z.number(),
   });
 
-  const skillEffectSchema = z.discriminatedUnion('type', [
+  const tagBehaviorOverridesSchema = z
+    .object({
+      instant_damage: z
+        .object({
+          element: elementType.optional(),
+          value: statFormulaSchema.optional(),
+          pierce: z.boolean().optional(),
+        })
+        .optional(),
+      instant_heal: z.object({ value: statFormulaSchema.optional() }).optional(),
+      shield_grant: z
+        .object({
+          value: statFormulaSchema.optional(),
+          duration: z.number().int().min(1).max(2).optional(),
+        })
+        .optional(),
+      move: z
+        .object({
+          range: z.number().int().min(0).optional(),
+          rangeFormula: statFormulaSchema.optional(),
+          teleport: z.boolean().optional(),
+        })
+        .optional(),
+      teleport: z
+        .object({
+          range: z.number().int().min(0).optional(),
+          rangeFormula: statFormulaSchema.optional(),
+        })
+        .optional(),
+      summon: z
+        .object({
+          entityDefinitionId: z.string().optional(),
+          position: hexCoordSchema.optional(),
+        })
+        .optional(),
+    })
+    .optional();
+
+  const applyTagEffectSchema: z.ZodType<ApplyTagEffect> = z.lazy(() =>
     z.object({
-      type: z.literal('damage'),
-      element: elementType,
-      value: statFormulaSchema,
-      pierce: z.boolean().optional(),
-    }),
-    z.object({
-      type: z.literal('heal'),
-      value: statFormulaSchema,
-    }),
-    z.object({
-      type: z.literal('move'),
-      range: z.number().int().min(0),
-      rangeFormula: statFormulaSchema.optional(),
-    }),
-    z.object({
-      type: z.literal('teleport'),
-      range: z.number().int().min(0),
-      rangeFormula: statFormulaSchema.optional(),
-    }),
-    z.object({
-      type: z.literal('apply_status'),
-      statusId: z.string(),
+      type: z.literal('apply_tag'),
+      tagId: z.string(),
       chance: z.number().min(0).max(1),
       duration: z.number().int().min(0).optional(),
       durationFormula: durationFormulaSchema.optional(),
       applicationFormula: applicationFormulaSchema.optional(),
+      overrides: tagBehaviorOverridesSchema,
     }),
-    z.object({
-      type: z.literal('shield'),
-      value: statFormulaSchema,
-      duration: z.number().int().min(1).max(2).optional(),
-    }),
-    z.object({
-      type: z.literal('summon'),
-      entityDefinitionId: z.string(),
-      position: z.object({ q: z.number(), r: z.number() }).optional(),
-    }),
-  ]);
+  ) as z.ZodType<ApplyTagEffect>;
+
+  const skillEffectSchema = applyTagEffectSchema;
 
   const targetingSchema = z.discriminatedUnion('type', [
     z.object({ type: z.literal('single_enemy'), range: z.number().int().min(0) }),
@@ -140,8 +158,39 @@ export function createFormulaSchemas(statIds: readonly string[]) {
     }),
   ]);
 
-  const statusBehaviorSchema: z.ZodType<unknown> = z.lazy(() =>
+  const tagBehaviorSchema: z.ZodType<TagBehavior> = z.lazy(() =>
     z.discriminatedUnion('type', [
+      z.object({
+        type: z.literal('instant_damage'),
+        element: elementType,
+        value: statFormulaSchema,
+        pierce: z.boolean().optional(),
+      }),
+      z.object({
+        type: z.literal('instant_heal'),
+        value: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('shield_grant'),
+        value: statFormulaSchema,
+        duration: z.number().int().min(1).max(2).optional(),
+      }),
+      z.object({
+        type: z.literal('move'),
+        range: z.number().int().min(0),
+        rangeFormula: statFormulaSchema.optional(),
+        teleport: z.boolean().optional(),
+      }),
+      z.object({
+        type: z.literal('teleport'),
+        range: z.number().int().min(0),
+        rangeFormula: statFormulaSchema.optional(),
+      }),
+      z.object({
+        type: z.literal('summon'),
+        entityDefinitionId: z.string(),
+        position: hexCoordSchema.optional(),
+      }),
       z.object({
         type: z.literal('dot'),
         element: elementType,
@@ -160,10 +209,30 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       z.object({
         type: z.literal('trigger'),
         event: z.enum(['on_hit', 'on_damaged', 'on_turn_start', 'on_move', 'on_attack']),
-        effect: skillEffectSchema,
+        effect: applyTagEffectSchema,
+      }),
+      z.object({
+        type: z.literal('absorb'),
+        percent: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('lifesteal'),
+        percent: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('reflect'),
+        percent: statFormulaSchema,
+      }),
+      z.object({
+        type: z.literal('clear'),
+        polarity: z.literal('positive'),
+      }),
+      z.object({
+        type: z.literal('cleanse'),
+        polarity: z.literal('negative'),
       }),
     ]),
-  );
+  ) as z.ZodType<TagBehavior>;
 
   const baseStatsSchema = z.object({
     hp: z.number().int().min(0),
@@ -198,10 +267,10 @@ export function createFormulaSchemas(statIds: readonly string[]) {
     })
     .merge(contentMetadataSchema);
 
-  const rawStatusSchema = z
+  const rawTagSchema = z
     .object({
       schemaVersion: z.number().int().min(1).optional(),
-      id: z.string().regex(/^status_[a-z0-9_]+$/),
+      id: z.string().regex(/^tag_[a-z0-9_]+$/),
       inherits: z.string().optional(),
       name: z.string().min(1),
       description: z.string().optional(),
@@ -209,7 +278,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
       stackable: z.boolean().optional(),
       maxStacks: z.number().int().min(1).optional(),
       iconId: z.string().optional(),
-      behaviors: z.array(statusBehaviorSchema).optional(),
+      behaviors: z.array(tagBehaviorSchema).optional(),
       applicationFormula: applicationFormulaSchema.optional(),
       durationFormula: durationFormulaSchema.optional(),
     })
@@ -234,7 +303,7 @@ export function createFormulaSchemas(statIds: readonly string[]) {
 
   return {
     rawSkillSchema,
-    rawStatusSchema,
+    rawTagSchema,
     rawEnemySchema,
     statFormulaSchema,
     durationFormulaSchema,
@@ -252,9 +321,14 @@ const defaultSchemas = createFormulaSchemas([
 ]);
 
 export const rawSkillSchema = defaultSchemas.rawSkillSchema;
-export const rawStatusSchema = defaultSchemas.rawStatusSchema;
+export const rawTagSchema = defaultSchemas.rawTagSchema;
 export const rawEnemySchema = defaultSchemas.rawEnemySchema;
 
+/** @deprecated Use rawTagSchema */
+export const rawStatusSchema = rawTagSchema;
+
 export type RawSkill = z.infer<typeof rawSkillSchema>;
-export type RawStatus = z.infer<typeof rawStatusSchema>;
+export type RawTag = z.infer<typeof rawTagSchema>;
 export type RawEnemy = z.infer<typeof rawEnemySchema>;
+/** @deprecated Use RawTag */
+export type RawStatus = RawTag;

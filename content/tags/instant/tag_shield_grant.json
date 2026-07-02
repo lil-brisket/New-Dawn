@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_shield_grant",
+  "name": "Shield",
+  "description": "Grants a damage-absorbing shield.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "instant",
+  "behaviors": [
+    {
+      "type": "shield_grant",
+      "value": {
+        "base": 0,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 1
+          }
+        ]
+      },
+      "duration": 2
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_lifesteal",
+  "name": "Life Steal",
+  "description": "Converts a portion of damage dealt into healed HP.",
+  "duration": 3,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "buff",
+  "behaviors": [
+    {
+      "type": "lifesteal",
+      "percent": {
+        "base": 0.1,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 0.005
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_damage",
+  "name": "Damage",
+  "description": "Basic damage dealt in battle.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "instant",
+  "behaviors": [
+    {
+      "type": "instant_damage",
+      "element": "physical",
+      "value": {
+        "base": 0,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 1
+          }
+        ]
+      }
+    }
+  ]
+}

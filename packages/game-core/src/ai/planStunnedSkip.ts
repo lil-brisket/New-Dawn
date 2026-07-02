@@ -1,7 +1,7 @@
 import type { BattleAction, BattleState } from '@dawn/types';
 import { defaultRegistry } from '@dawn/game-data';
 import { getActiveCombatant } from '../queries/getActiveCombatant';
-import { isStunned } from '../systems/status/hasControlEffect';
+import { isStunned } from '../systems/tag/hasControlEffect';
 
 /** When the active unit cannot act, end their turn immediately. */
 export function planStunnedSkip(state: BattleState): BattleAction[] | null {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "skill_fireball",
   "name": "Fireball",
   "description": "Hurls a ball of flame at a distant foe.",
@@ -8,14 +8,33 @@
   "element": "fire",
   "effects": [
     {
-      "type": "damage",
-      "element": "fire",
-      "value": {
-        "base": 20,
-        "terms": [{ "source": "stat", "key": "attack", "ratio": 1.2 }]
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "fire",
+          "value": {
+            "base": 20,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 1.2
+              }
+            ]
+          }
+        }
       }
     },
-    { "type": "apply_status", "statusId": "status_burn", "chance": 0.3 }
+    {
+      "type": "apply_tag",
+      "tagId": "tag_burn",
+      "chance": 0.3
+    }
   ],
-  "targeting": { "type": "single_enemy", "range": 3 }
+  "targeting": {
+    "type": "single_enemy",
+    "range": 3
+  }
 }

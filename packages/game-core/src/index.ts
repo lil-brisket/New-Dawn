@@ -46,6 +46,7 @@ export {
   sandboxSkipRound,
   sandboxSetSp,
   sandboxClearCooldowns,
+  sandboxApplyAllTags,
   sandboxApplyAllStatuses,
   sandboxSpawnDummy,
 } from './sandbox';
@@ -85,7 +86,12 @@ export {
 } from './systems/skill/targeting';
 export type { SkillTargetSelection } from './systems/skill/targeting';
 
-export { getStatusDisplays, getStatusesForCombatant } from './systems/status/queries';
-export type { StatusDisplayInfo } from './systems/status/queries';
+export {
+  getTagDisplays,
+  getTagsForCombatant,
+  getStatusDisplays,
+  getStatusesForCombatant,
+} from './systems/tag/queries';
+export type { TagDisplayInfo, StatusDisplayInfo } from './systems/tag/queries';
 
 export { defaultRegistry } from '@dawn/game-data';

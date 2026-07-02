@@ -1,22 +1,43 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "skill_shield_bash",
   "name": "Shield Bash",
   "description": "A defensive strike fueled by armor and blade.",
   "spCost": 15,
   "effects": [
     {
-      "type": "damage",
-      "element": "physical",
-      "value": {
-        "base": 10,
-        "terms": [
-          { "source": "stat", "key": "attack", "ratio": 0.6 },
-          { "source": "stat", "key": "defense", "ratio": 0.8 }
-        ]
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "physical",
+          "value": {
+            "base": 10,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.6
+              },
+              {
+                "source": "stat",
+                "key": "defense",
+                "ratio": 0.8
+              }
+            ]
+          }
+        }
       }
     },
-    { "type": "apply_status", "statusId": "status_stun", "chance": 0.25 }
+    {
+      "type": "apply_tag",
+      "tagId": "tag_stun",
+      "chance": 0.25
+    }
   ],
-  "targeting": { "type": "single_enemy", "range": 1 }
+  "targeting": {
+    "type": "single_enemy",
+    "range": 1
+  }
 }

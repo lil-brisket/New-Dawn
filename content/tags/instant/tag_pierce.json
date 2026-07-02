@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_pierce",
+  "name": "Pierce",
+  "description": "Ignores buffs and debuffs on both combatants. Breaks active shields.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "instant",
+  "behaviors": [
+    {
+      "type": "instant_damage",
+      "element": "physical",
+      "pierce": true,
+      "value": {
+        "base": 0,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 1
+          }
+        ]
+      }
+    }
+  ]
+}

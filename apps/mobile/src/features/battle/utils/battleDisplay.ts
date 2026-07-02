@@ -3,17 +3,20 @@ import {
   getActiveCombatant,
   isCombatantAlive,
   defaultRegistry,
-  getStatusDisplays,
+  getTagDisplays,
 } from '@dawn/game-core';
-import { resolveStatusIcon } from '../assets/resolveStatusIcon';
+import { resolveTagIcon } from '../assets/resolveTagIcon';
 
-export interface StatusDisplayItem {
+export interface TagDisplayItem {
   readonly id: string;
   readonly name: string;
   readonly icon: string;
   readonly remainingTurns: number;
   readonly stacks: number;
 }
+
+/** @deprecated Use TagDisplayItem */
+export type StatusDisplayItem = TagDisplayItem;
 
 export interface CombatantDisplay {
   readonly id: string;
@@ -25,7 +28,7 @@ export interface CombatantDisplay {
   readonly sp: number;
   readonly maxSp: number;
   readonly portraitKey: string;
-  readonly statusEffects: readonly StatusDisplayItem[];
+  readonly tagEffects: readonly TagDisplayItem[];
   readonly position: Combatant['position'];
 }
 
@@ -47,12 +50,12 @@ export function getCombatantAvatarLabel(name: string): string {
 
 export function combatantToDisplay(combatant: Combatant, state?: BattleState): CombatantDisplay {
   const extended = combatant as Combatant & { level?: number };
-  const statusEffects: StatusDisplayItem[] =
+  const tagEffects: TagDisplayItem[] =
     state !== undefined
-      ? getStatusDisplays(state, combatant.id, defaultRegistry).map((s) => ({
+      ? getTagDisplays(state, combatant.id, defaultRegistry).map((s) => ({
           id: s.id,
           name: s.name,
-          icon: resolveStatusIcon(s.iconId),
+          icon: resolveTagIcon(s.iconId),
           remainingTurns: s.remainingTurns,
           stacks: s.stacks,
         }))
@@ -68,7 +71,7 @@ export function combatantToDisplay(combatant: Combatant, state?: BattleState): C
     sp: combatant.sp,
     maxSp: combatant.maxSp,
     portraitKey: combatant.team === 'player' ? 'knight' : 'goblin',
-    statusEffects,
+    tagEffects,
     position: combatant.position,
   };
 }

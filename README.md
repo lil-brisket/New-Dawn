@@ -17,16 +17,59 @@ pnpm install
 ## Commands
 
 ```bash
-pnpm dev          # Start mobile app (Expo)
+pnpm dev          # Start game (Expo) + Dawn Studio editor (Turbo)
 pnpm test         # Run Vitest (game-core, utils)
 pnpm typecheck    # TypeScript across packages
 pnpm lint         # ESLint across packages
 pnpm content:codegen   # Regenerate game-data from content/*.json
 ```
 
+## Run the game
+
+`pnpm dev` starts **two** dev servers:
+
+| URL                       | What it is                             |
+| ------------------------- | -------------------------------------- |
+| **http://localhost:8081** | **The game** — Expo mobile app (Metro) |
+| **http://localhost:5174** | **Dawn Studio** — content editor only  |
+
+If you open port **5174**, you are in the editor, not the game.
+
+### Browser (easiest on desktop)
+
+1. Run `pnpm dev` (or game-only: `pnpm --filter @dawn/mobile dev`)
+2. Open **http://localhost:8081**
+3. In the Expo terminal, press **`w`** to open the web build
+
+Or start web directly:
+
+```bash
+pnpm --filter @dawn/mobile web
+```
+
+### Phone
+
+1. Install **Expo Go** (SDK 54) on your device
+2. Scan the QR code shown in the `@dawn/mobile` terminal output
+
+### Game-only dev (skip the editor)
+
+```bash
+pnpm --filter @dawn/mobile dev
+```
+
+### Developer menu (in-game tools)
+
+Once you reach the Home screen in a dev build:
+
+- **Web** — click **Welcome, Adventurer**
+- **Mobile** — long-press **Welcome, Adventurer**
+
+Or use **Settings → Developer Menu**. From there you can open Battle Sandbox, UI Showcase, and Dawn Studio (the same editor at port 5174).
+
 ## Dawn Studio (content editor)
 
-Dawn Studio is a **local dev tool** for editing game content (skills, statuses, enemies). It is **not bundled in production** — it reads/writes JSON under `content/` and runs codegen into `@dawn/game-data`.
+Dawn Studio is a **local dev tool** for editing game content (skills, tags, enemies). It is **not bundled in production** — it reads/writes JSON under `content/` and runs codegen into `@dawn/game-data`.
 
 ### Run the editor (browser)
 
@@ -89,7 +132,7 @@ Codegen also runs automatically when saving from the editor and before `game-dat
 
 ```
 apps/mobile/          Expo React Native app
-content/              Game content JSON (skills, statuses, enemies, …)
+content/              Game content JSON (skills, tags, enemies, …)
 tools/editor/         Dawn Studio — local Vite CMS
 packages/
   content-pipeline/   Validate, normalize, inherit content JSON

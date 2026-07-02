@@ -3,8 +3,8 @@ import { defaultRegistry } from '@dawn/game-data';
 import { restoreResources } from './restoreResources';
 import { updateMap } from '../../utils/immutable';
 import type { TurnCalculation } from './calculate';
-import { tickStatuses, decayStatuses, decrementCooldowns } from '../status/tickStatuses';
-import { decayShields } from '../status/dispatchTriggers';
+import { tickTags, decayTags, decrementCooldowns } from '../tag/tickTags';
+import { decayShields } from '../tag/dispatchTriggers';
 
 export interface TurnApplyResult {
   readonly state: BattleState;
@@ -25,7 +25,7 @@ export function applyEndTurn(
   const events: BattleEvent[] = [{ type: 'turn_ended', combatantId: action.combatantId }];
 
   let currentState = state;
-  const decayResult = decayStatuses(currentState, action.combatantId, defaultRegistry);
+  const decayResult = decayTags(currentState, action.combatantId, defaultRegistry);
   currentState = decayResult.state;
   events.push(...decayResult.events);
 
@@ -40,7 +40,7 @@ export function applyEndTurn(
     combatants = updateMap(combatants, calculated.nextCombatantId, restored);
 
     let tickState: BattleState = { ...currentState, combatants };
-    const tickResult = tickStatuses(tickState, calculated.nextCombatantId, defaultRegistry);
+    const tickResult = tickTags(tickState, calculated.nextCombatantId, defaultRegistry);
     tickState = tickResult.state;
     events.push(...tickResult.events);
     combatants = tickState.combatants;

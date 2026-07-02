@@ -4,6 +4,33 @@
   "description": "Restores HP to allies around the target.",
   "spCost": 25,
   "cooldown": 2,
-  "effects": [{ "type": "heal", "multiplier": 0.7 }],
-  "targeting": { "type": "area", "range": 2, "radius": 1, "filter": "ally", "center": "unit" }
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_instant_heal",
+      "chance": 1,
+      "overrides": {
+        "instant_heal": {
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.7
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "targeting": {
+    "type": "area",
+    "range": 2,
+    "radius": 1,
+    "filter": "ally",
+    "center": "unit"
+  },
+  "schemaVersion": 3
 }

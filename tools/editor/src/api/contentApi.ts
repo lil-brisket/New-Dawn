@@ -1,4 +1,5 @@
 import type { ContentDomain } from '@dawn/content-pipeline/domains';
+import type { CombatStatsConfig } from '@dawn/types';
 
 export interface ContentListItem {
   id: string;
@@ -8,10 +9,15 @@ export interface ContentListItem {
   category?: string;
 }
 
+function compareByName(a: ContentListItem, b: ContentListItem): number {
+  return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+}
+
 export async function listContent(domain: ContentDomain): Promise<ContentListItem[]> {
   const res = await fetch(`/api/content/${domain}`);
   if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  const items = (await res.json()) as ContentListItem[];
+  return items.sort(compareByName);
 }
 
 export async function getContent(
@@ -91,4 +97,19 @@ export async function listAssets(type: string): Promise<string[]> {
   const res = await fetch(`/api/assets/${type}/list`);
   if (!res.ok) return [];
   return res.json();
+}
+
+export async function getCombatStatsConfig(): Promise<CombatStatsConfig> {
+  const res = await fetch('/api/content/config/combat_stats');
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function saveCombatStatsConfig(data: CombatStatsConfig): Promise<void> {
+  const res = await fetch('/api/content/config/combat_stats', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(await res.text());
 }

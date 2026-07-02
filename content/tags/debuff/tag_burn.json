@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_burn",
+  "name": "Burn",
+  "description": "Takes fire damage each turn.",
+  "duration": 3,
+  "stackable": true,
+  "maxStacks": 3,
+  "behaviors": [
+    {
+      "type": "dot",
+      "element": "fire",
+      "damagePerTurn": {
+        "base": 5,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 0.2
+          }
+        ]
+      }
+    }
+  ]
+}

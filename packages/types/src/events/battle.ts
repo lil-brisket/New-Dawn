@@ -2,7 +2,7 @@ import type { ElementType } from '../common';
 import type { HexCoord } from '../battle/grid';
 import type { Team } from '../battle/team';
 
-export type ActionReason = 'attack' | 'skill' | 'status' | 'environment' | 'shield';
+export type ActionReason = 'attack' | 'skill' | 'tag' | 'environment' | 'shield';
 
 export interface CombatantMovedEvent {
   readonly type: 'combatant_moved';
@@ -19,7 +19,7 @@ export interface DamageDealtEvent {
   readonly reason?: ActionReason;
   readonly skillId?: string;
   readonly element?: ElementType;
-  readonly statusId?: string;
+  readonly tagId?: string;
   readonly pierce?: boolean;
 }
 
@@ -39,24 +39,24 @@ export interface SkillUsedEvent {
   readonly targetIds: readonly string[];
 }
 
-export interface StatusAppliedEvent {
-  readonly type: 'status_applied';
+export interface TagAppliedEvent {
+  readonly type: 'tag_applied';
   readonly sourceId: string;
   readonly targetId: string;
-  readonly statusId: string;
+  readonly tagId: string;
   readonly stacks: number;
 }
 
-export interface StatusRemovedEvent {
-  readonly type: 'status_removed';
+export interface TagRemovedEvent {
+  readonly type: 'tag_removed';
   readonly targetId: string;
-  readonly statusId: string;
+  readonly tagId: string;
 }
 
-export interface StatusTickEvent {
-  readonly type: 'status_tick';
+export interface TagTickEvent {
+  readonly type: 'tag_tick';
   readonly targetId: string;
-  readonly statusId: string;
+  readonly tagId: string;
   readonly damage?: number;
 }
 
@@ -103,9 +103,9 @@ export type BattleEvent =
   | DamageDealtEvent
   | HealAppliedEvent
   | SkillUsedEvent
-  | StatusAppliedEvent
-  | StatusRemovedEvent
-  | StatusTickEvent
+  | TagAppliedEvent
+  | TagRemovedEvent
+  | TagTickEvent
   | ShieldAppliedEvent
   | ShieldBrokenEvent
   | CombatantKilledEvent
@@ -114,3 +114,10 @@ export type BattleEvent =
   | BattleWonEvent;
 
 export type BattleEventType = BattleEvent['type'];
+
+/** @deprecated Use TagAppliedEvent */
+export type StatusAppliedEvent = TagAppliedEvent;
+/** @deprecated Use TagRemovedEvent */
+export type StatusRemovedEvent = TagRemovedEvent;
+/** @deprecated Use TagTickEvent */
+export type StatusTickEvent = TagTickEvent;

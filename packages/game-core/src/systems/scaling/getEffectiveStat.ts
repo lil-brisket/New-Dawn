@@ -1,6 +1,6 @@
 import type { CombatStatId } from '@dawn/types';
 import type { EffectContext } from './EffectContext';
-import { getEffectiveStatForCombatant } from '../status/getEffectiveStats';
+import { getEffectiveStatForCombatant } from '../tag/getEffectiveStats';
 
 export function getCombatantStat(combatant: EffectContext['source'], statId: CombatStatId): number {
   switch (statId) {
@@ -24,6 +24,9 @@ export function getEffectiveStat(
   statId: CombatStatId,
   combatant: EffectContext['source'] = ctx.source,
 ): number {
+  if (ctx.ignoreStatMods) {
+    return getCombatantStat(combatant, statId);
+  }
   return getEffectiveStatForCombatant(combatant, statId, ctx.registry);
 }
 

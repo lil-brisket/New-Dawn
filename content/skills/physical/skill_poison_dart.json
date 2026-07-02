@@ -4,8 +4,35 @@
   "description": "A toxic dart that poisons the target.",
   "spCost": 12,
   "effects": [
-    { "type": "damage", "element": "physical", "multiplier": 0.6 },
-    { "type": "apply_status", "statusId": "status_poison", "chance": 0.7 }
+    {
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "physical",
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.6
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "apply_tag",
+      "tagId": "tag_poison",
+      "chance": 0.7
+    }
   ],
-  "targeting": { "type": "single_enemy", "range": 2 }
+  "targeting": {
+    "type": "single_enemy",
+    "range": 2
+  },
+  "schemaVersion": 3
 }

@@ -1,1 +1,1 @@
-export type ContentDomain = 'skills' | 'statuses' | 'enemies';
+export type ContentDomain = 'skills' | 'tags' | 'enemies';

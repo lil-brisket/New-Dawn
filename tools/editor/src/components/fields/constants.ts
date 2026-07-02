@@ -1,6 +1,6 @@
 import type { ElementType } from '@dawn/types';
 
-/** Elements shown in skill/status metadata editors. */
+/** Elements shown in skill/tag metadata editors. */
 export const EDITOR_ELEMENTS: { value: ElementType; label: string }[] = [
   { value: 'fire', label: 'Fire' },
   { value: 'ice', label: 'Water' },
@@ -53,20 +53,22 @@ export const TRIGGER_EVENTS = [
   { value: 'on_attack', label: 'On Attack' },
 ] as const;
 
-export const EFFECT_TYPES = [
-  { value: 'damage', label: 'Damage' },
-  { value: 'heal', label: 'Heal' },
-  { value: 'apply_status', label: 'Status' },
-  { value: 'shield', label: 'Shield' },
-  { value: 'move', label: 'Move' },
-  { value: 'summon', label: 'Summon' },
-] as const;
-
 export const BEHAVIOR_TYPES = [
+  { value: 'instant_damage', label: 'Instant Damage' },
+  { value: 'instant_heal', label: 'Instant Heal' },
+  { value: 'shield_grant', label: 'Shield Grant' },
+  { value: 'move', label: 'Move' },
+  { value: 'teleport', label: 'Teleport' },
+  { value: 'summon', label: 'Summon' },
   { value: 'dot', label: 'DoT' },
   { value: 'stat_mod', label: 'Stat Mod' },
   { value: 'control', label: 'Control' },
   { value: 'trigger', label: 'Trigger' },
+  { value: 'absorb', label: 'Absorb' },
+  { value: 'lifesteal', label: 'Life Steal' },
+  { value: 'reflect', label: 'Reflect' },
+  { value: 'clear', label: 'Clear' },
+  { value: 'cleanse', label: 'Cleanse' },
 ] as const;
 
 export const RESOURCE_TYPES = [
@@ -77,12 +79,36 @@ export const RESOURCE_TYPES = [
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number]['value'];
 
-export const ID_PATTERNS: Record<'skills' | 'statuses', RegExp> = {
-  skills: /^skill_[a-z0-9_]+$/,
-  statuses: /^status_[a-z0-9_]+$/,
+export const COMMON_LABELS = [
+  { label: 'physical' },
+  { label: 'magic' },
+  { label: 'support' },
+  { label: 'debuff' },
+  { label: 'buff' },
+  { label: 'movement' },
+] as const;
+
+export const LABEL_COLORS: Record<string, string> = {
+  physical: '#c97a4a',
+  magic: '#6a8fd4',
+  support: '#5cb87a',
+  debuff: '#c45c5c',
+  buff: '#d4b44a',
+  movement: '#8a7ad4',
 };
 
-export const ID_PATTERN_HINTS: Record<'skills' | 'statuses', string> = {
+/** @deprecated Use COMMON_LABELS */
+export const COMMON_TAGS = COMMON_LABELS.map((entry) => ({ tag: entry.label }));
+
+/** @deprecated Use LABEL_COLORS */
+export const TAG_COLORS = LABEL_COLORS;
+
+export const ID_PATTERNS: Record<'skills' | 'tags', RegExp> = {
+  skills: /^skill_[a-z0-9_]+$/,
+  tags: /^tag_[a-z0-9_]+$/,
+};
+
+export const ID_PATTERN_HINTS: Record<'skills' | 'tags', string> = {
   skills: 'skill_snake_case (e.g. skill_fireball)',
-  statuses: 'status_snake_case (e.g. status_burn)',
+  tags: 'tag_snake_case (e.g. tag_burn)',
 };

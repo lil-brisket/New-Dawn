@@ -1,15 +1,9 @@
-import type {
-  EnemyDefinition,
-  SkillDefinition,
-  SkillEffect,
-  StatusBehavior,
-  StatusDefinition,
-} from '@dawn/types';
-import type { RawEnemy, RawSkill, RawStatus } from './schemas';
+import type { EnemyDefinition, SkillDefinition, TagBehavior, TagDefinition } from '@dawn/types';
+import type { RawEnemy, RawSkill, RawTag } from './schemas';
 import {
   defaultEnemyFields,
   defaultSkillFields,
-  defaultStatusFields,
+  defaultTagFields,
   inferCategoryFromPath,
 } from './defaults';
 
@@ -30,7 +24,7 @@ export function normalizeSkill(raw: RawSkill, filePath?: string): SkillDefinitio
     spCost: raw.spCost ?? raw.mpCost ?? defaults.spCost,
     apCost: raw.apCost ?? defaults.apCost,
     cooldown: raw.cooldown ?? defaults.cooldown,
-    effects: (raw.effects ?? defaults.effects) as SkillEffect[],
+    effects: raw.effects ?? defaults.effects,
     targeting: raw.targeting ?? defaults.targeting,
     shapeType: raw.shapeType ?? defaults.shapeType,
     iconId: raw.iconId ?? defaults.iconId,
@@ -43,14 +37,14 @@ export function normalizeSkill(raw: RawSkill, filePath?: string): SkillDefinitio
     weaponType: raw.weaponType,
     job: raw.job,
     rarity: raw.rarity,
-    tags: raw.tags ?? defaults.tags ?? [],
+    labels: raw.labels ?? defaults.labels ?? [],
     unlockLevel: raw.unlockLevel,
-    schemaVersion: raw.schemaVersion ?? 2,
+    schemaVersion: raw.schemaVersion ?? 3,
   };
 }
 
-export function normalizeStatus(raw: RawStatus, filePath?: string): StatusDefinition {
-  const defaults = defaultStatusFields(raw.id);
+export function normalizeTag(raw: RawTag, filePath?: string): TagDefinition {
+  const defaults = defaultTagFields(raw.id);
 
   return {
     id: raw.id,
@@ -60,7 +54,7 @@ export function normalizeStatus(raw: RawStatus, filePath?: string): StatusDefini
     stackable: raw.stackable ?? defaults.stackable,
     maxStacks: raw.maxStacks ?? defaults.maxStacks,
     iconId: raw.iconId ?? defaults.iconId,
-    behaviors: (raw.behaviors ?? defaults.behaviors) as StatusBehavior[],
+    behaviors: (raw.behaviors ?? defaults.behaviors) as TagBehavior[],
     applicationFormula: raw.applicationFormula,
     durationFormula: raw.durationFormula,
     category: raw.category ?? inferCategoryFromPath(filePath ?? ''),
@@ -68,11 +62,14 @@ export function normalizeStatus(raw: RawStatus, filePath?: string): StatusDefini
     weaponType: raw.weaponType,
     job: raw.job,
     rarity: raw.rarity,
-    tags: raw.tags ?? defaults.tags ?? [],
+    labels: raw.labels ?? defaults.labels ?? [],
     unlockLevel: raw.unlockLevel,
-    schemaVersion: raw.schemaVersion ?? 2,
+    schemaVersion: raw.schemaVersion ?? 3,
   };
 }
+
+/** @deprecated Use normalizeTag */
+export const normalizeStatus = normalizeTag;
 
 export function normalizeEnemy(raw: RawEnemy, filePath?: string): EnemyDefinition {
   const defaults = defaultEnemyFields(raw.id);
@@ -93,8 +90,8 @@ export function normalizeEnemy(raw: RawEnemy, filePath?: string): EnemyDefinitio
     weaponType: raw.weaponType,
     job: raw.job,
     rarity: raw.rarity,
-    tags: raw.tags ?? defaults.tags ?? [],
+    labels: raw.labels ?? defaults.labels ?? [],
     unlockLevel: raw.unlockLevel,
-    schemaVersion: raw.schemaVersion ?? 2,
+    schemaVersion: raw.schemaVersion ?? 3,
   };
 }

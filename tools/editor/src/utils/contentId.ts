@@ -1,4 +1,4 @@
-export type ContentIdPrefix = 'skill' | 'status';
+export type ContentIdPrefix = 'skill' | 'tag';
 
 /** Derive a content id from a display name (e.g. "Arcane Burst" → skill_arcane_burst). */
 export function nameToContentId(name: string, prefix: ContentIdPrefix): string {

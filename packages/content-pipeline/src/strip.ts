@@ -1,7 +1,7 @@
-import type { EnemyDefinition, SkillDefinition, StatusDefinition } from '@dawn/types';
+import type { EnemyDefinition, SkillDefinition, TagDefinition } from '@dawn/types';
 import type { RawSkill } from './schemas';
 import { mergeSkillRaw } from './defaults';
-import { rawToDefaultEnemy, rawToDefaultSkill, rawToDefaultStatus } from './inherit';
+import { rawToDefaultEnemy, rawToDefaultSkill, rawToDefaultTag } from './inherit';
 
 function isEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -70,7 +70,7 @@ export function stripSkillDefaults(
     weaponType: skill.weaponType,
     job: skill.job,
     rarity: skill.rarity,
-    tags: skill.tags,
+    labels: skill.labels,
     unlockLevel: skill.unlockLevel,
   };
 
@@ -81,8 +81,8 @@ export function stripSkillDefaults(
   return { id: skill.id, name: skill.name, ...stripped };
 }
 
-export function stripStatusDefaults(status: StatusDefinition): Record<string, unknown> {
-  const rawForm: Record<string, unknown> = { ...status };
+export function stripTagDefaults(tag: TagDefinition): Record<string, unknown> {
+  const rawForm: Record<string, unknown> = { ...tag };
   delete rawForm.animationKey;
   delete rawForm.soundKey;
   delete rawForm.vfxId;
@@ -90,10 +90,13 @@ export function stripStatusDefaults(status: StatusDefinition): Record<string, un
 
   const stripped = diffRaw(
     rawForm,
-    rawToDefaultStatus(status.id, status.name) as unknown as Record<string, unknown>,
+    rawToDefaultTag(tag.id, tag.name) as unknown as Record<string, unknown>,
   );
-  return { id: status.id, name: status.name, ...stripped };
+  return { id: tag.id, name: tag.name, ...stripped };
 }
+
+/** @deprecated Use stripTagDefaults */
+export const stripStatusDefaults = stripTagDefaults;
 
 export function stripEnemyDefaults(enemy: EnemyDefinition): Record<string, unknown> {
   const rawForm: Record<string, unknown> = { ...enemy };
@@ -108,9 +111,12 @@ export function skillToAuthoringJson(skill: SkillDefinition, raw?: RawSkill): st
   return JSON.stringify(stripSkillDefaults(skill, raw), null, 2);
 }
 
-export function statusToAuthoringJson(status: StatusDefinition): string {
-  return JSON.stringify(stripStatusDefaults(status), null, 2);
+export function tagToAuthoringJson(tag: TagDefinition): string {
+  return JSON.stringify(stripTagDefaults(tag), null, 2);
 }
+
+/** @deprecated Use tagToAuthoringJson */
+export const statusToAuthoringJson = tagToAuthoringJson;
 
 export function enemyToAuthoringJson(enemy: EnemyDefinition): string {
   return JSON.stringify(stripEnemyDefaults(enemy), null, 2);

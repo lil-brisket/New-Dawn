@@ -5,7 +5,7 @@ import { createGrid, offsetToCube } from '../../grid/Grid';
 import { createCombatant } from '../../entities/Combatant';
 import { createBattle } from '../../battle/createBattle';
 import { dispatchAction } from '../../battle/dispatchAction';
-import { applyStatus } from '../../systems/status/applyStatus';
+import { applyTag } from '../../systems/tag/applyTag';
 import { defaultRegistry } from '@dawn/game-data';
 import { createSeededRandom } from '@dawn/utils';
 import { nearestEnemyStrategy } from './nearestEnemy';
@@ -118,11 +118,11 @@ describe('nearestEnemyStrategy', () => {
     if (!battle.ok) return;
 
     let state = battle.state;
-    const stunned = applyStatus({
+    const stunned = applyTag({
       state,
       sourceId: 'player',
       targetId: 'e1',
-      statusId: 'status_stun',
+      tagId: 'tag_stun',
       chance: 1,
       registry: defaultRegistry,
       rng: createSeededRandom(1),

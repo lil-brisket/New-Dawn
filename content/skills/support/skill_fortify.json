@@ -4,6 +4,16 @@
   "description": "Bolsters an ally defenses.",
   "spCost": 15,
   "cooldown": 2,
-  "effects": [{ "type": "apply_status", "statusId": "status_defense_up", "chance": 1 }],
-  "targeting": { "type": "single_ally", "range": 1 }
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_defense_up",
+      "chance": 1
+    }
+  ],
+  "targeting": {
+    "type": "single_ally",
+    "range": 1
+  },
+  "schemaVersion": 3
 }

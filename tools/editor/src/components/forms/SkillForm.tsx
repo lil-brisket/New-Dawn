@@ -1,6 +1,6 @@
-import type { ElementType, SkillEffect, TargetSelector } from '@dawn/types';
+import type { SkillEffect, TargetSelector } from '@dawn/types';
 import type { ShapeType } from '../fields/constants';
-import { formatElementLabel, hasDisplayElement } from '../fields/elementUtils';
+import { formatElementLabel } from '../fields/elementUtils';
 import { CostEditor } from '../fields/CostEditor';
 import { IdField } from '../fields/IdField';
 import { MetadataSection } from '../fields/MetadataSection';
@@ -17,10 +17,14 @@ function formatCosts(costs: FlatCosts): string {
   return `HP ${costs.hpCost ?? 0} · SP ${costs.spCost ?? 0} · AP ${costs.apCost ?? 0}`;
 }
 
-function formatTerms(effect: SkillEffect): string {
-  if (effect.type !== 'damage' && effect.type !== 'heal') return '';
-  const terms = effect.value.terms.map((t) => t.key).join(', ');
-  return `base ${effect.value.base}${terms ? ` + ${terms}` : ''}`;
+function formatApplyTag(effect: SkillEffect): string {
+  const chance = Math.round(effect.chance * 100);
+  const parts = [`Apply ${effect.tagId}`, `${chance}%`];
+  if (effect.duration !== undefined) parts.push(`${effect.duration} turns`);
+  const dmg = effect.overrides?.instant_damage;
+  if (dmg?.element) parts.push(formatElementLabel(dmg.element));
+  if (dmg?.pierce) parts.push('Pierce');
+  return parts.join(' · ');
 }
 
 export function SkillPreview({ draft }: { draft: Record<string, unknown> }) {
@@ -65,14 +69,7 @@ export function SkillPreview({ draft }: { draft: Record<string, unknown> }) {
         <strong>Effects</strong>
         {effects.map((e, i) => (
           <div key={i} style={{ padding: '6px 0', borderTop: '1px solid #2e2e3a', color: '#ccc' }}>
-            {e.type === 'damage' &&
-              `Damage — ${formatTerms(e)}${hasDisplayElement(e.element) ? ` (${formatElementLabel(e.element)})` : ''}${e.pierce ? ' · Pierce' : ''}`}
-            {e.type === 'heal' && `Heal — ${formatTerms(e)}`}
-            {e.type === 'apply_status' && `Status ${e.statusId}`}
-            {e.type === 'shield' &&
-              `Shield — ${e.value.base}${e.value.terms.length ? ` + ${e.value.terms.map((t) => t.key).join(', ')}` : ''} · ${e.duration ?? 2} turns`}
-            {e.type === 'move' && `Move — ${e.range}`}
-            {e.type === 'summon' && `Summon — ${e.entityDefinitionId}`}
+            {formatApplyTag(e)}
           </div>
         ))}
       </div>
@@ -157,11 +154,7 @@ export function SkillForm({
 
       <section style={sectionCard}>
         <h3 style={sectionTitle}>Effects</h3>
-        <EffectBuilder
-          effects={effects}
-          skillElement={draft.element as ElementType | undefined}
-          onChange={(e) => set('effects', e)}
-        />
+        <EffectBuilder effects={effects} onChange={(e) => set('effects', e)} />
       </section>
 
       {issues.length > 0 && (

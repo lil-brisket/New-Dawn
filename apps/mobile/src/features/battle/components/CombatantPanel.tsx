@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, HealthBar, ManaBar, useTheme, type AvatarSize } from '@dawn/ui';
 import type { BattleTheme } from '../theme/BattleTheme';
 import { getCombatantAvatarLabel, type TeamDisplay } from '../utils/battleDisplay';
-import { StatusEffectList } from './StatusEffectList';
+import { TagEffectList } from './TagEffectList';
 
 export interface CombatantPanelProps {
   team: TeamDisplay;
@@ -93,8 +93,8 @@ export function CombatantPanel({
           },
         ]}
       >
-        {rep.statusEffects.length > 0 ? (
-          <StatusEffectList effects={rep.statusEffects} alignment={alignment} />
+        {rep.tagEffects.length > 0 ? (
+          <TagEffectList effects={rep.tagEffects} alignment={alignment} />
         ) : (
           <Text
             style={{
@@ -104,7 +104,7 @@ export function CombatantPanel({
               opacity: 0.6,
             }}
           >
-            Status
+            Tags
           </Text>
         )}
       </View>

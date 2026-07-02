@@ -24,8 +24,8 @@ function formatEvent(event: BattleEvent): string {
   switch (event.type) {
     case 'damage_dealt':
       return `Damage: ${event.amount} → ${event.targetId}`;
-    case 'status_applied':
-      return `Status ${event.statusId} on ${event.targetId}`;
+    case 'tag_applied':
+      return `Tag ${event.tagId} on ${event.targetId}`;
     case 'skill_used':
       return `Skill ${event.skillId} by ${event.sourceId}`;
     case 'heal_applied':

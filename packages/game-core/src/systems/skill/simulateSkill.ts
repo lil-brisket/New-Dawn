@@ -11,7 +11,7 @@ export type SimulateSkillResult =
 function buildSimulation(events: readonly BattleEvent[]): Omit<SkillSimulation, 'ok'> {
   const damage = new Map<string, number>();
   const healing = new Map<string, number>();
-  const statuses: { targetId: string; statusId: string }[] = [];
+  const tags: { targetId: string; tagId: string }[] = [];
   let movement: SkillSimulation['movement'];
 
   for (const event of events) {
@@ -26,8 +26,8 @@ function buildSimulation(events: readonly BattleEvent[]): Omit<SkillSimulation, 
         healing.set(event.targetId, prev + event.amount);
         break;
       }
-      case 'status_applied':
-        statuses.push({ targetId: event.targetId, statusId: event.statusId });
+      case 'tag_applied':
+        tags.push({ targetId: event.targetId, tagId: event.tagId });
         break;
       case 'combatant_moved':
         movement = { from: event.from, to: event.to };
@@ -37,7 +37,7 @@ function buildSimulation(events: readonly BattleEvent[]): Omit<SkillSimulation, 
     }
   }
 
-  return { damage, healing, statuses, movement, events };
+  return { damage, healing, tags, movement, events };
 }
 
 export function simulateSkill(

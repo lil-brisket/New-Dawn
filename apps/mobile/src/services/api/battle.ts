@@ -43,7 +43,7 @@ function combatantFromDefinition(
     ap: 30,
     maxAp: 30,
     skillIds: def?.skillIds ?? [],
-    statuses: [],
+    tags: [],
     skillCooldowns: {},
   };
 }

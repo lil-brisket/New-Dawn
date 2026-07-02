@@ -5,6 +5,7 @@ import type {
   SkillDefinition,
   TargetSelector,
 } from '@dawn/types';
+import { defaultRegistry } from '@dawn/game-data';
 import { distance } from '../../../grid/HexMath';
 import { contains, getTile, spiral } from '../../../grid/GridOps';
 import { getCombatant } from '../../../queries/getActiveCombatant';
@@ -12,6 +13,7 @@ import { isCombatantAlive } from '../../../queries/isCombatantAlive';
 import { isTileOccupied } from '../../../queries/getCombatantAt';
 import { isAlly, isEnemy } from '../../../entities/Team';
 import { getCombatantsInRadius, getTilesInRadius, matchesAreaFilter } from './area';
+import { getSkillMovementRange, skillHasTeleport } from '../skillTagUtils';
 
 export interface SkillTargetSelection {
   readonly targetId?: string;
@@ -154,12 +156,8 @@ export function getTargetTiles(
 
   switch (targeting.type) {
     case 'tile': {
-      const hasTeleport = skill.effects.some((e) => e.type === 'teleport');
-      const range =
-        skill.effects.find((e) => e.type === 'teleport' || e.type === 'move')?.type === 'teleport'
-          ? ((skill.effects.find((e) => e.type === 'teleport') as { range: number } | undefined)
-              ?.range ?? targeting.range)
-          : targeting.range;
+      const hasTeleport = skillHasTeleport(skill, defaultRegistry);
+      const range = getSkillMovementRange(skill, defaultRegistry) ?? targeting.range;
 
       return spiral(state.grid, source.position, range).filter((coord) => {
         if (!inRange(source, coord, range)) return false;

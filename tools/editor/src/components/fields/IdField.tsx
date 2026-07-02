@@ -3,7 +3,7 @@ import { ID_PATTERN_HINTS, ID_PATTERNS } from './constants';
 import { ValidationMessage } from './ValidationMessage';
 import { field, hint, input } from './styles';
 
-export function validateContentId(domain: 'skills' | 'statuses', id: string): string | undefined {
+export function validateContentId(domain: 'skills' | 'tags', id: string): string | undefined {
   const trimmed = id.trim();
   if (!trimmed) return 'ID is required';
   if (!ID_PATTERNS[domain].test(trimmed)) {
@@ -23,7 +23,7 @@ export function IdField({
   readOnly?: boolean;
   onChange?: (id: string) => void;
 }) {
-  if (domain !== 'skills' && domain !== 'statuses') {
+  if (domain !== 'skills' && domain !== 'tags') {
     return (
       <label style={field}>
         ID

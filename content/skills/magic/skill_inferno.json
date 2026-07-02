@@ -3,5 +3,27 @@
   "inherits": "skill_fireball",
   "name": "Inferno",
   "spCost": 50,
-  "effects": [{ "type": "damage", "element": "fire", "multiplier": 2.4 }]
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "fire",
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 2.4
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 3
 }

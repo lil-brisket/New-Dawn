@@ -4,8 +4,8 @@ import type {
   Combatant,
   CombatStatsConfig,
   SkillDefinition,
-  StatusDefinition,
-  StatusInstance,
+  TagDefinition,
+  TagInstance,
 } from '@dawn/types';
 import type { RandomSource } from '@dawn/utils';
 
@@ -13,12 +13,18 @@ export interface EffectContext {
   readonly source: Combatant;
   readonly target: Combatant;
   readonly skill?: SkillDefinition;
-  readonly status?: StatusDefinition;
-  readonly statusInstance?: StatusInstance;
+  readonly tag?: TagDefinition;
+  readonly tagInstance?: TagInstance;
   readonly battle: BattleState;
   readonly registry: DefinitionRegistry;
   readonly combatStats: CombatStatsConfig;
   readonly rng: RandomSource;
+  /** When true, stat formulas use raw combatant stats and ignore tag stat_mod behaviors. */
+  readonly ignoreStatMods?: boolean;
+  /** @deprecated Use tag */
+  readonly status?: TagDefinition;
+  /** @deprecated Use tagInstance */
+  readonly statusInstance?: TagInstance;
 }
 
 export function createEffectContext(params: {
@@ -29,8 +35,17 @@ export function createEffectContext(params: {
   combatStats: CombatStatsConfig;
   rng: RandomSource;
   skill?: SkillDefinition;
-  status?: StatusDefinition;
-  statusInstance?: StatusInstance;
+  tag?: TagDefinition;
+  tagInstance?: TagInstance;
+  status?: TagDefinition;
+  statusInstance?: TagInstance;
+  ignoreStatMods?: boolean;
 }): EffectContext {
-  return params;
+  return {
+    ...params,
+    tag: params.tag ?? params.status,
+    tagInstance: params.tagInstance ?? params.statusInstance,
+    status: params.tag ?? params.status,
+    statusInstance: params.tagInstance ?? params.statusInstance,
+  };
 }

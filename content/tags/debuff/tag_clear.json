@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_clear",
+  "name": "Clear",
+  "description": "Removes positive effects from the enemy.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "debuff",
+  "behaviors": [
+    {
+      "type": "clear",
+      "polarity": "positive"
+    }
+  ]
+}

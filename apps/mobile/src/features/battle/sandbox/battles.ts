@@ -117,9 +117,9 @@ const DEFINITIONS: readonly BattleDefinition[] = [
   {
     id: 'skill_lab',
     name: 'Skill Lab',
-    description: 'Test all skills and status effects',
+    description: 'Test all skills and tag effects',
     difficulty: 'easy',
-    tags: ['skills', 'status', 'regression'],
+    tags: ['skills', 'tag', 'regression'],
     defaultEnemyStrategy: 'passive',
     sceneId: 'training_field',
     build: () => {

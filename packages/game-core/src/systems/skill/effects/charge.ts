@@ -7,7 +7,7 @@ import { distance, neighbors } from '../../../grid/HexMath';
 import { contains, getTile } from '../../../grid/GridOps';
 import { findPath } from '../../movement/Pathfinder';
 
-export function resolveChargeEffect(ctx: AbilityContext, targetId: string): void {
+export function resolveChargeSkill(ctx: AbilityContext, targetId: string): void {
   const source = getCombatant(ctx.battle, ctx.source.id);
   const target = getCombatant(ctx.battle, targetId);
   if (!source || !target) return;

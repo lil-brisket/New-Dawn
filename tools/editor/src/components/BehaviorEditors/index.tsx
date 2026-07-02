@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { StatusBehavior } from '@dawn/types';
+import type { TagBehavior } from '@dawn/types';
 import { BEHAVIOR_TYPES } from '../fields/constants';
 import { EnumSelect } from '../fields/EnumSelect';
 import { btnGhost } from '../fields/styles';
@@ -8,11 +8,14 @@ import { BehaviorFields, createDefaultBehavior } from './editors';
 export function BehaviorBuilder({
   behaviors,
   onChange,
+  lockStructure = false,
 }: {
-  behaviors: StatusBehavior[];
-  onChange: (b: StatusBehavior[]) => void;
+  behaviors: TagBehavior[];
+  onChange: (b: TagBehavior[]) => void;
+  /** When true, behavior types are fixed — only value fields can be edited. */
+  lockStructure?: boolean;
 }) {
-  const [addType, setAddType] = useState<StatusBehavior['type']>('dot');
+  const [addType, setAddType] = useState<TagBehavior['type']>('dot');
 
   return (
     <div>
@@ -29,13 +32,15 @@ export function BehaviorBuilder({
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
             <strong>{BEHAVIOR_TYPES.find((t) => t.value === b.type)?.label ?? b.type}</strong>
-            <button
-              type="button"
-              style={btnGhost}
-              onClick={() => onChange(behaviors.filter((_, i) => i !== index))}
-            >
-              Delete
-            </button>
+            {!lockStructure ? (
+              <button
+                type="button"
+                style={btnGhost}
+                onClick={() => onChange(behaviors.filter((_, i) => i !== index))}
+              >
+                Delete
+              </button>
+            ) : null}
           </div>
           <BehaviorFields
             behavior={b}
@@ -47,20 +52,26 @@ export function BehaviorBuilder({
           />
         </div>
       ))}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-        <EnumSelect
-          value={addType}
-          options={[...BEHAVIOR_TYPES]}
-          onChange={(t) => t && setAddType(t)}
-        />
-        <button
-          type="button"
-          style={btnGhost}
-          onClick={() => onChange([...behaviors, createDefaultBehavior(addType)])}
-        >
-          + Add Behavior
-        </button>
-      </div>
+      {!lockStructure ? (
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <EnumSelect
+            value={addType}
+            options={[...BEHAVIOR_TYPES]}
+            onChange={(t) => t && setAddType(t)}
+          />
+          <button
+            type="button"
+            style={btnGhost}
+            onClick={() => onChange([...behaviors, createDefaultBehavior(addType)])}
+          >
+            + Add Behavior
+          </button>
+        </div>
+      ) : (
+        <p style={{ margin: 0, fontSize: 12, color: '#9aa0b4' }}>
+          Behavior type is fixed for this tag. Adjust formulas and values above.
+        </p>
+      )}
     </div>
   );
 }

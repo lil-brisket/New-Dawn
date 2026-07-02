@@ -4,7 +4,7 @@ import { createCombatant, withCooldowns, withSp } from '../entities/Combatant';
 import { withHp } from '../entities/Combatant';
 import { getCombatant } from '../queries/getActiveCombatant';
 import { updateMap } from '../utils/immutable';
-import { applyStatus } from '../systems/status/applyStatus';
+import { applyTag } from '../systems/tag/applyTag';
 import { getBattleRng } from '../utils/battleRng';
 import { createHex } from '../grid/Grid';
 import { dispatchAction } from '../battle/dispatchAction';
@@ -90,7 +90,7 @@ export function sandboxClearCooldowns(state: BattleState, combatantId: string): 
   };
 }
 
-export function sandboxApplyAllStatuses(state: BattleState, combatantId: string): SandboxResult {
+export function sandboxApplyAllTags(state: BattleState, combatantId: string): SandboxResult {
   const combatant = getCombatant(state, combatantId);
   if (!combatant) {
     return { ok: false, error: 'CombatantNotFound' };
@@ -100,19 +100,19 @@ export function sandboxApplyAllStatuses(state: BattleState, combatantId: string)
   const events: BattleEvent[] = [];
   const rng = getBattleRng(state);
 
-  for (const statusDef of [
-    defaultRegistry.getStatus('status_burn'),
-    defaultRegistry.getStatus('status_stun'),
-    defaultRegistry.getStatus('status_poison'),
-    defaultRegistry.getStatus('status_attack_up'),
-    defaultRegistry.getStatus('status_defense_up'),
+  for (const tagDef of [
+    defaultRegistry.getTag('tag_burn'),
+    defaultRegistry.getTag('tag_stun'),
+    defaultRegistry.getTag('tag_poison'),
+    defaultRegistry.getTag('tag_attack_up'),
+    defaultRegistry.getTag('tag_defense_up'),
   ]) {
-    if (!statusDef) continue;
-    const result = applyStatus({
+    if (!tagDef) continue;
+    const result = applyTag({
       state: current,
       sourceId: combatantId,
       targetId: combatantId,
-      statusId: statusDef.id,
+      tagId: tagDef.id,
       chance: 1,
       registry: defaultRegistry,
       rng,
@@ -123,6 +123,9 @@ export function sandboxApplyAllStatuses(state: BattleState, combatantId: string)
 
   return { ok: true, state: current, events };
 }
+
+/** @deprecated Use sandboxApplyAllTags */
+export const sandboxApplyAllStatuses = sandboxApplyAllTags;
 
 export function sandboxSpawnDummy(
   state: BattleState,

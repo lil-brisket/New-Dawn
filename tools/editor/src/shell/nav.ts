@@ -1,7 +1,7 @@
 export const NAV_ITEMS: { path: string; label: string; placeholder?: boolean }[] = [
   { path: '/', label: 'Dashboard' },
   { path: '/skills', label: 'Skills' },
-  { path: '/statuses', label: 'Statuses' },
+  { path: '/tags', label: 'Tags' },
   { path: '/enemies', label: 'Enemies' },
   { path: '/combat-stats', label: 'Combat Stats' },
   { path: '/characters', label: 'Characters', placeholder: true },

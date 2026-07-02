@@ -20,7 +20,7 @@ export function ContentEditorLayout({
   renderPreview,
   showReferences = false,
 }: {
-  domain: 'skills' | 'statuses' | 'enemies';
+  domain: 'skills' | 'tags' | 'enemies';
   title: string;
   renderForm: (
     draft: Record<string, unknown>,
@@ -40,6 +40,8 @@ export function ContentEditorLayout({
         onSearchChange={editorState.setSearch}
         onSelect={editorState.loadItem}
         onNew={editorState.handleNew}
+        showItemId={domain !== 'tags'}
+        showNewButton={domain !== 'tags'}
       />
       <div style={editor}>
         <h1 style={{ marginTop: 0, fontSize: 22 }}>{title}</h1>

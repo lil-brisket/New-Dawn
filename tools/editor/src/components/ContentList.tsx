@@ -38,6 +38,8 @@ export function ContentList({
   onSearchChange,
   onSelect,
   onNew,
+  showItemId = true,
+  showNewButton = true,
 }: {
   items: ContentListItem[];
   selectedId: string | null;
@@ -45,6 +47,8 @@ export function ContentList({
   onSearchChange: (q: string) => void;
   onSelect: (id: string) => void;
   onNew: () => void;
+  showItemId?: boolean;
+  showNewButton?: boolean;
 }) {
   return (
     <div style={panel}>
@@ -54,20 +58,22 @@ export function ContentList({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      <button
-        type="button"
-        style={{
-          margin: '0 12px 8px',
-          padding: '8px',
-          borderRadius: 6,
-          border: '1px dashed #555',
-          background: 'transparent',
-          color: '#8ab4f8',
-        }}
-        onClick={onNew}
-      >
-        + New
-      </button>
+      {showNewButton ? (
+        <button
+          type="button"
+          style={{
+            margin: '0 12px 8px',
+            padding: '8px',
+            borderRadius: 6,
+            border: '1px dashed #555',
+            background: 'transparent',
+            color: '#8ab4f8',
+          }}
+          onClick={onNew}
+        >
+          + New
+        </button>
+      ) : null}
       <div style={list}>
         {items.map((item) => (
           <button
@@ -77,7 +83,7 @@ export function ContentList({
             onClick={() => onSelect(item.id)}
           >
             <div style={{ fontWeight: 600, fontSize: 13 }}>{item.name}</div>
-            <div style={{ fontSize: 11, color: '#777' }}>{item.id}</div>
+            {showItemId ? <div style={{ fontSize: 11, color: '#777' }}>{item.id}</div> : null}
           </button>
         ))}
       </div>

@@ -17,7 +17,7 @@ import {
   sandboxSkipRound,
   sandboxSetSp,
   sandboxClearCooldowns,
-  sandboxApplyAllStatuses,
+  sandboxApplyAllTags,
   sandboxSpawnDummy,
   getValidTargets,
   getTargetTiles,
@@ -328,10 +328,10 @@ export function useBattle(initialBattleId = 'training') {
     applySandbox((s) => sandboxClearCooldowns(s, battleState.activeCombatantId!));
   }, [battleState?.activeCombatantId, applySandbox]);
 
-  const applyAllStatuses = useCallback(() => {
+  const applyAllTags = useCallback(() => {
     const id = selectedCombatantId ?? battleState?.activeCombatantId;
     if (!id) return;
-    applySandbox((s) => sandboxApplyAllStatuses(s, id));
+    applySandbox((s) => sandboxApplyAllTags(s, id));
   }, [selectedCombatantId, battleState?.activeCombatantId, applySandbox]);
 
   const spawnDummy = useCallback(() => {
@@ -481,7 +481,7 @@ export function useBattle(initialBattleId = 'training') {
     skillTargetTiles,
     infiniteSp,
     clearCooldowns,
-    applyAllStatuses,
+    applyAllTags,
     spawnDummy,
   };
 }

@@ -14,7 +14,7 @@ import {
 import { calculateApplicationChance, calculateDuration } from './statusFormulas';
 import { formulaModifierRegistry, type FormulaModifier } from './modifierRegistry';
 import { createSeededRandom } from '@dawn/utils';
-import { resolveStatusApplication } from '../status/resolveStatusApplication';
+import { resolveTagApplication } from '../tag/resolveTagApplication';
 import { createBattle } from '../../battle/createBattle';
 import { createGrid } from '../../grid/Grid';
 
@@ -169,16 +169,16 @@ describe('status formulas', () => {
   });
 });
 
-describe('resolveStatusApplication', () => {
+describe('resolveTagApplication', () => {
   it('writes source snapshots on apply', () => {
     const ctx = makeCtx({ sourceAttack: 25 });
-    const result = resolveStatusApplication({
+    const result = resolveTagApplication({
       ctx,
-      statusId: 'status_burn',
+      tagId: 'tag_burn',
       baseChance: 1,
     });
     expect(result.applied).toBe(true);
-    const instance = result.state.combatants.get('tgt')!.statuses[0]!;
+    const instance = result.state.combatants.get('tgt')!.tags[0]!;
     expect(instance.sourceSnapshots?.attack).toBe(25);
   });
 });

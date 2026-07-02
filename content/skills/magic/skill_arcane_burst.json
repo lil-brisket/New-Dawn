@@ -1,0 +1,38 @@
+{
+  "id": "skill_arcane_burst",
+  "name": "Arcane Burst",
+  "description": "Unleashes arcane energy around a foe, hitting nearby enemies.",
+  "spCost": 30,
+  "cooldown": 2,
+  "element": "lightning",
+  "effects": [
+    {
+      "type": "apply_tag",
+      "tagId": "tag_damage",
+      "chance": 1,
+      "overrides": {
+        "instant_damage": {
+          "element": "lightning",
+          "value": {
+            "base": 0,
+            "terms": [
+              {
+                "source": "stat",
+                "key": "attack",
+                "ratio": 0.9
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "targeting": {
+    "type": "area",
+    "range": 3,
+    "radius": 1,
+    "filter": "enemy",
+    "center": "unit"
+  },
+  "schemaVersion": 3
+}

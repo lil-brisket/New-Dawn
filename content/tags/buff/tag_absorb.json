@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_absorb",
+  "name": "Absorb",
+  "description": "Converts a portion of damage taken into healed HP.",
+  "duration": 3,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "buff",
+  "behaviors": [
+    {
+      "type": "absorb",
+      "percent": {
+        "base": 0.1,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "resistance",
+            "ratio": 0.01
+          }
+        ]
+      }
+    }
+  ]
+}

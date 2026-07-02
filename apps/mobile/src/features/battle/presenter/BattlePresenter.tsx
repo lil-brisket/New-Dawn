@@ -589,9 +589,9 @@ export function BattlePresenter() {
       { id: 'infiniteSp', label: 'Infinite SP', onPress: () => battle.infiniteSp() },
       { id: 'skipCd', label: 'Skip Cooldowns', onPress: () => battle.clearCooldowns() },
       {
-        id: 'applyStatuses',
-        label: 'Apply Every Status',
-        onPress: () => battle.applyAllStatuses(),
+        id: 'applyTags',
+        label: 'Apply Every Tag',
+        onPress: () => battle.applyAllTags(),
       },
       { id: 'spawnDummy', label: 'Spawn Dummy', onPress: () => battle.spawnDummy() },
       { id: 'resetBattle', label: 'Reset Battle', onPress: () => battle.restart() },

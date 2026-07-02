@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_bind",
+  "name": "Bind",
+  "description": "Movement is reduced.",
+  "duration": 2,
+  "behaviors": [
+    {
+      "type": "control",
+      "effect": "bind"
+    }
+  ]
+}

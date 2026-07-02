@@ -5,7 +5,7 @@ export interface SkillSimulation {
   readonly ok: true;
   readonly damage: ReadonlyMap<string, number>;
   readonly healing: ReadonlyMap<string, number>;
-  readonly statuses: ReadonlyArray<{ targetId: string; statusId: string }>;
+  readonly tags: ReadonlyArray<{ targetId: string; tagId: string }>;
   readonly movement?: { from: HexCoord; to: HexCoord };
   readonly events: readonly BattleEvent[];
 }

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 3,
+  "id": "tag_instant_heal",
+  "name": "Instant Heal",
+  "description": "Heals immediately on apply.",
+  "duration": 0,
+  "stackable": false,
+  "maxStacks": 1,
+  "category": "instant",
+  "behaviors": [
+    {
+      "type": "instant_heal",
+      "value": {
+        "base": 0,
+        "terms": [
+          {
+            "source": "stat",
+            "key": "attack",
+            "ratio": 1
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import type { ContentDomain } from '@dawn/content-pipeline/domains';
-import { rawEnemySchema, rawSkillSchema, rawStatusSchema } from '@dawn/content-pipeline/schemas';
+import { rawEnemySchema, rawSkillSchema, rawTagSchema } from '@dawn/content-pipeline/schemas';
 import { useMemo } from 'react';
 
 export type DraftIssue = { path: string; message: string };
@@ -8,7 +8,7 @@ export function validateDraft(domain: ContentDomain, draft: Record<string, unkno
   if (!draft.id || !draft.name) return [];
 
   const schema =
-    domain === 'skills' ? rawSkillSchema : domain === 'statuses' ? rawStatusSchema : rawEnemySchema;
+    domain === 'skills' ? rawSkillSchema : domain === 'tags' ? rawTagSchema : rawEnemySchema;
 
   const result = schema.safeParse(draft);
   if (result.success) return [];

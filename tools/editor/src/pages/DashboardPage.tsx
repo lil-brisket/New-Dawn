@@ -28,7 +28,7 @@ export function DashboardPage() {
   const { stats, errors, warnings } = data;
   const metrics: { key: string; label: string }[] = [
     { key: 'skillCount', label: 'Skills' },
-    { key: 'statusCount', label: 'Statuses' },
+    { key: 'tagCount', label: 'Tags' },
     { key: 'enemyCount', label: 'Enemies' },
     { key: 'brokenReferences', label: 'Broken References' },
     { key: 'warnings', label: 'Warnings' },
